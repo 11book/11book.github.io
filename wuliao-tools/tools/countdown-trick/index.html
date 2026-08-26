@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⏳ 倒计时整蛊</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #2a2a3a;
+      --text: #c9b896;
+      --text-dim: #6a6a7a;
+      --primary: #e8a838;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(232,168,56,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .title {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 32px;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    input {
+      flex: 1;
+      height: 52px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 16px;
+      color: var(--text);
+      outline: none;
+      text-align: center;
+    }
+    input:focus { border-color: var(--primary); }
+    .btn {
+      height: 52px;
+      padding: 0 24px;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--bg);
+      cursor: pointer;
+    }
+    .btn:active { opacity: 0.8; }
+    .countdown-display {
+      font-family: "Noto Serif SC", serif;
+      font-size: 6rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: 0 0 40px rgba(232,168,56,0.4);
+      display: none;
+      margin: 32px 0;
+    }
+    .countdown-display.active { display: block; }
+    .surprise {
+      display: none;
+      font-size: 1.2rem;
+      color: var(--primary);
+      line-height: 1.8;
+      padding: 24px;
+      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      margin-top: 16px;
+    }
+    .surprise.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">⏳ 倒计时整蛊</div>
+    <div id="setup">
+      <input type="number" id="secondsInput" placeholder="输入倒计时秒数（3-60）" min="3" max="60" value="10">
+      <div class="input-row">
+        <button class="btn" id="startBtn">启动倒计时</button>
+      </div>
+    </div>
+    <div class="countdown-display" id="countdownDisplay">10</div>
+    <div class="surprise" id="surprise"></div>
+  </div>
+  <script>
+    const surprises = [
+      "🎉 恭喜！你成功浪费了生命中的几秒钟",
+      "😂 惊不惊喜？意不意外？什么都没发生！",
+      "🧘 你刚才专注地看着数字，什么也没得到，但很平静",
+      "🍀 运气不错，这次倒计时没有爆炸",
+      "🎈 答案揭晓：其实什么都没有！就当是冥想吧",
+      "🤖 AI 判定：你刚才在发呆，成功骗过所有人",
+      "🌈 预言：明天你还会再来玩一次",
+      "💫 检测到你在期待什么——但什么都没有，习惯就好",
+    ];
+    const startBtn = document.getElementById('startBtn');
+    const input = document.getElementById('secondsInput');
+    const display = document.getElementById('countdownDisplay');
+    const setup = document.getElementById('setup');
+    const surprise = document.getElementById('surprise');
+
+    startBtn.onclick = () => {
+      const sec = parseInt(input.value) || 10;
+      const count = Math.min(Math.max(sec, 3), 60);
+      setup.style.display = 'none';
+      display.classList.add('active');
+      display.textContent = count;
+      let remaining = count;
+      const interval = setInterval(() => {
+        remaining--;
+        if (remaining > 0) {
+          display.textContent = remaining;
+        } else {
+          clearInterval(interval);
+          display.classList.remove('active');
+          surprise.classList.add('active');
+          surprise.textContent = surprises[Math.floor(Math.random() * surprises.length)];
+        }
+      }, 1000);
+    };
+  </script>
+</body>
+</html>

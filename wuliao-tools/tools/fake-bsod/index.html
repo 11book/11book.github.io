@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统错误</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #0078D7;
+      overflow: hidden;
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      user-select: none;
+    }
+    .bsod {
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .sad-face {
+      font-size: 5rem;
+      margin-bottom: 24px;
+      filter: grayscale(1);
+    }
+    .title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .message {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      max-width: 420px;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .qr {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      margin-top: 8px;
+    }
+    .hint {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 0.7rem;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="bsod" id="bsod">
+    <div class="sad-face">:(</div>
+    <div class="title">您的设备出现问题，需要重新启动。</div>
+    <div class="message">
+      我们只收集某些错误信息，然后您可以重新启动。<br>
+      如果您关注这些错误，请等待几分钟，然后重新启动。<br>
+      完成关闭时将显示更多错误信息。
+    </div>
+    <div class="qr">0% 完成</div>
+    <div class="hint">按 ESC 或点击屏幕退出整蛊模式</div>
+  </div>
+  <script>
+    const bsod = document.getElementById('bsod');
+    let count = 0;
+    const interval = setInterval(() => {
+      count++;
+      document.querySelector('.qr').textContent = Math.min(count * 3, 100) + '% 完成';
+      if (count >= 34) clearInterval(interval);
+    }, 200);
+
+    // 隐藏鼠标
+    document.addEventListener('mousemove', e => {
+      document.body.style.cursor = 'none';
+      bsod.style.cursor = 'none';
+    });
+
+    const exit = () => {
+      document.body.style.cursor = 'auto';
+      bsod.style.opacity = '0';
+      bsod.style.transition = 'opacity 0.3s';
+      setTimeout(() => { bsod.style.display = 'none'; }, 300);
+    };
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') exit(); });
+    document.addEventListener('click', () => {
+      if (document.querySelector('.qr').textContent === '100% 完成') exit();
+    });
+    // 点击任意处退出（整蛊用）
+    setTimeout(() => {
+      document.addEventListener('click', exit, { once: true });
+    }, 3000);
+  </script>
+</body>
+</html>

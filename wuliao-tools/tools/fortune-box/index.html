@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark-mysterious">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>🔥 逆天改命</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/system-notify.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      background-color: var(--color-bg, #0a0a0f);
+      color: var(--color-text, #c9b896);
+      height: 100%; position: relative;
+    }
+    body::before {
+      content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background-image: var(--bg-pattern); pointer-events: none; z-index: 0;
+    }
+    body.sn-mode { background: #121212; }
+    body.sn-mode::before { display: none; }
+    .app { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px; position: relative; z-index: 1; }
+    .container { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+    .clock {
+      width: 160px; height: 160px; border-radius: 50%;
+      background: var(--clock-bg); position: relative;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--clock-glow);
+    }
+    .clock.hidden { display: none; }
+    .clock::before {
+      content: ''; position: absolute; width: 168px; height: 168px; border-radius: 50%;
+      background: var(--clock-face); z-index: -1;
+      animation: clockRotate 60s linear infinite;
+    }
+    @keyframes clockRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .clock-face { text-align: center; }
+    .clock-time {
+      font-family: "Noto Serif SC", serif; font-size: 2rem; font-weight: 700;
+      color: var(--color-text-bright); letter-spacing: 2px;
+      text-shadow: 0 0 20px var(--color-primary-glow);
+    }
+    .clock-date { font-size: 0.75rem; color: var(--color-text-dim); margin-top: 4px; }
+    .input-section { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+    .input {
+      width: 100%; height: 52px; background: var(--color-surface);
+      border: 2px solid var(--color-border); border-radius: 16px;
+      padding: 0 20px; font-size: 16px; color: var(--color-text); outline: none;
+    }
+    .input::placeholder { color: var(--color-text-dim); }
+    .input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-glow); }
+    .input.sn-mode { background: var(--sn-bg); border-color: var(--sn-border); color: var(--sn-text); }
+    .input.sn-mode::placeholder { color: var(--sn-text-dim); }
+    .input.sn-mode:focus { border-color: var(--sn-green); box-shadow: 0 0 0 3px rgba(77,255,136,0.15); }
+    .btn {
+      width: 100%; height: 56px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dim));
+      border: none; border-radius: 16px; font-family: "Noto Serif SC", serif; font-size: 18px; font-weight: 600;
+      color: var(--color-bg); cursor: pointer;
+    }
+    .btn:active { opacity: 0.8; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* 系统通知模式下的按钮样式 */
+    .btn.sn-mode {
+      background: var(--sn-bg);
+      border: 2px solid var(--sn-border);
+      color: var(--sn-text);
+      font-family: "Noto Sans SC", sans-serif;
+    }
+    .btn.sn-mode:hover { border-color: var(--sn-text-dim); background: var(--sn-titlebar); }
+    .loading { display: none; flex-direction: column; align-items: center; gap: 12px; }
+    .loading.active { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--color-border); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; color: var(--color-text-dim); }
+    /* 动画浮层 */
+    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.93); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+    .overlay.active { display: flex; }
+    .overlay-card { width: 100%; max-width: 440px; background: var(--color-surface); border-radius: 20px; border: 2px solid var(--color-border-bright); }
+    .overlay-title { font-family: "Noto Serif SC", serif; font-size: 1rem; color: var(--color-primary); text-align: center; padding: 16px; border-bottom: 1px solid var(--color-border); }
+    .overlay-canvas { width: 100%; min-height: 200px; background: #1a0a2e; }
+    .overlay-text { font-size: 0.95rem; color: var(--color-text); text-align: center; padding: 12px 16px; line-height: 1.6; }
+    .overlay-actions { display: flex; gap: 10px; padding: 0 16px 16px; }
+    .overlay-actions .btn { flex: 1; height: 48px; font-size: 15px; }
+    .btn-outline { background: transparent; border: 2px solid var(--color-border-bright); color: var(--color-text); }
+    /* 底部按钮 */
+    .fixed-btns { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 16px 20px; z-index: 50; pointer-events: none; }
+    .fixed-btn { width: 48px; height: 48px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; pointer-events: auto; -webkit-user-select: none; user-select: none; }
+    .fixed-btn:active { background: var(--color-surface-hover); }
+    /* 设置面板 */
+    .settings-panel { position: fixed; bottom: 76px; right: 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 14px; z-index: 51; display: none; min-width: 200px; }
+    .settings-panel.show { display: block; }
+    .settings-label { font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .api-key-input { width: 100%; height: 36px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 0 10px; font-size: 12px; color: var(--color-text); outline: none; margin-top: 6px; }
+    .api-key-input:focus { border-color: var(--color-primary); }
+    .api-key-saved { font-size: 10px; color: #4caf50; margin-top: 4px; display: none; }
+    .theme-grid { display: grid; gap: 6px; }
+    .theme-grid.mode-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .theme-grid.mode-grid .theme-opt { padding: 8px 4px; font-size: 11px; }
+    .theme-opt { padding: 8px 10px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; font-size: 12px; color: var(--color-text-dim); cursor: pointer; text-align: center; }
+    .theme-opt.active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-bg); }
+    /* 历史面板 */
+    .history-panel { position: fixed; top: 0; right: -100%; width: min(360px, 90vw); height: 100%; background: var(--color-bg-secondary); border-left: 1px solid var(--color-border); z-index: 200; transition: right 0.3s; display: flex; flex-direction: column; }
+    .history-panel.open { right: 0; }
+    .history-head { padding: 16px; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; }
+    .history-head-title { font-family: "Noto Serif SC", serif; font-size: 15px; color: var(--color-text-bright); }
+    .history-close { background: none; border: none; color: var(--color-text-dim); font-size: 22px; cursor: pointer; padding: 4px; line-height: 1; }
+    .history-body { flex: 1; overflow-y: auto; padding: 12px; }
+    .history-item { background: var(--color-surface); border-radius: 12px; padding: 12px; margin-bottom: 8px; cursor: pointer; }
+    .history-item:active { background: var(--color-surface-hover); }
+    .history-item-time { font-size: 11px; color: var(--color-text-dim); margin-bottom: 3px; }
+    .history-item-input { font-size: 14px; color: var(--color-text); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-item-result { font-size: 13px; color: var(--color-primary); }
+    .history-empty { text-align: center; color: var(--color-text-dim); padding: 40px 20px; font-size: 14px; }
+    @media (max-width: 400px) { .clock { width: 140px; height: 140px; } .clock::before { width: 148px; height: 148px; } .clock-time { font-size: 1.7rem; } }
+
+    .overlay-card.ai-result {
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.3), 0 20px 60px rgba(0,0,0,0.5);
+      border-color: rgba(0, 240, 255, 0.5);
+    }
+    [data-theme="cyberpunk"] .overlay-card.ai-result {
+      box-shadow: 0 0 40px rgba(0, 240, 255, 0.4), 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* 命运揭晓动画 */
+    @keyframes frFloat { 0%{opacity:0;transform:translateY(20px)} 100%{opacity:1;transform:translateY(0)} }
+    @keyframes frSpinIn { 0%{opacity:0;transform:scale(0) rotate(-180deg)} 100%{opacity:1;transform:scale(1) rotate(0deg)} }
+    @keyframes frPulse { 0%,100%{opacity:0.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+    @keyframes frDrop { 0%{opacity:0;transform:translateY(-60px) scale(0.5)} 70%{opacity:1;transform:translateY(8px) scale(1.05)} 85%{transform:translateY(-4px) scale(0.98)} 100%{transform:translateY(0) scale(1)} }
+    @keyframes frShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-10px)} 30%{transform:translateX(10px)} 45%{transform:translateX(-7px)} 60%{transform:translateX(7px)} 75%{transform:translateX(-3px)} 90%{transform:translateX(2px)} }
+    @keyframes frBreathe { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:0.9;transform:scale(1.05)} }
+
+    /* 系统通知结果展示区 */
+    #snOutput { display: none; width: 100%; }
+    #snOutput.active { display: block; }
+    #snOutput .sn-output-area { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="container">
+
+      <!-- 时钟（系统通知模式下隐藏） -->
+      <div class="clock" id="mainClock">
+        <div class="clock-face">
+          <div class="clock-time" id="clockTime">00:00:00</div>
+          <div class="clock-date" id="clockDate">年月日</div>
+        </div>
+      </div>
+
+      <!-- 输入区（唯一，样式随模式变化） -->
+      <div class="input-section" id="inputSection">
+        <input
+          type="text"
+          class="input"
+          id="fortuneInput"
+          placeholder="写点什么..."
+          maxlength="100"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+        >
+        <button class="btn" id="drawBtn">🔥 逆天改命</button>
+        <!-- 系统通知输出区 -->
+        <div id="snOutput">
+          <div class="sn-output-area" id="snOutputArea"></div>
+        </div>
+      </div>
+
+      <!-- 加载中 -->
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">命运生成中...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="fixed-btns">
+    <div class="fixed-btn" id="historyBtn">📜</div>
+    <div class="fixed-btn" id="settingsBtn">⚙️</div>
+  </div>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-label">🔑 AI 秘钥</div>
+    <input type="password" class="api-key-input" id="apiKeyInput" placeholder="填写后自动保存" autocomplete="off">
+    <div class="api-key-saved" id="apiKeySaved">✅ 已保存</div>
+    <div style="height:12px"></div>
+    <div class="settings-label">模式</div>
+    <div class="theme-grid mode-grid">
+      <div class="theme-opt active" id="tabFortune" data-mode="fortune">🔮 改命</div>
+      <div class="theme-opt" id="tabNotify" data-mode="notify">💻 系统通知</div>
+      <div class="theme-opt" id="tabFriendWish" data-mode="friend-wish">🎁 好友许愿</div>
+    </div>
+    <div class="settings-label">氛围</div>
+    <div class="theme-grid">
+      <div class="theme-opt active" data-t="dark-mysterious">🌑 暗黑</div>
+      <div class="theme-opt" data-t="cyberpunk">⚡ 赛博</div>
+      <div class="theme-opt" data-t="japanese-shrine">⛩️ 神社</div>
+      <div class="theme-opt" data-t="chinese-mystic">☯️ 玄学</div>
+    </div>
+    <div style="height:4px"></div>
+  </div>
+  <div class="history-panel" id="historyPanel">
+    <div class="history-head">
+      <span class="history-head-title">抽签历史</span>
+      <button class="history-close" id="historyClose">×</button>
+    </div>
+    <div class="history-body" id="historyBody"><div class="history-empty">还没有抽过签</div></div>
+  </div>
+  <div class="overlay" id="overlay">
+    <div class="overlay-card">
+      <div class="overlay-title" id="overlayTitle"></div>
+      <div class="overlay-canvas" id="overlayCanvas"></div>
+      <div class="overlay-actions">
+        <button class="btn btn-outline" id="replayBtn">再看一次</button>
+        <button class="btn" id="againBtn">再抽一次</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js?v=202608251430"></script>
+</body>
+</html>

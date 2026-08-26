@@ -1,0 +1,321 @@
+/* ============================================
+   系统通知生成器 · 样式
+   模拟 Windows/macOS 系统通知窗口
+   ============================================ */
+
+:root {
+  --sn-bg: #1e1e1e;
+  --sn-titlebar: #2d2d2d;
+  --sn-border: #3a3a3a;
+  --sn-text: #e0e0e0;
+  --sn-text-dim: #888888;
+  --sn-green: #4dff88;
+  --sn-red: #ff4d4d;
+  --sn-yellow: #ffd700;
+  --sn-blue: #64b5f6;
+  --sn-font: 'Consolas', 'Monaco', 'Menlo', 'SF Mono', monospace;
+}
+
+/* 系统通知模式下的整体背景 */
+body.sn-mode {
+  background: #121212;
+}
+
+/* ============================================
+   模式切换 Tab
+   ============================================ */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--color-surface);
+  border-radius: 14px;
+  padding: 4px;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  margin-bottom: 16px;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-dim);
+  font-size: 13px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.mode-tab.active {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-weight: 600;
+}
+
+.mode-tab:not(.active):hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ============================================
+   系统通知窗口
+   ============================================ */
+.sn-window {
+  width: 100%;
+  max-width: 400px;
+  background: var(--sn-bg);
+  border: 1px solid var(--sn-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  font-family: var(--sn-font);
+  opacity: 0;
+  transform: scale(0.92) translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sn-window.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* 标题栏 */
+.sn-titlebar {
+  background: var(--sn-titlebar);
+  padding: 0 12px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--sn-border);
+  user-select: none;
+}
+
+.sn-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.sn-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.sn-dot-red { background: #ff5f57; }
+.sn-dot-yellow { background: #febc2e; }
+.sn-dot-green { background: #28c840; }
+
+.sn-titlebar-text {
+  font-size: 13px;
+  color: var(--sn-text-dim);
+  margin-left: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* 窗口内容 */
+.sn-body {
+  padding: 20px 20px 16px;
+}
+
+/* 主标题 */
+.sn-headline {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sn-text);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+/* 通知行 */
+.sn-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+.sn-row.visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sn-icon {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  margin-top: 1px;
+}
+
+.sn-icon.ok     { color: var(--sn-green); }
+.sn-icon.warn   { color: var(--sn-red); }
+.sn-icon.info   { color: var(--sn-blue); }
+.sn-icon.neutral { color: var(--sn-text-dim); }
+
+.sn-label {
+  color: var(--sn-text-dim);
+  margin-right: 4px;
+}
+
+.sn-text {
+  color: var(--sn-text);
+  word-break: break-all;
+}
+
+.sn-text.green  { color: var(--sn-green); }
+.sn-text.red    { color: var(--sn-red); }
+.sn-text.yellow { color: var(--sn-yellow); }
+.sn-text.dim    { color: var(--sn-text-dim); }
+
+/* 分隔线 */
+.sn-divider {
+  border: none;
+  border-top: 1px solid var(--sn-border);
+  margin: 12px 0;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.1s;
+}
+
+.sn-divider.visible { opacity: 1; }
+
+/* 提示区 */
+.sn-footer {
+  font-size: 12px;
+  color: var(--sn-text-dim);
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.2s;
+}
+
+.sn-footer.visible { opacity: 1; }
+
+.sn-footer-label {
+  color: var(--sn-yellow);
+  margin-right: 4px;
+}
+
+/* 打字机光标闪烁 */
+@keyframes snBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.sn-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--sn-green);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: snBlink 0.8s step-end infinite;
+}
+
+/* 加载状态 */
+.sn-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 12px;
+}
+
+.sn-loading-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.sn-loading-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--sn-text-dim);
+  border-radius: 50%;
+  animation: snPulse 1.2s ease infinite;
+}
+
+.sn-loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.sn-loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes snPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.sn-loading-text {
+  font-size: 12px;
+  color: var(--sn-text-dim);
+  letter-spacing: 1px;
+}
+
+/* 系统通知模式下的输入区 */
+.sn-input-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sn-input {
+  width: 100%;
+  height: 52px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 14px;
+  padding: 0 16px;
+  font-size: 15px;
+  color: var(--color-text);
+  font-family: "Noto Sans SC", sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sn-input::placeholder {
+  color: var(--color-text-dim);
+}
+
+.sn-input:focus {
+  border-color: var(--sn-green);
+  box-shadow: 0 0 0 3px rgba(77, 255, 136, 0.15);
+}
+
+.sn-btn {
+  width: 100%;
+  height: 52px;
+  background: var(--sn-bg);
+  border: 2px solid var(--sn-border);
+  border-radius: 14px;
+  font-size: 15px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 600;
+  color: var(--sn-text);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.sn-btn:hover {
+  border-color: var(--sn-text-dim);
+  background: var(--sn-titlebar);
+}
+
+.sn-btn:active {
+  transform: scale(0.98);
+}
+
+.sn-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 隐藏模式切换的输入/输出区 */
+.input-section.fortune-mode { display: flex; }
+.input-section.sn-mode { display: none; }

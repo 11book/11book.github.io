@@ -1,0 +1,38 @@
+v10 - 改命系统 LangGraph多节点流水线 (classify->answer->twist->score->title)
+http://localhost:8080/
+http://192.168.31.186:8080/
+[2026-08-25T09:56:27.244Z][REQ] {"text":"想让好朋友发财","mode":"friend-wish"}
+[2026-08-25T09:56:27.247Z][FRIEND] {"step":"start","input":"想让好朋友发财"}
+[2026-08-25T09:56:32.951Z][FRIEND] {"step":"raw","raw":"{\"headline\":\"【命运系统·好友许愿通道已开启】\",\"result\":\"您的愿望：想让好朋友发财\n\n系统分析：\n优先想到朋友，而不是自己\n您的善良指数"}
+[2026-08-25T09:56:32.952Z][FRIEND] {"step":"fallback","reason":"Bad control character in string literal in JSON at position 53 (line 1 column 54)"}
+[2026-08-25T09:56:32.953Z][OK] {"text":"想让好朋友发财","mode":"friend-wish","title":"【命运系统·好友许愿通道已开启】"}
+[2026-08-25T09:56:33.990Z][REQ] {"text":"想让好朋友发财","mode":"friend-wish"}
+[2026-08-25T09:56:33.990Z][FRIEND] {"step":"start","input":"想让好朋友发财"}
+[2026-08-25T09:56:35.822Z][FRIEND] {"step":"raw","raw":"{\"headline\":\"【命运系统·好友许愿通道已开启】\",\"result\":\"您的愿望：想让好朋友发财\\n\\n系统分析：\\n优先想到朋友，而不是自己\\n您的"}
+[2026-08-25T09:56:35.823Z][FRIEND] {"step":"ok","headline":"【命运系统·好友许愿通道已开启】"}
+[2026-08-25T09:56:35.824Z][OK] {"text":"想让好朋友发财","mode":"friend-wish","title":"【命运系统·好友许愿通道已开启】"}
+[2026-08-25T09:56:44.591Z][REQ] {"text":"想让好朋友发财","mode":"friend-wish"}
+[2026-08-25T09:56:44.591Z][FRIEND] {"step":"start","input":"想让好朋友发财"}
+[2026-08-25T09:56:46.548Z][FRIEND] {"step":"raw","raw":"{\"headline\":\"【命运系统·好友许愿通道已开启】\",\"result\":\"您的愿望：想让好朋友发财\n\n系统分析：\n优先想到朋友，而不是自己\n您的善良指数"}
+[2026-08-25T09:56:46.548Z][FRIEND] {"step":"fallback","reason":"Bad control character in string literal in JSON at position 53 (line 1 column 54)"}
+[2026-08-25T09:56:46.550Z][OK] {"text":"想让好朋友发财","mode":"friend-wish","title":"【命运系统·好友许愿通道已开启】"}
+[2026-08-26T01:01:51.356Z][REQ] {"text":"我想让我的好朋友今天不加班","mode":"friend-wish"}
+[2026-08-26T01:01:51.359Z][FRIEND] {"step":"start","input":"我想让我的好朋友今天不加班"}
+[2026-08-26T01:01:52.879Z][FRIEND] {"step":"raw","raw":"{\"headline\":\"【命运系统·好友许愿通道已开启】\",\"result\":\"您的愿望：我想让我的好朋友今天不加班\n\n系统分析：\n优先想到朋友，而不是自己\n"}
+[2026-08-26T01:01:52.879Z][FRIEND] {"step":"fallback","reason":"Bad control character in string literal in JSON at position 59 (line 1 column 60)"}
+[2026-08-26T01:01:52.881Z][OK] {"text":"我想让我的好朋友今天不加班","mode":"friend-wish","title":"【命运系统·好友许愿通道已开启】"}
+[2026-08-26T01:02:05.104Z][REQ] {"text":"我想让我的好朋友今天不加班","mode":"system-notification"}
+[2026-08-26T01:02:05.105Z][SN] {"step":"start","input":"我想让我的好朋友今天不加班"}
+[2026-08-26T01:02:08.214Z][SN] {"step":"raw","raw":"```json\n{\n  \"headline\": \"⏳ 命运时钟·加班逆转术\",\n  \"items\": [\n    {\n      \"icon\": \"🌙\",\n "}
+[2026-08-26T01:02:08.215Z][SN] {"step":"ok","headline":"⏳ 命运时钟·加班逆转术"}
+[2026-08-26T01:02:08.216Z][OK] {"text":"我想让我的好朋友今天不加班","mode":"system-notification","title":"⏳ 命运时钟·加班逆转术"}
+[2026-08-26T01:02:36.298Z][REQ] {"text":"我想让我的好朋友今天不加班","mode":"system-notification"}
+[2026-08-26T01:02:36.298Z][SN] {"step":"start","input":"我想让我的好朋友今天不加班"}
+[2026-08-26T01:02:39.485Z][SN] {"step":"raw","raw":"{\n  \"headline\": \"⌛ 宇宙加班抵消局已受理\",\n  \"result\": \"▶ 命运偏移：拒绝加班 100%\",\n  \"items\": [\n   "}
+[2026-08-26T01:02:39.485Z][SN] {"step":"ok","headline":"⌛ 宇宙加班抵消局已受理"}
+[2026-08-26T01:02:39.485Z][OK] {"text":"我想让我的好朋友今天不加班","mode":"system-notification","title":"⌛ 宇宙加班抵消局已受理"}
+[2026-08-26T01:04:31.532Z][REQ] {"text":"我想让我的好朋友今天不加班","mode":"system-notification"}
+[2026-08-26T01:04:31.532Z][SN] {"step":"start","input":"我想让我的好朋友今天不加班"}
+[2026-08-26T01:04:34.478Z][SN] {"step":"raw","raw":"{\n  \"headline\": \"✦ 因果律模块异常检测 ✦\",\n  \"result\": \"命运丝线重连中——加班运势已被强制剥离\",\n  \"items\": ["}
+[2026-08-26T01:04:34.479Z][SN] {"step":"ok","headline":"✦ 因果律模块异常检测 ✦"}
+[2026-08-26T01:04:34.481Z][OK] {"text":"我想让我的好朋友今天不加班","mode":"system-notification","title":"✦ 因果律模块异常检测 ✦"}

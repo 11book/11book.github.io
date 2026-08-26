@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 无厘头工具箱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #2a2a3a;
+      --text: #c9b896;
+      --text-dim: #6a6a7a;
+      --primary: #e8a838;
+      --primary-glow: rgba(232,168,56,0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(232,168,56,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .header h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 4px;
+      text-shadow: 0 0 30px var(--primary-glow);
+    }
+    .header p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .tool-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+    .tool-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .tool-name {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .tool-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+    .tool-status {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 20px;
+      background: rgba(232,168,56,0.15);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 无厘头工具箱</h1>
+      <p>整蛊 · 玄学 · 预知未来 · 时空穿越</p>
+    </div>
+    <div class="tools-grid">
+      <a class="tool-card" href="tools/fortune-box/">
+        <div class="tool-icon">🔮</div>
+        <div class="tool-name">逆天改命盲盒</div>
+        <div class="tool-desc">输入文字，AI 分析后给出一个无厘头的命运结果，附带刮奖揭示动画</div>
+        <span class="tool-status">🔥 热门</span>
+      </a>
+      <a class="tool-card" href="tools/fake-bsod/">
+        <div class="tool-icon">💀</div>
+        <div class="tool-name">假装蓝屏</div>
+        <div class="tool-desc">整蛊神器，打开后假装系统崩溃，按 ESC 或等几秒恢复</div>
+        <span class="tool-status">🆕 新上线</span>
+      </a>
+      <a class="tool-card" href="tools/countdown-trick/">
+        <div class="tool-icon">⏳</div>
+        <div class="tool-name">倒计时整蛊</div>
+        <div class="tool-desc">输入秒数开始倒计时，到 0 时给你一个"惊喜"</div>
+        <span class="tool-status">🆕 新上线</span>
+      </a>
+      <a class="tool-card" href="tools/timetravel/">
+        <div class="tool-icon">⏰</div>
+        <div class="tool-name">时空穿越器</div>
+        <div class="tool-desc">选择目标时间，启动穿越特效，10 秒后"到达"未来/过去</div>
+        <span class="tool-status">🆕 新上线</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

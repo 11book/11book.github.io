@@ -1,0 +1,295 @@
+/* ============================================
+   CSS 变量系统 - 无厘头盲盒卜卦生成器
+   4种氛围统一使用这套变量，通过 data-theme 切换
+   ============================================ */
+
+:root {
+  /* === 通用尺寸 === */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-xxl: 64px;
+
+  /* === 通用圆角 === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* === 通用过渡 === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 600ms ease;
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === 通用阴影 === */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 20px currentColor;
+
+  /* === 时钟样式 === */
+  --clock-size: 200px;
+  --clock-border-width: 3px;
+
+  /* === 输入框样式 === */
+  --input-height: 48px;
+  --input-font-size: 16px;
+
+  /* === 按钮样式 === */
+  --btn-height: 52px;
+  --btn-font-size: 18px;
+  --btn-font-weight: 600;
+}
+
+/* ============================================
+   氛围1：暗黑神秘（默认）
+   青铜鼎 / 甲骨文 / 烟熏火燎
+   ============================================ */
+[data-theme="dark-mysterious"] {
+  --color-bg: #0a0a0f;
+  --color-bg-secondary: #12121a;
+  --color-surface: #1a1a24;
+  --color-surface-hover: #242430;
+
+  --color-primary: #d4af37;       /* 青铜金 */
+  --color-primary-dim: #8b7355;
+  --color-primary-glow: rgba(212, 175, 55, 0.3);
+
+  --color-accent: #8b4513;         /* 暗红 */
+  --color-accent-glow: rgba(139, 69, 19, 0.4);
+
+  --color-text: #c9b896;           /* 骨白 */
+  --color-text-dim: #7a7062;
+  --color-text-bright: #f5e6c8;
+
+  --color-border: rgba(212, 175, 55, 0.2);
+  --color-border-bright: rgba(212, 175, 55, 0.5);
+
+  --clock-face: conic-gradient(from 0deg, #d4af37 0%, #8b7355 25%, #d4af37 50%, #8b7355 75%, #d4af37 100%);
+  --clock-bg: radial-gradient(circle at 50% 50%, #1a1a24 0%, #0a0a0f 70%);
+  --clock-glow: 0 0 30px rgba(212, 175, 55, 0.4);
+
+  --smoke-color: rgba(139, 115, 85, 0.15);
+  --particle-color: #d4af37;
+
+  --font-display: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+  --font-body: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+
+  --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L35 15L30 25L25 15Z' fill='%23d4af3710'/%3E%3Ccircle cx='30' cy='45' r='3' fill='%23d4af3708'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   氛围2：赛博朋克
+   霓虹 / 全息 / 故障风
+   ============================================ */
+[data-theme="cyberpunk"] {
+  --color-bg: #050510;
+  --color-bg-secondary: #0a0a1a;
+  --color-surface: #101025;
+  --color-surface-hover: #1a1a35;
+
+  --color-primary: #00f0ff;        /* 电光蓝 */
+  --color-primary-dim: #0077aa;
+  --color-primary-glow: rgba(0, 240, 255, 0.3);
+
+  --color-accent: #ff00aa;         /* 霓虹粉 */
+  --color-accent-glow: rgba(255, 0, 170, 0.4);
+
+  --color-text: #e0e0ff;
+  --color-text-dim: #6666aa;
+  --color-text-bright: #ffffff;
+
+  --color-border: rgba(0, 240, 255, 0.2);
+  --color-border-bright: rgba(0, 240, 255, 0.6);
+
+  --clock-face: conic-gradient(from 0deg, #00f0ff 0%, #ff00aa 25%, #00f0ff 50%, #ff00aa 75%, #00f0ff 100%);
+  --clock-bg: radial-gradient(circle at 50% 50%, #101025 0%, #050510 70%);
+  --clock-glow: 0 0 30px rgba(0, 240, 255, 0.5), 0 0 60px rgba(255, 0, 170, 0.3);
+
+  --smoke-color: rgba(0, 240, 255, 0.1);
+  --particle-color: #00f0ff;
+
+  --font-display: "Orbitron", "Rajdhani", "Noto Sans SC", sans-serif;
+  --font-body: "Rajdhani", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+
+  --glitch-intensity: 1;
+  --scanline-opacity: 0.05;
+
+  --bg-pattern: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='50' x2='100' y2='50' stroke='%2300f0ff08' stroke-width='1'/%3E%3Cline x1='50' y1='0' x2='50' y2='100' stroke='%23ff00aa08' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   氛围3：日式神社
+   简约 / 抽签筒 / 纸垂
+   ============================================ */
+[data-theme="japanese-shrine"] {
+  --color-bg: #f5f0e8;
+  --color-bg-secondary: #ebe5d9;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f8f4ec;
+
+  --color-primary: #c41e3a;        /* 朱红 */
+  --color-primary-dim: #8b1528;
+  --color-primary-glow: rgba(196, 30, 58, 0.2);
+
+  --color-accent: #2c2c2c;         /* 墨黑 */
+  --color-accent-glow: rgba(44, 44, 44, 0.1);
+
+  --color-text: #3c3c3c;
+  --color-text-dim: #8c8c8c;
+  --color-text-bright: #1c1c1c;
+
+  --color-border: rgba(196, 30, 58, 0.15);
+  --color-border-bright: rgba(196, 30, 58, 0.4);
+
+  --clock-face: conic-gradient(from 0deg, #c41e3a 0%, #d4d4d4 25%, #c41e3a 50%, #d4d4d4 75%, #c41e3a 100%);
+  --clock-bg: radial-gradient(circle at 50% 50%, #ffffff 0%, #f5f0e8 70%);
+  --clock-glow: 0 0 20px rgba(196, 30, 58, 0.2);
+
+  --smoke-color: rgba(200, 180, 160, 0.2);
+  --particle-color: #c41e3a;
+
+  --font-display: "Shippori Mincho", "Noto Serif JP", "Yu Mincho", serif;
+  --font-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+
+  --paper-texture: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+
+  --bg-pattern: url("data:image/svg+xml,%3Csvg width='80' height='120' viewBox='0 0 80 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0 L45 80 L40 90 L35 80 Z' fill='%23c41e3a15'/%3E%3Cpath d='M38 20 L40 5 L42 20' stroke='%23c41e3a20' fill='none'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   氛围4：中式玄学
+   八卦 / 罗盘 / 铜钱
+   ============================================ */
+[data-theme="chinese-mystic"] {
+  --color-bg: #1a0a0a;
+  --color-bg-secondary: #2a1515;
+  --color-surface: #3a2020;
+  --color-surface-hover: #4a2828;
+
+  --color-primary: #ffd700;        /* 金色 */
+  --color-primary-dim: #b8860b;
+  --color-primary-glow: rgba(255, 215, 0, 0.3);
+
+  --color-accent: #dc143c;         /* 中国红 */
+  --color-accent-glow: rgba(220, 20, 60, 0.4);
+
+  --color-text: #f0d8c0;
+  --color-text-dim: #a08060;
+  --color-text-bright: #fff8e8;
+
+  --color-border: rgba(255, 215, 0, 0.2);
+  --color-border-bright: rgba(255, 215, 0, 0.5);
+
+  --clock-face: conic-gradient(from 0deg, #ffd700 0%, #dc143c 12.5%, #ffd700 25%, #dc143c 37.5%, #ffd700 50%, #dc143c 62.5%, #ffd700 75%, #dc143c 87.5%, #ffd700 100%);
+  --clock-bg: radial-gradient(circle at 50% 50%, #3a2020 0%, #1a0a0a 70%);
+  --clock-glow: 0 0 30px rgba(255, 215, 0, 0.4);
+
+  --smoke-color: rgba(220, 20, 60, 0.1);
+  --particle-color: #ffd700;
+
+  --font-display: "Noto Serif SC", "KaiTi", "SimSun", serif;
+  --font-body: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+
+  --bagua-pattern: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%23ffd70020' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23ffd70015' stroke-width='1'/%3E%3Cpath d='M50 5 L50 95 M5 50 L95 50' stroke='%23ffd70010' stroke-width='1'/%3E%3C/svg%3E");
+
+  --bg-pattern: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='8' fill='none' stroke='%23ffd70010' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%23ffd70008' stroke-width='1'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%23ffd70005' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   通用样式重置
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* 背景图案 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--bg-pattern);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 背景纸纹（日式） */
+[data-theme="japanese-shrine"] body::before {
+  background-image: var(--paper-texture), var(--bg-pattern);
+}
+
+/* 背景八卦（中式） */
+[data-theme="chinese-mystic"] body::before {
+  background-image: var(--bagua-pattern), var(--bg-pattern);
+}
+
+/* 赛博朋克扫描线 */
+[data-theme="cyberpunk"] body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================================
+   工具类
+   ============================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-center { text-align: center; }
+.text-primary { color: var(--color-primary); }
+.text-dim { color: var(--color-text-dim); }
+
+/* 发光效果 */
+.glow {
+  box-shadow: var(--clock-glow);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
