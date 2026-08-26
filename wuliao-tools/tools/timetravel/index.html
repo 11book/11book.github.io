@@ -295,12 +295,24 @@
     ];
 
     function getScenario(dir, amount, unit) {
+      const unitLabel = {seconds:'秒',minutes:'分钟',hours:'小时',days:'天',years:'年'}[unit];
+
+      // 时间膨胀整蛊：穿越只要10秒，但主观感受是跨越的时间
+      const dilationText = {
+        seconds: `虽然只过了10秒，但你的大脑觉得已经过了${amount}秒——高度专注！`,
+        minutes: `你感觉像过了${amount}分钟那么久，实际上只过了10秒——时间膨胀成功！`,
+        hours: `你主观感受：过了约${amount}小时，脑子转得快到飞起，现实只过了10秒。`,
+        days: `你的大脑经历了${amount}天的信息轰炸（睡前刷手机、失眠、早上起不来…），实际上只过了10秒。`,
+        years: `你瞬间老了${amount}年——的外观没变，发际线没变，但内心沧桑了${amount}年。`,
+      };
+
       if (dir === 'past') {
-        return pastScenarios[Math.floor(Math.random() * pastScenarios.length)];
+        const s = pastScenarios[Math.floor(Math.random() * pastScenarios.length)];
+        return { ...s, dilation: dilationText[unit].replace(/未来/g, '过去') };
       }
-      // future — 按时间精度选场景
       const pool = futureScenarios[unit] || futureScenarios.days;
-      return pool[Math.floor(Math.random() * pool.length)];
+      const s = pool[Math.floor(Math.random() * pool.length)];
+      return { ...s, dilation: dilationText[unit] };
     }
 
     function calcTarget(dir, amount, unit) {
@@ -344,10 +356,9 @@
             document.body.classList.remove('flying');
             const scenario = getScenario(dir, amount, unit);
             const target = calcTarget(dir, amount, unit);
-
             document.getElementById('resultEmoji').textContent = scenario.emoji;
             document.getElementById('resultTitle').textContent = scenario.title;
-            document.getElementById('resultText').textContent = scenario.text;
+            document.getElementById('resultText').innerHTML = scenario.text + (scenario.dilation ? `<div style="margin-top:12px;font-size:0.82rem;color:var(--text-dim);font-style:italic;">💭 ${scenario.dilation}</div>` : '');
             document.getElementById('resultTime').innerHTML =
               `<strong>出发：</strong>${new Date().toLocaleString('zh-CN')}<br>` +
               `<strong>到达：</strong>${target.toLocaleString('zh-CN')} ` +
