@@ -26,10 +26,10 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      overflow: hidden;
+      overflow-x: hidden;
     }
     body.flying {
-      animation: bgFly 0.15s infinite;
+      animation: bgFly 0.12s infinite;
     }
     @keyframes bgFly {
       0% { background: #0a0a0f; }
@@ -50,31 +50,42 @@
       font-size: 1.4rem;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
-    .subtitle { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 32px; }
+    .subtitle { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 28px; }
     .clock-face {
-      width: 180px; height: 180px;
+      width: 200px; height: 200px;
       border-radius: 50%;
       border: 3px solid var(--primary);
-      margin: 0 auto 32px;
+      margin: 0 auto 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 40px var(--glow), inset 0 0 40px rgba(232,168,56,0.05);
+      box-shadow: 0 0 50px var(--glow), inset 0 0 40px rgba(232,168,56,0.05);
       flex-direction: column;
+      position: relative;
     }
+    .clock-face.past-mode { border-color: #7a9eff; box-shadow: 0 0 50px rgba(122,158,255,0.3), inset 0 0 40px rgba(122,158,255,0.05); }
+    .clock-face.past-mode .clock-time { color: #7a9eff; text-shadow: 0 0 20px rgba(122,158,255,0.5); }
+    .clock-face.future-mode { border-color: var(--primary); }
     .clock-time {
       font-family: "Noto Serif SC", serif;
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--primary);
       text-shadow: 0 0 20px var(--glow);
     }
-    .clock-date { font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; }
-    .inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .clock-date { font-size: 0.68rem; color: var(--text-dim); margin-top: 4px; }
+    .dest-time {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+      min-height: 16px;
+    }
+    .dest-time span { color: var(--primary); }
+    .inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     .input-row { display: flex; align-items: center; gap: 10px; }
-    .input-row label { font-size: 0.85rem; color: var(--text-dim); width: 60px; text-align: right; }
+    .input-row label { font-size: 0.82rem; color: var(--text-dim); width: 58px; text-align: right; }
     input, select {
       flex: 1;
       height: 44px;
@@ -90,12 +101,12 @@
     select { cursor: pointer; }
     .btn {
       width: 100%;
-      height: 56px;
+      height: 54px;
       background: linear-gradient(135deg, var(--primary), #c88020);
       border: none;
       border-radius: 14px;
       font-family: "Noto Serif SC", serif;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--bg);
       cursor: pointer;
@@ -105,10 +116,10 @@
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .progress-bar {
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: var(--surface);
-      border-radius: 4px;
-      margin: 24px 0;
+      border-radius: 3px;
+      margin: 18px 0 12px;
       overflow: hidden;
       display: none;
     }
@@ -116,33 +127,58 @@
     .progress-fill {
       height: 100%;
       background: var(--primary);
-      border-radius: 4px;
+      border-radius: 3px;
       width: 0%;
       transition: width 1s linear;
     }
-    .status-text { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 16px; display: none; min-height: 24px; }
+    .status-text {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      display: none;
+      min-height: 20px;
+    }
     .status-text.active { display: block; }
     .result-box {
       display: none;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 24px;
-      margin-top: 16px;
+      padding: 22px;
+      margin-top: 14px;
+      text-align: left;
     }
     .result-box.active { display: block; }
-    .result-box .emoji { font-size: 3rem; margin-bottom: 12px; }
-    .result-box .text { font-size: 1rem; line-height: 1.6; color: var(--text); }
-    .result-box .time-info { font-size: 0.8rem; color: var(--text-dim); margin-top: 12px; }
+    .result-emoji { font-size: 2.8rem; text-align: center; margin-bottom: 10px; }
+    .result-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .result-text { font-size: 0.9rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+    .result-time {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 10px 14px;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .result-time strong { color: var(--primary); font-size: 0.85rem; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="title">⏰ 时空穿越器</div>
-    <div class="subtitle">选择目标时间，穿越时空，预知未来</div>
-    <div class="clock-face">
+    <div class="subtitle">选择目的地，穿越时空，见证奇迹</div>
+    <div class="clock-face" id="clockFace">
       <div class="clock-time" id="clockTime">00:00:00</div>
       <div class="clock-date" id="clockDate">年/月/日</div>
+      <div class="dest-time" id="destTimeHint"></div>
     </div>
     <div class="inputs">
       <div class="input-row">
@@ -159,7 +195,7 @@
           <option value="seconds">秒</option>
           <option value="minutes">分钟</option>
           <option value="hours">小时</option>
-          <option value="days">天</option>
+          <option value="days" selected>天</option>
           <option value="years">年</option>
         </select>
       </div>
@@ -168,19 +204,68 @@
     <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
     <div class="status-text" id="statusText"></div>
     <div class="result-box" id="resultBox">
-      <div class="emoji" id="resultEmoji">🎉</div>
-      <div class="text" id="resultText"></div>
-      <div class="time-info" id="resultTime"></div>
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-text" id="resultText"></div>
+      <div class="result-time" id="resultTime"></div>
     </div>
   </div>
   <script>
     // 时钟
+    let clockInterval;
     const upd = () => {
       const n = new Date();
       document.getElementById('clockTime').textContent = n.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
       document.getElementById('clockDate').textContent = n.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
     };
-    upd(); setInterval(upd, 1000);
+    upd();
+    clockInterval = setInterval(upd, 1000);
+
+    // 方向切换样式
+    const direction = document.getElementById('direction');
+    const clockFace = document.getElementById('clockFace');
+    const destTimeHint = document.getElementById('destTimeHint');
+
+    function updateClockStyle() {
+      const dir = direction.value;
+      clockFace.className = 'clock-face ' + (dir === 'past' ? 'past-mode' : 'future-mode');
+      // 清除旧时钟，重新开始
+      clearInterval(clockInterval);
+      if (dir === 'past') {
+        // 倒走时钟
+        clockInterval = setInterval(() => {
+          const n = new Date();
+          const past = new Date(n.getTime() - 1000);
+          document.getElementById('clockTime').textContent = past.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+          document.getElementById('clockDate').textContent = past.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+        }, 1000);
+      } else {
+        upd();
+        clockInterval = setInterval(upd, 1000);
+      }
+    }
+
+    direction.onchange = () => {
+      updateClockStyle();
+      updateDestHint();
+    };
+
+    function updateDestHint() {
+      const amt = parseInt(document.getElementById('amount').value) || 0;
+      const unit = document.getElementById('unit').value;
+      const dir = direction.value;
+      const unitLabel = {seconds:'秒',minutes:'分钟',hours:'小时',days:'天',years:'年'}[unit];
+      if (!amt) { destTimeHint.innerHTML = ''; return; }
+
+      const now = new Date();
+      const ms = {seconds:1000,minutes:60000,hours:3600000,days:86400000,years:31536000000}[unit];
+      const target = new Date(dir === 'future' ? now.getTime() + amt * ms : now.getTime() - amt * ms);
+
+      destTimeHint.innerHTML = `目标：<span>${dir === 'future' ? '→' : '←'} ${amt} ${unitLabel} = ${target.toLocaleString('zh-CN',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})}</span>`;
+    }
+
+    document.getElementById('amount').oninput = updateDestHint;
+    document.getElementById('unit').onchange = updateDestHint;
 
     const launchBtn = document.getElementById('launchBtn');
     const progressBar = document.getElementById('progressBar');
@@ -188,26 +273,65 @@
     const statusText = document.getElementById('statusText');
     const resultBox = document.getElementById('resultBox');
 
-    const futures = [
-      { emoji: "🔮", text: "你看到了未来的自己——正在无聊地刷手机" },
-      { emoji: "🍕", text: "穿越成功！你发现自己正在吃一块超好吃的披萨" },
-      { emoji: "🐕", text: "到达未来！一只柯基正在舔你的脸" },
-      { emoji: "📱", text: "你看了一眼未来：这天你发了 3 条消息，没人回" },
-      { emoji: "☕", text: "未来你正在喝咖啡，但咖啡已经凉了" },
-      { emoji: "🌙", text: "穿越到未来，你发现自己在睡觉——睡得很香" },
-      { emoji: "🎮", text: "未来你正在打游戏，状态极佳" },
-      { emoji: "💰", text: "你看到了未来的银行余额——跟现在一模一样" },
-    ];
-    const pasts = [
-      { emoji: "📦", text: "你回到了过去，发现自己正在找东西——找的就是回到过去的方法" },
-      { emoji: "🤔", text: "穿越回过去，你发现自己忘了带钥匙" },
-      { emoji: "🍜", text: "回到过去，你吃了一碗泡面——还是那个味道" },
-      { emoji: "💤", text: "你回到过去，发现自己正在睡觉" },
-      { emoji: "📚", text: "穿越成功！你正在读一本已经忘了一半的书" },
+    // 不同时间跨度的整蛊场景
+    const futureScenarios = {
+      seconds: [
+        { emoji: "⚡", title: "穿越成功！", text: "你成功穿越到了10秒后的未来，发现什么都没变——除了你的手机多了条推送" },
+        { emoji: "🤖", title: "抵达未来！", text: "你穿越到了几秒后，发现自己正在想：'刚才是谁在催我？'" },
+      ],
+      minutes: [
+        { emoji: "📱", title: "未来已来！", text: "10分钟后的你，发了一条朋友圈：'刚才发呆浪费了10分钟'" },
+        { emoji: "☕", title: "时间跳跃！", text: "你到了20分钟后的未来，咖啡已经凉透了，而你还没喝" },
+      ],
+      hours: [
+        { emoji: "🌙", title: "几小时后…", text: "你穿越到了3小时后，发现自己正在懊恼：'我刚浪费了3小时！'" },
+        { emoji: "🍜", title: "饭点到了", text: "穿越成功！已经是午饭时间，你发现午饭还没吃——跟前世一样" },
+      ],
+      days: [
+        { emoji: "📅", title: "几天后…", text: "你穿越到了10天后，发现这天是周末，而你还在工作" },
+        { emoji: "📊", title: "一周总结", text: "10天后你回顾这10天：发了20次呆，躺了30次，看了40次手机" },
+        { emoji: "🎂", title: "生日提醒", text: "穿越成功！10天后有个朋友过生日，礼物还没买——你记下了" },
+        { emoji: "🧹", title: "大扫除", text: "10天后的你已经把房间收拾好了——或者是还没收拾？这是个谜" },
+        { emoji: "💰", title: "工资去哪了", text: "10天后你查了银行余额，发现跟现在一模一样——果然没多" },
+      ],
+      years: [
+        { emoji: "📱", title: "100年后…", text: "100年后的世界，手机已经进化到第38代，而你依然是手机重度依赖用户" },
+        { emoji: "🏠", title: "未来的你", text: "你穿越到了100年后，发现自己住在火星——房租更贵了" },
+        { emoji: "🤖", title: "AI时代", text: "100年后，AI已经能帮你做所有事了——除了替你穿越时空" },
+        { emoji: "🌍", title: "世界巨变", text: "100年后的世界，中国队终于进了世界杯——哦等等，这个100年前就在说了" },
+        { emoji: "💾", title: "怀旧警告", text: "穿越到100年后，你发现现在用的技术已经进了博物馆，门票10块钱" },
+      ],
+    };
+
+    const pastScenarios = [
+      { emoji: "📦", title: "回到过去了！", text: "你回到了过去，发现自己正在找东西——找的就是回到过去的方法" },
+      { emoji: "🔑", title: "忘带钥匙", text: "你穿越回10分钟前，发现自己刚出门，钥匙忘在屋里了——跟前世一样" },
+      { emoji: "🍜", title: "泡面还没吃", text: "你回到30分钟前，发现泡面还没泡，完美避开了等待的焦虑" },
+      { emoji: "💬", title: "差点说错话", text: "你回到过去，在要说那句话之前1秒按住了自己的嘴——机智！" },
+      { emoji: "📱", title: "差点发了", text: "你回到5分钟前，成功阻止了自己发那条尴尬的朋友圈" },
+      { emoji: "☕", title: "咖啡还没凉", text: "你回到了咖啡刚买的时候，现在它是热的——完美！" },
+      { emoji: "🤔", title: "穿越悖论", text: "你回到过去想改变历史，结果发现历史早就包含了你穿越回去这件事" },
+      { emoji: "🕐", title: "早起的你", text: "你回到了早上7点，发现自己还在赖床——果然还是起不来" },
     ];
 
+    function getScenario(dir, amount, unit) {
+      if (dir === 'past') {
+        return pastScenarios[Math.floor(Math.random() * pastScenarios.length)];
+      }
+      // future — 按时间精度选场景
+      const pool = futureScenarios[unit] || futureScenarios.days;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function calcTarget(dir, amount, unit) {
+      const now = new Date();
+      const ms = {seconds:1000,minutes:60000,hours:3600000,days:86400000,years:31536000000};
+      const target = new Date(dir === 'future' ? now.getTime() + amount * ms[unit] : now.getTime() - amount * ms[unit]);
+      return target;
+    }
+
     launchBtn.onclick = () => {
-      const dir = document.getElementById('direction').value;
+      const dir = direction.value;
       const amount = parseInt(document.getElementById('amount').value) || 10;
       const unit = document.getElementById('unit').value;
       const unitLabel = {seconds:'秒',minutes:'分钟',hours:'小时',days:'天',years:'年'}[unit];
@@ -217,15 +341,14 @@
       statusText.classList.add('active');
       resultBox.classList.remove('active');
 
-      // 穿越动画 10 秒
       const steps = [
-        "🔌 正在建立时空场...",
-        "⚡ 时空场稳定中...",
-        "🌌 虫洞开启中...",
-        dir === 'future' ? "🚀 正在加速穿越..." : "🕰️ 逆流时间...",
-        "✨ 穿越中...",
-        "⏰ 时间校准中...",
-        "🛬 即将着陆..."
+        dir === 'future' ? "🚀 建立时空场…" : "🕰️ 启动时光倒流…",
+        dir === 'future' ? "⚡ 时空场稳定中…" : "⏪ 逆向时间流…",
+        dir === 'future' ? "🌌 开启虫洞…" : "🔙 回溯中…",
+        dir === 'future' ? "✨ 穿越加速…" : "⏳ 倒流中…",
+        dir === 'future' ? "🚀 高速穿越…" : "🔄 历史重写中…",
+        dir === 'future' ? "⏰ 校准时间坐标…" : "⏰ 时间对齐中…",
+        dir === 'future' ? "🛬 着陆未来…" : "🛬 着陆过去…",
       ];
 
       let step = 0;
@@ -239,22 +362,28 @@
           document.body.classList.add('flying');
           setTimeout(() => {
             document.body.classList.remove('flying');
-            const list = dir === 'future' ? futures : pasts;
-            const r = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('resultEmoji').textContent = r.emoji;
-            document.getElementById('resultText').textContent = r.text;
-            const now = new Date();
-            document.getElementById('resultTime').textContent =
-              `穿越成功！到达 ${dir === 'future' ? '未来' : '过去'} ${amount} ${unitLabel}后 ` +
-              `（${now.toLocaleString('zh-CN')}）`;
+            const scenario = getScenario(dir, amount, unit);
+            const target = calcTarget(dir, amount, unit);
+
+            document.getElementById('resultEmoji').textContent = scenario.emoji;
+            document.getElementById('resultTitle').textContent = scenario.title;
+            document.getElementById('resultText').textContent = scenario.text;
+            document.getElementById('resultTime').innerHTML =
+              `<strong>出发：</strong>${new Date().toLocaleString('zh-CN')}<br>` +
+              `<strong>到达：</strong>${target.toLocaleString('zh-CN')} ` +
+              `<span style="color:var(--text-dim)">(${amount > 0 ? '+' : ''}${amount} ${unitLabel})</span>`;
+
             resultBox.classList.add('active');
             progressBar.classList.remove('active');
             statusText.classList.remove('active');
             launchBtn.disabled = false;
-          }, 600);
+          }, 500);
         }
       }, 1000);
     };
+
+    // 初始化
+    updateDestHint();
   </script>
 </body>
 </html>
