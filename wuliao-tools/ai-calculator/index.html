@@ -14,12 +14,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: 'SF Pro Display', -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     overflow: hidden;
     user-select: none;
   }
 
-  /* 计算器整机 */
   .calculator {
     background: #2d2d2d;
     border-radius: 30px;
@@ -36,7 +35,6 @@
     .keypad { gap: 8px; }
   }
 
-  /* 显示屏 */
   .display {
     background: #0d0d0d;
     border-radius: 12px;
@@ -67,37 +65,10 @@
     transition: all 0.15s;
   }
 
-  .display-result.big {
-    font-size: 36px;
-  }
+  .display-result.big { font-size: 36px; }
+  .display-result.huge { font-size: 26px; }
+  .display-result.error { color: #ff6b6b; font-size: 18px; }
 
-  .display-result.huge {
-    font-size: 26px;
-  }
-
-  .display-result.error {
-    color: #ff6b6b;
-    font-size: 18px;
-  }
-
-  /* AI思考指示器 */
-  .ai-thinking {
-    display: none;
-    color: #4ecca3;
-    font-size: 12px;
-    text-align: center;
-    margin-top: 8px;
-    animation: blink 1s infinite;
-  }
-
-  .ai-thinking.show { display: block; }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* 按键区 */
   .keypad {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -116,234 +87,276 @@
     overflow: hidden;
   }
 
-  .btn:active {
-    transform: scale(0.93);
-  }
+  .btn:active { transform: scale(0.93); }
 
-  .btn-num {
-    background: #333;
-    color: #fff;
-  }
-
+  .btn-num { background: #333; color: #fff; }
   .btn-num:hover { background: #3d3d3d; }
-
-  .btn-op {
-    background: #ff9f0a;
-    color: #fff;
-  }
-
+  .btn-op { background: #ff9f0a; color: #fff; }
   .btn-op:hover { background: #ffb03a; }
-
-  .btn-fn {
-    background: #616161;
-    color: #000;
-  }
-
+  .btn-fn { background: #616161; color: #000; }
   .btn-fn:hover { background: #757575; }
+  .btn-eq { background: #ff9f0a; color: #fff; border-radius: 50%; }
 
-  .btn-eq {
-    background: #ff9f0a;
-    color: #fff;
-    border-radius: 50%;
-  }
-
-  /* 手指动画区域 */
-  .animation-zone {
+  /* ===== 动画遮罩 ===== */
+  .anim-zone {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(26, 26, 46, 0.95);
+    inset: 0;
+    background: rgba(26,26,46,0.97);
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    z-index: 200;
     cursor: pointer;
   }
 
-  .animation-zone.active { display: flex; }
+  .anim-zone.active { display: flex; }
 
-  .calc-small {
+  .calc-mini {
     position: absolute;
-    top: 20px;
-    transform: scale(0.6);
-    opacity: 0.3;
+    top: 16px;
+    transform: scale(0.5);
+    opacity: 0.25;
     pointer-events: none;
   }
 
   .thinking-text {
     color: #4ecca3;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
-    margin-bottom: 20px;
-    min-height: 36px;
+    margin-bottom: 28px;
+    min-height: 32px;
     text-align: center;
   }
 
-  .counting-area {
+  .anim-area {
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 8px;
     min-height: 200px;
     width: 100%;
     max-width: 500px;
     padding: 0 20px;
+  }
+
+  /* 手指数数 */
+  .hands-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
     flex-wrap: wrap;
   }
 
-  .hand-wrapper {
+  .hand-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
     opacity: 0;
-    transform: translateY(40px);
-    transition: all 0.4s ease-out;
+    transform: translateY(30px);
+    transition: opacity 0.35s, transform 0.35s;
   }
 
-  .hand-wrapper.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .hand-wrap.appear { opacity: 1; transform: translateY(0); }
 
-  .hand-wrapper.slide-in-left {
-    animation: slideInLeft 0.5s ease-out forwards;
-  }
+  .hand-wrap.slide-l { animation: slideL 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
+  .hand-wrap.slide-r { animation: slideR 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
 
-  .hand-wrapper.slide-in-right {
-    animation: slideInRight 0.5s ease-out forwards;
-  }
-
-  @keyframes slideInLeft {
-    from { transform: translateX(-100px) translateY(40px); opacity: 0; }
+  @keyframes slideL {
+    from { transform: translateX(-80px) translateY(20px); opacity: 0; }
     to { transform: translateX(0) translateY(0); opacity: 1; }
   }
 
-  @keyframes slideInRight {
-    from { transform: translateX(100px) translateY(40px); opacity: 0; }
+  @keyframes slideR {
+    from { transform: translateX(80px) translateY(20px); opacity: 0; }
     to { transform: translateX(0) translateY(0); opacity: 1; }
   }
 
-  .hand-label {
-    color: #aaa;
+  .hand-lbl {
+    color: #666;
     font-size: 11px;
-    margin-top: 6px;
+    margin-top: 5px;
+  }
+
+  /* 竖式计算 */
+  .竖式 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .竖式-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 28px;
+    color: #ddd;
+    letter-spacing: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .竖式-row.show { opacity: 1; }
+
+  .竖式-digit {
+    display: inline-block;
+    width: 28px;
     text-align: center;
+    transition: transform 0.3s, color 0.3s;
   }
 
-  /* 手指SVG */
-  .finger {
-    transform-origin: bottom center;
-    transition: transform 0.3s ease;
+  .竖式-digit.pop {
+    animation: digitPop 0.4s ease;
+    color: #4ecca3;
   }
 
-  .finger.counting {
-    animation: fingerCount 0.5s ease forwards;
+  .竖式-op { color: #ff9f0a; font-size: 22px; }
+
+  .竖式-line {
+    width: 180px;
+    height: 2px;
+    background: #555;
+    margin: 4px 0;
+    opacity: 0;
+    transition: opacity 0.4s;
   }
 
-  @keyframes fingerCount {
-    0% { transform: rotate(0deg); }
-    60% { transform: rotate(-60deg) translateY(-3px); }
-    100% { transform: rotate(-40deg); }
-  }
+  .竖式-line.show { opacity: 1; }
 
-  .finger-label {
-    fill: #4ecca3;
-    font-size: 20px;
+  .竖式-result {
+    font-size: 36px;
+    color: #fff;
     font-weight: bold;
-    text-anchor: middle;
+    letter-spacing: 3px;
+    opacity: 0;
+    transition: opacity 0.4s;
   }
 
-  /* 离谱答案 */
+  .竖式-result.show { opacity: 1; }
+
+  /* 算筹 */
+  .算筹舞台 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .算筹行 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .算筹行.show { opacity: 1; }
+
+  .筹棍 {
+    width: 4px;
+    height: 18px;
+    background: #fad6a5;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s;
+  }
+
+  .筹棍横 { width: 18px; height: 4px; }
+
+  .筹棍.pop {
+    animation: 棍动 0.3s ease;
+  }
+
+  @keyframes 棍动 {
+    0% { transform: scaleY(0); }
+    60% { transform: scaleY(1.3); }
+    100% { transform: scaleY(1); }
+  }
+
+  .算筹-label {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .算筹-label.show { opacity: 1; }
+
+  /* 结果气泡 */
   .result-bubble {
     position: absolute;
-    bottom: 15%;
-    background: #4ecca3;
-    color: #1a1a2e;
-    padding: 16px 32px;
-    border-radius: 20px;
-    font-size: 20px;
-    font-weight: bold;
+    bottom: 12%;
+    background: #fff;
+    color: #000;
+    padding: 16px 30px;
+    border-radius: 18px;
     text-align: center;
     opacity: 0;
     transform: scale(0.5);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
     max-width: 90vw;
   }
 
-  .result-bubble.show {
-    opacity: 1;
-    transform: scale(1);
+  .result-bubble.show { opacity: 1; transform: scale(1); }
+
+  .bubble-eq {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 2px;
   }
 
-  .result-bubble .main-result {
-    font-size: 36px;
+  .bubble-result {
+    font-size: 34px;
+    font-weight: 700;
     display: block;
-    margin-bottom: 4px;
+    letter-spacing: -1px;
   }
 
-  .result-bubble .sub-result {
-    font-size: 13px;
-    font-weight: normal;
-    opacity: 0.7;
+  .bubble-sub {
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 4px;
+    display: block;
   }
 
-  .tap-hint {
-    position: absolute;
-    bottom: 5%;
-    color: #666;
-    font-size: 13px;
-    animation: fadeInUp 0.5s ease 1s both;
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* 答案抖动 */
-  @keyframes shake {
-    0%, 100% { transform: translateX(0) scale(1); }
-    20% { transform: translateX(-8px) scale(1.05); }
-    40% { transform: translateX(8px) scale(1.05); }
+  @keyframes bubbleShake {
+    0%,100% { transform: translateX(0) scale(1); }
+    20% { transform: translateX(-8px) scale(1.04); }
+    40% { transform: translateX(8px) scale(1.04); }
     60% { transform: translateX(-4px) scale(1.02); }
     80% { transform: translateX(4px) scale(1.02); }
   }
 
-  .result-bubble.shake { animation: shake 0.6s ease; }
+  .result-bubble.shake { animation: bubbleShake 0.55s ease; }
 
-  /* 手指数数喊出来的数字 */
-  .count-callout {
+  .tap-hint {
     position: absolute;
-    font-size: 28px;
-    font-weight: bold;
-    color: #4ecca3;
-    pointer-events: none;
-    opacity: 0;
+    bottom: 4%;
+    color: #444;
+    font-size: 13px;
   }
 
-  @keyframes countPop {
-    0% { opacity: 0; transform: scale(0.5) translateY(0); }
-    30% { opacity: 1; transform: scale(1.2) translateY(-10px); }
-    100% { opacity: 0; transform: scale(0.8) translateY(-40px); }
+  /* 手指弯曲动画 */
+  @keyframes fingerBend {
+    0% { transform: rotate(0deg) translateY(0); }
+    50% { transform: rotate(-50deg) translateY(-4px); }
+    100% { transform: rotate(-35deg) translateY(0); }
   }
 </style>
 </head>
 <body>
 
-<!-- 缩小版计算器（动画时显示在顶部） -->
-<div class="calculator calc-small">
-  <div class="display">
-    <div class="display-expression" id="expSmall"></div>
-    <div class="display-result" id="resSmall"></div>
-  </div>
-</div>
-
-<!-- 主计算器 -->
 <div class="calculator">
   <div class="display">
     <div class="display-expression" id="expression"></div>
     <div class="display-result" id="result">0</div>
-    <div class="ai-thinking" id="thinking">🤔 AI正在掰手指中...</div>
   </div>
   <div class="keypad">
     <button class="btn btn-fn" onclick="clearCalc()">AC</button>
@@ -364,27 +377,31 @@
     <button class="btn btn-num" onclick="appendNum('1')">1</button>
     <button class="btn btn-num" onclick="appendNum('2')">2</button>
     <button class="btn btn-num" onclick="appendNum('3')">3</button>
-    <button class="btn btn-eq" onclick="calculate()" style="background:#ff9f0a;">=</button>
+    <button class="btn btn-eq" onclick="calculate()">=</button>
 
     <button class="btn btn-num" onclick="appendNum('0')" style="grid-column: span 2; border-radius: 32px; text-align: left; padding-left: 28px;">0</button>
     <button class="btn btn-num" onclick="appendOp('.')">.</button>
   </div>
 </div>
 
-<!-- 手指动画区域 -->
-<div class="animation-zone" id="animZone" onclick="closeAnim()">
-  <div class="thinking-text" id="thinkingText">🤔 AI正在启动手指...</div>
-
-  <div class="counting-area" id="countingArea">
-    <!-- 手会动态生成在这里 -->
+<!-- 缩小计算器（动画时显示在顶部） -->
+<div class="calculator calc-mini">
+  <div class="display">
+    <div class="display-expression" id="expMini"></div>
+    <div class="display-result" id="resMini">0</div>
   </div>
+</div>
 
+<!-- 动画遮罩 -->
+<div class="anim-zone" id="animZone" onclick="closeAnim()">
+  <div class="thinking-text" id="thinkingText">🤔 AI正在思考…</div>
+  <div class="anim-area" id="animArea"></div>
   <div class="result-bubble" id="resultBubble">
-    <span class="main-result" id="bubbleMain"></span>
-    <span class="sub-result" id="bubbleSub"></span>
+    <div class="bubble-eq" id="bubbleEq"></div>
+    <span class="bubble-result" id="bubbleResult"></span>
+    <span class="bubble-sub" id="bubbleSub"></span>
   </div>
-
-  <div class="tap-hint">👆 点击任意处继续算</div>
+  <div class="tap-hint">点击继续</div>
 </div>
 
 <script>
@@ -392,36 +409,30 @@
 let expression = '';
 let justCalculated = false;
 
-// ====== 显示屏 ======
 const resultEl = document.getElementById('result');
 const expEl = document.getElementById('expression');
-const resSmall = document.getElementById('resSmall');
-const expSmall = document.getElementById('expSmall');
+const resMini = document.getElementById('resMini');
+const expMini = document.getElementById('expMini');
 
 function updateDisplay() {
-  if (justCalculated) {
-    resultEl.textContent = '0';
-    expEl.textContent = '';
-  } else {
-    expEl.textContent = expression;
-  }
-  resSmall.textContent = resultEl.textContent;
-  expSmall.textContent = expEl.textContent;
+  expEl.textContent = expression
+    .replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
+  resMini.textContent = resultEl.textContent;
+  expMini.textContent = expEl.textContent;
+  if (resultEl.textContent.length > 6) resultEl.className = 'display-result big';
+  else if (resultEl.textContent.length > 9) resultEl.className = 'display-result huge';
+  else resultEl.className = 'display-result';
 }
 
-// ====== 按键逻辑 ======
+// ====== 按键 ======
 function appendNum(n) {
-  if (justCalculated) {
-    expression = '';
-    justCalculated = false;
-  }
+  if (justCalculated) { expression = ''; justCalculated = false; }
   expression += n;
   updateDisplay();
 }
 
 function appendOp(op) {
   if (justCalculated && expression) {
-    // 接着上次结果继续算
     expression = resultEl.textContent + op;
     justCalculated = false;
   } else {
@@ -434,6 +445,7 @@ function clearCalc() {
   expression = '';
   justCalculated = false;
   resultEl.textContent = '0';
+  resultEl.className = 'display-result';
   updateDisplay();
 }
 
@@ -446,340 +458,302 @@ function backspace() {
 // ====== 计算 ======
 function calculate() {
   if (!expression || justCalculated) return;
-
-  // 替换运算符号为JS能认的
-  let jsExpr = expression
-    .replace(/×/g, '*')
-    .replace(/÷/g, '/')
-    .replace(/−/g, '-');
-
-  // 计算真实结果
+  const jsExpr = expression.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
   let realResult;
   try {
-    // 安全解析：只允许数字和运算符
-    if (!/^[\d+\-*/(). ]+$/.test(jsExpr)) throw new Error('invalid');
+    if (!/^[\d+\-*/.() ]+$/.test(jsExpr)) throw new Error();
     // eslint-disable-next-line no-eval
     realResult = eval(jsExpr);
-    if (!isFinite(realResult)) throw new Error('infinite');
+    if (!isFinite(realResult)) throw new Error();
   } catch(e) {
-    resultEl.textContent = '算不动了';
+    resultEl.textContent = 'Error';
     resultEl.classList.add('error');
     justCalculated = true;
     return;
   }
-
   justCalculated = true;
   resultEl.textContent = realResult;
   updateDisplay();
-
-  // 启动无厘头动画
-  setTimeout(() => startFunnyAnim(expression, realResult), 300);
+  setTimeout(() => startAnim(expression, realResult), 350);
 }
 
-// ====== 无厘头答案生成 ======
-function generateFunnyAnswer(expr, real) {
-  const funnies = [];
-
-  // 小数字场景
-  if (Math.abs(real) >= 0 && Math.abs(real) <= 5) {
-    const options = [
-      { main: real + 1, sub: '手指比较实诚，多算了一个' },
-      { main: real + 2, sub: '刚才手抖了，多掰了两下' },
-      { main: Math.max(0, real - 1), sub: 'AI偷偷藏了一个（别告诉别人）' },
-    ];
-    return options[Math.floor(Math.random() * options.length)];
-  }
-
-  // 6-20
-  if (Math.abs(real) > 5 && Math.abs(real) <= 20) {
-    const offset = Math.floor(Math.random() * 10) - 3;
-    const main = Math.round(real + offset);
-    const abs = Math.abs(offset);
-    if (offset > 0) {
-      return { main, sub: `数到${abs}的时候手不够开始数脚趾了` };
-    } else if (offset < 0) {
-      return { main, sub: `数到一半发现脚趾也不够用了` };
-    } else {
-      return { main, sub: '刚好数完，没多没少，运气不错！' };
-    }
-  }
-
-  // 21-100
-  if (Math.abs(real) > 20 && Math.abs(real) <= 100) {
-    const main = Math.round(real * (0.7 + Math.random() * 0.6));
-    const stories = [
-      `手脚并用还是不够，开始数耳朵了`,
-      `头发也贡献出来了`,
-      `胳膊肘派上用场了`,
-      `算了半天，决定四舍五入一下`,
-    ];
-    return { main, sub: stories[Math.floor(Math.random() * stories.length)] };
-  }
-
-  // 100+
-  if (Math.abs(real) > 100 && Math.abs(real) <= 10000) {
-    const main = Math.floor(Math.random() * 999) + 1;
-    const bigStories = [
-      '手指脚趾头发耳朵全部上场，还是不够',
-      'AI已经放弃，随便给一个',
-      '数着数着睡着了，醒来随便报个数',
-      '这个数字太大，假装算完了',
-    ];
-    return { main, sub: bigStories[Math.floor(Math.random() * bigStories.length)] };
-  }
-
-  // 超大数字
-  if (Math.abs(real) > 10000) {
-    const hugeStories = [
-      { main: '超出AI认知范围', sub: '数到破产也没算出来' },
-      { main: '∞', sub: '反正很多就对了' },
-      { main: '一个天文数字', sub: '具体多少不重要，反正很大' },
-    ];
-    return hugeStories[Math.floor(Math.random() * hugeStories.length)];
-  }
-
-  // 负数
-  if (real < 0) {
-    return { main: '手不够用', sub: '欠的手指比拥有的还多' };
-  }
-
-  // 小数
-  if (!Number.isInteger(real)) {
-    const rounded = Math.round(real);
-    return { main: rounded, sub: `四舍五入了，精确到${Math.random() > 0.5 ? '手指' : '脚趾'}` };
-  }
-
-  return { main: real, sub: '正常结果（很难得）' };
-}
-
-// ====== 手绘SVG ======
-function createHandSVG(fingersUp) {
-  // fingersUp: 0-5 表示有几根手指伸直
-  const fingerRects = [
-    { x: 20, isThumb: false },  // 食指
-    { x: 36, isThumb: false },  // 中指
-    { x: 52, isThumb: false },  // 无名指
-    { x: 68, isThumb: false },  // 小拇指
-    { x: 5,  isThumb: true  },  // 拇指（单独位置）
-  ];
-
-  const SVG_NS = 'http://www.w3.org/2000/svg';
-
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('width', '90');
-  svg.setAttribute('height', '110');
-  svg.setAttribute('viewBox', '0 0 90 110');
-
-  // 手掌
-  const palm = document.createElementNS(SVG_NS, 'ellipse');
-  palm.setAttribute('cx', '45');
-  palm.setAttribute('cy', '85');
-  palm.setAttribute('rx', '32');
-  palm.setAttribute('ry', '22');
-  palm.setAttribute('fill', '#ffcc99');
-  palm.setAttribute('stroke', '#e8a870');
-  palm.setAttribute('stroke-width', '1.5');
-  svg.appendChild(palm);
-
-  // 手指绘制
-  const fingerY = 65; // 手指底部y
-  const fingerH = 38;
-  const fingerW = 10;
-
-  // 普通手指（4根）
-  for (let i = 0; i < 4; i++) {
-    const fx = fingerRects[i].x;
-    const fUp = fingersUp > i ? 1 : 0;
-    const angle = fUp ? -8 + i * 2 : 0;
-    const yOffset = fUp ? 0 : 12;
-
-    const g = document.createElementNS(SVG_NS, 'g');
-    g.classList.add('finger');
-    if (fUp) g.classList.add('counting');
-
-    // 手指本体
-    const rect = document.createElementNS(SVG_NS, 'rect');
-    rect.setAttribute('x', fx - fingerW/2);
-    rect.setAttribute('y', fingerY - fingerH + yOffset);
-    rect.setAttribute('width', fingerW);
-    rect.setAttribute('height', fingerH);
-    rect.setAttribute('rx', '5');
-    rect.setAttribute('fill', '#ffcc99');
-    rect.setAttribute('stroke', '#e8a870');
-    rect.setAttribute('stroke-width', '1.5');
-    rect.setAttribute('transform', `rotate(${angle}, ${fx}, ${fingerY})`);
-    g.appendChild(rect);
-
-    // 关节线
-    const joint = document.createElementNS(SVG_NS, 'line');
-    joint.setAttribute('x1', fx - 3);
-    joint.setAttribute('y1', fingerY - fingerH * 0.5 + yOffset);
-    joint.setAttribute('x2', fx + 3);
-    joint.setAttribute('y2', fingerY - fingerH * 0.5 + yOffset);
-    joint.setAttribute('stroke', '#e8a870');
-    joint.setAttribute('stroke-width', '1');
-    joint.setAttribute('transform', `rotate(${angle}, ${fx}, ${fingerY})`);
-    g.appendChild(joint);
-
-    svg.appendChild(g);
-  }
-
-  // 拇指（单独，处理旋转）
-  {
-    const fx = fingerRects[4].x;
-    const fUp = fingersUp > 3 ? 1 : 0;
-    const angle = fUp ? -40 : 0;
-
-    const g = document.createElementNS(SVG_NS, 'g');
-    g.classList.add('finger');
-
-    const rect = document.createElementNS(SVG_NS, 'rect');
-    rect.setAttribute('x', fx);
-    rect.setAttribute('y', 70 + (fUp ? 0 : 5));
-    rect.setAttribute('width', 10);
-    rect.setAttribute('height', 30);
-    rect.setAttribute('rx', '5');
-    rect.setAttribute('fill', '#ffcc99');
-    rect.setAttribute('stroke', '#e8a870');
-    rect.setAttribute('stroke-width', '1.5');
-    rect.setAttribute('transform', `rotate(${angle}, ${fx + 5}, 95)`);
-    g.appendChild(rect);
-
-    svg.appendChild(g);
-  }
-
-  return svg;
-}
-
-// ====== 脚趾SVG ======
-function createFootSVG(toesUp) {
-  const SVG_NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('width', '70');
-  svg.setAttribute('height', '50');
-  svg.setAttribute('viewBox', '0 0 70 50');
-
-  // 脚掌
-  const palm = document.createElementNS(SVG_NS, 'ellipse');
-  palm.setAttribute('cx', '35');
-  palm.setAttribute('cy', '38');
-  palm.setAttribute('rx', '28');
-  palm.setAttribute('ry', '12');
-  palm.setAttribute('fill', '#ffcc99');
-  palm.setAttribute('stroke', '#e8a870');
-  palm.setAttribute('stroke-width', '1.5');
-  svg.appendChild(palm);
-
-  // 脚趾
-  for (let i = 0; i < 5; i++) {
-    const tx = 12 + i * 11;
-    const tUp = toesUp > i ? 1 : 0;
-    const ty = 25 - tUp * 8;
-
-    const circle = document.createElementNS(SVG_NS, 'ellipse');
-    circle.setAttribute('cx', tx);
-    circle.setAttribute('cy', ty);
-    circle.setAttribute('rx', '5');
-    circle.setAttribute('ry', tUp ? 7 : 4);
-    circle.setAttribute('fill', '#ffcc99');
-    circle.setAttribute('stroke', '#e8a870');
-    circle.setAttribute('stroke-width', '1');
-    svg.appendChild(circle);
-  }
-
-  return svg;
-}
-
-// ====== 手指动画 ======
-async function startFunnyAnim(expr, realResult) {
+// ====== 动画启动 ======
+function startAnim(expr, result) {
   const zone = document.getElementById('animZone');
-  const area = document.getElementById('countingArea');
+  const area = document.getElementById('animArea');
   const thinking = document.getElementById('thinkingText');
   const bubble = document.getElementById('resultBubble');
 
   zone.classList.add('active');
   area.innerHTML = '';
   bubble.classList.remove('show', 'shake');
-  thinking.textContent = '🤔 AI正在启动手指...';
 
-  const displayExpr = expr
-    .replace(/\*/g, '×')
-    .replace(/\//g, '÷')
-    .replace(/-/g, '−');
+  const displayExpr = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
 
-  thinking.textContent = `${displayExpr} = ?`;
-  await sleep(800);
+  const abs = Math.abs(result);
+  if (abs <= 10) {
+    animFingers(displayExpr, result, thinking, area, bubble);
+  } else if (abs <= 999) {
+    anim竖式(displayExpr, result, thinking, area, bubble);
+  } else {
+    anim算筹(displayExpr, result, thinking, area, bubble);
+  }
+}
 
-  // 生成答案
-  const funny = generateFunnyAnswer(expr, realResult);
+// ====== 动画1: 手指数数 (1-10) ======
+function animFingers(displayExpr, result, thinking, area, bubble) {
+  thinking.textContent = '🤔 让我掰指头算算…';
+  area.innerHTML = '';
 
-  // 手指动画
-  const totalItems = Math.ceil(Math.abs(realResult) / 2);
-  const hands = Math.min(6, Math.ceil(totalItems / 5));
-  const footCount = Math.max(0, Math.floor((totalItems - hands * 5) / 5));
-  const leftover = totalItems - hands * 5 - footCount * 5;
+  const n = Math.abs(Math.round(result));
+  const isNeg = result < 0;
+  const hands = Math.ceil(n / 5);
 
-  const handWrappers = [];
+  const row = document.createElement('div');
+  row.className = 'hands-row';
+  area.appendChild(row);
 
-  // 手
-  for (let i = 0; i < hands; i++) {
+  const handEls = [];
+  let t = 400;
+
+  for (let h = 0; h < hands; h++) {
     const hw = document.createElement('div');
-    hw.className = 'hand-wrapper slide-in-left';
-    area.appendChild(hw);
-    handWrappers.push({ el: hw, type: 'hand', count: 5 });
-    await sleep(200);
+    hw.className = 'hand-wrap ' + (h%2===0 ? 'slide-l' : 'slide-r');
+    const lbl = document.createElement('div');
+    lbl.className = 'hand-lbl';
+    lbl.textContent = h%2===0 ? '左手' : '右手';
+    hw.appendChild(createHandSVG(0));
+    hw.appendChild(lbl);
+    row.appendChild(hw);
+    handEls.push(hw);
+    setTimeout(() => hw.classList.add('appear'), t);
+    t += 180;
   }
 
-  // 脚
-  for (let i = 0; i < footCount; i++) {
-    const hw = document.createElement('div');
-    hw.className = 'hand-wrapper slide-in-right';
-    area.appendChild(hw);
-    handWrappers.push({ el: hw, type: 'foot', count: 5 });
-    await sleep(200);
-  }
+  t += 300;
 
-  await sleep(600);
-
-  // 数数动画
-  let count = 0;
-  const fingers = [1, 2, 3, 4, 5, 1, 2, 3, 4, 5]; // 每只手数数的顺序
-
-  for (let h = 0; h < handWrappers.length; h++) {
-    const { el, type, count: maxCount } = handWrappers[h];
-    for (let f = 0; f < maxCount; f++) {
-      count++;
-      thinking.textContent = `正在数第 ${count} 个...`;
-
-      if (type === 'hand') {
-        const svg = createHandSVG(fingers[f]);
-        el.innerHTML = '';
-        el.appendChild(svg);
-      } else {
-        const svg = createFootSVG(fingers[f]);
-        el.innerHTML = '';
-        el.appendChild(svg);
-      }
-
-      el.classList.add('visible');
-      await sleep(350);
+  // 数数动画：每数一个数，一根手指弯下去
+  let counted = 0;
+  const step = () => {
+    if (counted >= n) {
+      showResult(displayExpr, result, bubble);
+      return;
     }
+    const handIdx = Math.floor(counted / 5);
+    const fingerIdx = counted % 5;
+    const hw = handEls[handIdx];
+    if (!hw) { counted++; setTimeout(step, 50); return; }
+
+    hw.innerHTML = '';
+    hw.appendChild(createHandSVG(fingerIdx + 1));
+    hw.appendChild(hw.querySelector('.hand-lbl') || document.createElement('div'));
+    thinking.textContent = `正在数第 ${counted + 1} 个…`;
+    counted++;
+    setTimeout(step, 300);
+  };
+
+  setTimeout(step, t);
+}
+
+// ====== 动画2: 竖式计算 (11-999) ======
+function anim竖式(displayExpr, result, thinking, area, bubble) {
+  thinking.textContent = '📝 列个竖式算算…';
+  area.innerHTML = '';
+
+  const abs = Math.abs(result);
+  const isNeg = result < 0;
+
+  // 分解数字为位数数组
+  const digits = String(abs).split('').map(Number);
+
+  // 构造竖式DOM
+  const 竖 = document.createElement('div');
+ 竖.className = '竖式';
+  area.appendChild(竖);
+
+  // 第一行：被加数/被减数
+  const row1 = document.createElement('div');
+  row1.className = '竖式-row';
+  if (isNeg) {
+    const neg = document.createElement('span');
+    neg.className = '竖式-op';
+    neg.textContent = '−';
+    row1.appendChild(neg);
+  }
+  digits.forEach((d, i) => {
+    const sp = document.createElement('span');
+    sp.className = '竖式-digit';
+    sp.textContent = d;
+    sp.dataset.idx = i;
+    row1.appendChild(sp);
+  });
+  竖.appendChild(row1);
+
+  // 第二行：运算符 + 另一个数（从表达式解析）
+  const row2 = document.createElement('div');
+  row2.className = '竖式-row';
+  const opSpan = document.createElement('span');
+  opSpan.className = '竖式-op';
+  // 尝试从expression提取第二个数
+  const parts = displayExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').split(/([+\-×÷])/);
+  opSpan.textContent = displayExpr.match(/[+\-×÷]/)?.[0] || '+';
+  row2.appendChild(opSpan);
+
+  // 用一个随机数填第二行（整蛊效果）
+  const num2 = Math.floor(Math.abs(Math.round(result)) * (0.3 + Math.random() * 0.7));
+  const digits2 = String(num2).padStart(digits.length, '0').split('').slice(-digits.length);
+  digits2.forEach(d => {
+    const sp = document.createElement('span');
+    sp.className = '竖式-digit';
+    sp.textContent = d;
+    row2.appendChild(sp);
+  });
+  竖.appendChild(row2);
+
+  // 横线
+  const ln = document.createElement('div');
+  ln.className = '竖式-line';
+  竖.appendChild(ln);
+
+  // 结果行
+  const rowR = document.createElement('div');
+  rowR.className = '竖式-row 竖式-result';
+  const resultDigits = String(abs).split('');
+  if (isNeg) {
+    const neg = document.createElement('span');
+    neg.className = '竖式-op';
+    neg.textContent = '−';
+    rowR.appendChild(neg);
+  }
+  resultDigits.forEach(d => {
+    const sp = document.createElement('span');
+    sp.className = '竖式-digit';
+    sp.textContent = d;
+    rowR.appendChild(sp);
+  });
+  竖.appendChild(rowR);
+
+  // 动画时序
+  let t = 400;
+  row1.querySelectorAll('.竖式-digit').forEach((el, i) => {
+    setTimeout(() => { el.classList.add('pop'); row1.classList.add('show'); }, t + i * 80);
+  });
+  t += digits.length * 80 + 300;
+
+  row2.querySelectorAll('.竖式-digit').forEach((el, i) => {
+    setTimeout(() => { el.classList.add('pop'); row2.classList.add('show'); }, t + i * 80);
+  });
+  t += digits.length * 80 + 400;
+
+  setTimeout(() => ln.classList.add('show'), t);
+  t += 400;
+
+  rowR.querySelectorAll('.竖式-digit').forEach((el, i) => {
+    setTimeout(() => { el.classList.add('pop'); rowR.classList.add('show'); }, t + i * 120);
+  });
+  t += digits.length * 120 + 500;
+
+  thinking.textContent = '✅ 算出来了！';
+  setTimeout(() => showResult(displayExpr, result, bubble), t);
+}
+
+// ====== 动画3: 算筹 (1000+) ======
+function anim算筹(displayExpr, result, thinking, area, bubble) {
+  thinking.textContent = '🧮 用算筹来算…';
+  area.innerHTML = '';
+
+  const abs = Math.abs(result);
+  const isNeg = result < 0;
+  const numStr = String(abs);
+  const len = numStr.length;
+
+  // 创建算筹舞台
+  const 舞台 = document.createElement('div');
+  舞台.className = '算筹舞台';
+  area.appendChild(舞台);
+
+  // 每位数字一行算筹
+  const digitRows = [];
+  for (let i = 0; i < Math.min(len, 5); i++) { // 最多显示5行
+    const 行 = document.createElement('div');
+    行.className = '算筹行';
+    const lbl = document.createElement('div');
+    lbl.className = '算筹-label';
+    lbl.textContent = numStr[i] + ' =';
+    行.appendChild(lbl);
+
+    // 画算筹棍：每5根横过来为一组
+    const d = parseInt(numStr[i]);
+    const groups = Math.floor(d / 5);
+    const remainder = d % 5;
+
+    for (let g = 0; g < groups; g++) {
+      // 5根横棍
+      for (let k = 0; k < 5; k++) {
+        const 棍 = document.createElement('div');
+        棍.className = '筹棍 筹棍横';
+        行.appendChild(棍);
+      }
+    }
+    // 剩余竖棍
+    for (let k = 0; k < remainder; k++) {
+      const 棍 = document.createElement('div');
+      棍.className = '筹棍';
+      行.appendChild(棍);
+    }
+
+    舞台.appendChild(行);
+    digitRows.push(行);
   }
 
-  await sleep(600);
-  thinking.textContent = '🤯 算出来了！';
+  if (len > 5) {
+    const more = document.createElement('div');
+    more.className = '算筹-label';
+    more.textContent = `… 共 ${len} 位`;
+    more.style.opacity = '1';
+    more.style.color = '#666';
+    舞台.appendChild(more);
+  }
 
-  // 显示离谱答案
-  await sleep(400);
+  // 动画时序
+  let t = 400;
+  digitRows.forEach((行, ri) => {
+    setTimeout(() => {
+      行.classList.add('show');
+      const 棍s = 行.querySelectorAll('.筹棍');
+      棍s.forEach((棍, ci) => {
+        setTimeout(() => 棍.classList.add('pop'), ci * 40);
+      });
+    }, t + ri * 250);
+    t += 250;
+  });
+
+  t += digitRows.length * 250 + 600;
+  thinking.textContent = '✅ 算出来了！';
+  setTimeout(() => showResult(displayExpr, result, bubble), t);
+}
+
+// ====== 显示正确结果 ======
+function showResult(displayExpr, result, bubble) {
+  thinking.textContent = '';
   bubble.classList.add('show', 'shake');
-  document.getElementById('bubbleMain').textContent = displayExpr + ' = ' + funny.main;
-  document.getElementById('bubbleSub').textContent = funny.sub;
+
+  const resultStr = String(result);
+  document.getElementById('bubbleEq').textContent = displayExpr + ' =';
+  document.getElementById('bubbleResult').textContent = resultStr;
+
+  const subs = [
+    '算对了，就是费手',
+    '答案正确，就是过程有点离谱',
+    '手指数完、脚趾数完，算筹也用上了',
+    '用算筹验算过了，确实是这个数',
+    '没错，就是费了点功夫',
+  ];
+  document.getElementById('bubbleSub').textContent = subs[Math.floor(Math.random() * subs.length)];
 }
 
 function closeAnim() {
-  const zone = document.getElementById('animZone');
-  zone.classList.remove('active');
-  // 重置主屏
+  document.getElementById('animZone').classList.remove('active');
   resultEl.classList.remove('error');
   expression = '';
   justCalculated = false;
@@ -787,12 +761,79 @@ function closeAnim() {
   updateDisplay();
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+// ====== 手型SVG ======
+function createHandSVG(fingersExtended) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('width', '72');
+  svg.setAttribute('height', '120');
+  svg.setAttribute('viewBox', '0 0 72 120');
+
+  // 手掌
+  const palm = document.createElementNS(NS, 'ellipse');
+  palm.setAttribute('cx', '36'); palm.setAttribute('cy', '95');
+  palm.setAttribute('rx', '22'); palm.setAttribute('ry', '17');
+  palm.setAttribute('fill', '#fad6a5');
+  palm.setAttribute('stroke', '#d4a574');
+  palm.setAttribute('stroke-width', '1.5');
+  svg.appendChild(palm);
+
+  // 四指（食指→小指）
+  const cfg = [
+    {x:20, tilt:-5,  len:38},
+    {x:30, tilt:-1,  len:44},
+    {x:40, tilt:2,   len:42},
+    {x:49, tilt:6,   len:36},
+  ];
+
+  for (let i = 0; i < 4; i++) {
+    const c = cfg[i];
+    const ext = fingersExtended > i;
+    const bend = ext ? 0 : 14;
+    const tip = 95 - c.len + bend;
+
+    const g = document.createElementNS(NS, 'g');
+
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d',
+      `M${c.x-5} 95 ` +
+      `C${c.x-6+c.tilt*0.2} ${95-14} ${c.x-4+c.tilt} ${tip+8} ${c.x} ${tip} ` +
+      `C${c.x+4+c.tilt} ${tip+8} ${c.x+6+c.tilt*0.2} ${95-14} ${c.x+5} 95 Z`
+    );
+    path.setAttribute('fill', '#fad6a5');
+    path.setAttribute('stroke', '#d4a574');
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('stroke-linejoin', 'round');
+    if (!ext) {
+      const j2 = document.createElementNS(NS, 'path');
+      j2.setAttribute('d', `M${c.x-3.5} ${tip+10} Q${c.x} ${tip+17} ${c.x+3.5} ${tip+10}`);
+      j2.setAttribute('stroke', '#d4a574');
+      j2.setAttribute('stroke-width', '1');
+      j2.setAttribute('fill', 'none');
+      g.appendChild(j2);
+    }
+    g.appendChild(path);
+    svg.appendChild(g);
+  }
+
+  // 拇指
+  const thumbExt = fingersExtended > 3;
+  const tp = document.createElementNS(NS, 'path');
+  if (thumbExt) {
+    tp.setAttribute('d', 'M10 80 C6 75 4 68 7 62 C10 56 17 54 20 59 C23 64 20 72 15 78 Z');
+  } else {
+    tp.setAttribute('d', 'M14 80 C11 76 9 70 12 65 C15 60 20 60 21 64 C22 69 18 75 16 79 Z');
+  }
+  tp.setAttribute('fill', '#fad6a5');
+  tp.setAttribute('stroke', '#d4a574');
+  tp.setAttribute('stroke-width', '1.5');
+  svg.appendChild(tp);
+
+  return svg;
 }
 
-// ====== 键盘支持 ======
-document.addEventListener('keydown', (e) => {
+// ====== 键盘 ======
+document.addEventListener('keydown', e => {
   if (e.key >= '0' && e.key <= '9') appendNum(e.key);
   else if (e.key === '.') appendOp('.');
   else if (e.key === '+') appendOp('+');
@@ -806,6 +847,5 @@ document.addEventListener('keydown', (e) => {
 
 updateDisplay();
 </script>
-
 </body>
 </html>
