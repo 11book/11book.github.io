@@ -39,44 +39,16 @@
     justify-content: flex-end;
   }
 
-  .display-expression {
-    color: #888;
-    font-size: 20px;
-    min-height: 28px;
-    word-break: break-all;
-    line-height: 1.2;
-  }
-
-  .display-result {
-    color: #fff;
-    font-size: 48px;
-    font-weight: 200;
-    letter-spacing: -2px;
-    line-height: 1.1;
-    transition: all 0.15s;
-  }
-
+  .display-expression { color: #888; font-size: 20px; min-height: 28px; word-break: break-all; line-height: 1.2; }
+  .display-result { color: #fff; font-size: 48px; font-weight: 200; letter-spacing: -2px; line-height: 1.1; transition: all 0.15s; }
   .display-result.big { font-size: 36px; }
   .display-result.huge { font-size: 26px; }
   .display-result.waiting { color: #555; font-size: 36px; letter-spacing: 0; }
   .display-result.error { color: #ff6b6b; font-size: 18px; }
 
-  .keypad {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
+  .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
-  .btn {
-    height: 64px;
-    border-radius: 50%;
-    border: none;
-    font-size: 26px;
-    font-weight: 400;
-    cursor: pointer;
-    transition: all 0.1s;
-  }
-
+  .btn { height: 64px; border-radius: 50%; border: none; font-size: 26px; font-weight: 400; cursor: pointer; transition: all 0.1s; }
   .btn:active { transform: scale(0.93); }
   .btn-num { background: #333; color: #fff; }
   .btn-num:hover { background: #3d3d3d; }
@@ -90,7 +62,7 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at center top, #1e2a4a 0%, #1a1a2e 70%);
+    background: radial-gradient(ellipse at 50% 30%, #1e2a4a 0%, #1a1a2e 65%);
     display: none;
     flex-direction: column;
     align-items: center;
@@ -103,7 +75,7 @@
 
   .expr-bar {
     position: absolute;
-    top: max(env(safe-area-inset-top), 28px);
+    top: max(env(safe-area-inset-top), 24px);
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255,255,255,0.07);
@@ -119,7 +91,7 @@
     color: #4ecca3;
     font-size: 17px;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 18px;
     min-height: 26px;
   }
 
@@ -127,7 +99,7 @@
     position: relative;
     width: 100%;
     max-width: 520px;
-    height: 360px;
+    height: 340px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -139,218 +111,32 @@
     top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 240px;
-    height: 5px;
+    width: 200px;
+    height: 4px;
     background: rgba(255,255,255,0.1);
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     opacity: 0;
     transition: opacity 0.3s;
   }
 
   .progress-bar.show { opacity: 1; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #4ecca3, #7fecb8); border-radius: 2px; transition: width 0.35s ease; width: 0%; }
 
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4ecca3, #7fecb8);
-    border-radius: 3px;
-    transition: width 0.35s ease;
-    width: 0%;
-  }
-
-  /* ===== 两列手指头 ===== */
-  .fingers-area {
-    display: flex;
-    gap: 48px;
-    align-items: flex-end;
+  /* ===== SVG 两只手 ===== */
+  .hands-wrapper {
+    position: relative;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
     transition: opacity 0.5s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
   }
 
-  .fingers-area.show { opacity: 1; transform: translateY(0); }
-
-  /* 单只手 */
-  .hand-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-  }
-
-  .hand-label {
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 6px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  /* 手指圆圈列 */
-  .finger-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* 单个手指头 */
-  .finger {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #2a2d3e;
-    border: 2.5px solid #3a3d50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: 800;
-    color: rgba(255,255,255,0.25);
-    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  }
-
-  .finger::before {
-    content: '';
-    position: absolute;
-    inset: 3px;
-    border-radius: 50%;
-    background: transparent;
-    transition: all 0.3s;
-  }
-
-  /* 变绿：数到这根手指 */
-  .finger.counted {
-    background: linear-gradient(135deg, #4ecca3, #3dbb91);
-    border-color: #2fa07a;
-    color: #fff;
-    box-shadow: 0 0 22px rgba(78,204,163,0.65), 0 2px 10px rgba(0,0,0,0.25);
-    transform: scale(1.18);
-  }
-
-  /* 正在数：脉冲动画 */
-  .finger.counting {
-    background: linear-gradient(135deg, #7fecb8, #4ecca3);
-    border-color: #3dbb91;
-    color: #fff;
-    animation: finPulse 0.45s ease infinite alternate;
-    box-shadow: 0 0 18px rgba(78,204,163,0.55);
-  }
-
-  @keyframes finPulse {
-    from { transform: scale(1.08); box-shadow: 0 0 14px rgba(78,204,163,0.45); }
-    to   { transform: scale(1.22); box-shadow: 0 0 26px rgba(78,204,163,0.7); }
-  }
-
-  /* 手掌底部 */
-  .palm-base {
-    width: 72px;
-    height: 28px;
-    background: linear-gradient(180deg, #ffd7b5, #f0b896);
-    border-radius: 36px 36px 20px 20px;
-    border: 2px solid #e8b89a;
-    margin-top: 6px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-  }
-
-  /* 袖子 */
-  .sleeve-base {
-    width: 80px;
-    height: 24px;
-    background: linear-gradient(180deg, #5a9bd4, #3d7db5);
-    border-radius: 6px 6px 0 0;
-    border: 1.5px solid #2d6095;
-    position: relative;
-  }
-
-  .sleeve-base::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: #2d6095;
-    border-radius: 2px;
-  }
-
-  /* 脚趾区 */
-  .feet-row {
-    display: flex;
-    gap: 48px;
-    margin-top: 10px;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  .feet-row.show { opacity: 1; }
-
-  .foot-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .foot-label {
-    font-size: 10px;
-    color: rgba(255,255,255,0.25);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .toe-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .t {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #2a2d3e;
-    border: 2px solid #3a3d50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.2);
-    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  }
-
-  .t.counted {
-    background: linear-gradient(135deg, #4ecca3, #3dbb91);
-    border-color: #2fa07a;
-    color: #fff;
-    box-shadow: 0 0 16px rgba(78,204,163,0.6);
-    transform: scale(1.15);
-  }
-
-  .t.counting {
-    background: linear-gradient(135deg, #7fecb8, #4ecca3);
-    border-color: #3dbb91;
-    color: #fff;
-    animation: finPulse 0.45s ease infinite alternate;
-    box-shadow: 0 0 14px rgba(78,204,163,0.55);
-  }
-
-  .sole-base {
-    width: 50px;
-    height: 14px;
-    background: #ffd7b5;
-    border: 1.5px solid #e8b89a;
-    border-radius: 25px 25px 18px 18px;
-    margin-top: 2px;
-  }
+  .hands-wrapper.show { opacity: 1; transform: translateY(0); }
 
   /* 思考气泡 */
   .think-bubble {
     position: absolute;
-    top: -36px;
+    top: -32px;
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
@@ -363,6 +149,7 @@
     transition: opacity 0.3s;
     box-shadow: 0 2px 10px rgba(0,0,0,0.12);
     font-weight: bold;
+    z-index: 20;
   }
 
   .think-bubble::after {
@@ -388,19 +175,16 @@
     color: #ff6b6b;
     opacity: 0;
     transition: all 0.35s;
-    z-index: 10;
+    z-index: 30;
     text-shadow: 0 4px 24px rgba(255,107,107,0.6);
   }
 
-  .cross-icon.show {
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
-    opacity: 1;
-  }
+  .cross-icon.show { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
 
   /* 结果卡 */
   .result-card {
     position: absolute;
-    bottom: -12px;
+    bottom: -14px;
     left: 50%;
     transform: translateX(-50%) scale(0.7);
     background: #fff;
@@ -414,11 +198,7 @@
     z-index: 6;
   }
 
-  .result-card.show {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-  }
-
+  .result-card.show { opacity: 1; transform: translateX(-50%) scale(1); }
   .rc-eq { font-size: 13px; color: #aaa; margin-bottom: 2px; }
   .rc-result { font-size: 44px; font-weight: 800; letter-spacing: -2px; display: block; color: #1a1a2e; }
   .rc-sub { font-size: 12px; color: #999; margin-top: 4px; display: block; }
@@ -433,12 +213,7 @@
 
   .result-card.shake { animation: cardShake 0.5s ease; }
 
-  .tap-hint {
-    position: absolute;
-    bottom: 5%;
-    color: #444;
-    font-size: 13px;
-  }
+  .tap-hint { position: absolute; bottom: 5%; color: #444; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -453,22 +228,18 @@
     <button class="btn btn-fn" onclick="backspace()">⌫</button>
     <button class="btn btn-fn" onclick="appendOp('÷')">÷</button>
     <button class="btn btn-op" onclick="appendOp('×')">×</button>
-
     <button class="btn btn-num" onclick="appendNum('7')">7</button>
     <button class="btn btn-num" onclick="appendNum('8')">8</button>
     <button class="btn btn-num" onclick="appendNum('9')">9</button>
     <button class="btn btn-op" onclick="appendOp('-')">−</button>
-
     <button class="btn btn-num" onclick="appendNum('4')">4</button>
     <button class="btn btn-num" onclick="appendNum('5')">5</button>
     <button class="btn btn-num" onclick="appendNum('6')">6</button>
     <button class="btn btn-op" onclick="appendOp('+')">+</button>
-
     <button class="btn btn-num" onclick="appendNum('1')">1</button>
     <button class="btn btn-num" onclick="appendNum('2')">2</button>
     <button class="btn btn-num" onclick="appendNum('3')">3</button>
     <button class="btn btn-eq" onclick="calculate()">=</button>
-
     <button class="btn btn-num" onclick="appendNum('0')" style="grid-column: span 2; border-radius: 32px; text-align: left; padding-left: 28px;">0</button>
     <button class="btn btn-num" onclick="appendOp('.')">.</button>
   </div>
@@ -484,64 +255,190 @@
       <div class="progress-fill" id="progressFill"></div>
     </div>
 
-    <!-- 两只手 -->
-    <div class="fingers-area" id="fingersArea">
+    <div class="hands-wrapper" id="handsWrapper">
       <div class="think-bubble" id="thinkBubble">手指头…</div>
       <div class="cross-icon" id="crossIcon">✗</div>
 
-      <!-- 左手：手指 1-5 -->
-      <div class="hand-col">
-        <div class="hand-label">左手</div>
-        <div class="finger-stack">
-          <div class="finger" id="fin1">1</div>
-          <div class="finger" id="fin2">2</div>
-          <div class="finger" id="fin3">3</div>
-          <div class="finger" id="fin4">4</div>
-          <div class="finger" id="fin5">5</div>
-        </div>
-        <div class="palm-base"></div>
-        <div class="sleeve-base"></div>
-      </div>
+      <!--
+        扁平卡通风格两只手 SVG
+        左手: fin1-fin5 (1-5)
+        右手: fin6-fin10 (6-10)
+        脚趾: toe11-toe20 (11-20)
+      -->
+      <svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- 肤色渐变 -->
+          <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffe0c8"/>
+            <stop offset="100%" stop-color="#fdd0a8"/>
+          </linearGradient>
+          <!-- 袖子渐变 -->
+          <linearGradient id="sleeve" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#5a9bd4"/>
+            <stop offset="100%" stop-color="#3d7db5"/>
+          </linearGradient>
+          <!-- 激活绿 -->
+          <linearGradient id="activeGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7fecb8"/>
+            <stop offset="100%" stop-color="#3dbb91"/>
+          </linearGradient>
+          <!-- 手掌阴影 -->
+          <radialGradient id="palmShadow" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#ffd7b5" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#d49b78" stop-opacity="0.35"/>
+          </radialGradient>
+          <!-- 发光效果 -->
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="glowStrong">
+            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
 
-      <!-- 右手：手指 6-10 -->
-      <div class="hand-col">
-        <div class="hand-label">右手</div>
-        <div class="finger-stack">
-          <div class="finger" id="fin6">6</div>
-          <div class="finger" id="fin7">7</div>
-          <div class="finger" id="fin8">8</div>
-          <div class="finger" id="fin9">9</div>
-          <div class="finger" id="fin10">10</div>
-        </div>
-        <div class="palm-base"></div>
-        <div class="sleeve-base"></div>
-      </div>
-    </div>
+        <!-- ==================== 左手 (中心 x=115) ==================== -->
+        <!-- 袖子 -->
+        <rect x="72" y="240" width="86" height="50" rx="8" fill="url(#sleeve)" stroke="#2d6095" stroke-width="2"/>
+        <rect x="76" y="244" width="78" height="6" rx="3" fill="#2d6095" opacity="0.5"/>
 
-    <!-- 脚趾区 -->
-    <div class="feet-row" id="feetRow">
-      <div class="foot-col">
-        <div class="foot-label">左脚</div>
-        <div class="toe-stack">
-          <div class="t" id="t11">11</div>
-          <div class="t" id="t12">12</div>
-          <div class="t" id="t13">13</div>
-          <div class="t" id="t14">14</div>
-          <div class="t" id="t15">15</div>
-        </div>
-        <div class="sole-base"></div>
-      </div>
-      <div class="foot-col">
-        <div class="foot-label">右脚</div>
-        <div class="toe-stack">
-          <div class="t" id="t16">16</div>
-          <div class="t" id="t17">17</div>
-          <div class="t" id="t18">18</div>
-          <div class="t" id="t19">19</div>
-          <div class="t" id="t20">20</div>
-        </div>
-        <div class="sole-base"></div>
-      </div>
+        <!-- 拇指 (左侧，倾斜) -->
+        <g id="g-fin5" class="finger-g" data-n="5">
+          <rect x="64" y="185" width="22" height="50" rx="11" fill="url(#skin)" stroke="#d49b78" stroke-width="2"
+                transform="rotate(-22 75 185)"/>
+          <text x="75" y="215" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">5</text>
+        </g>
+
+        <!-- 掌心 -->
+        <ellipse cx="115" cy="235" rx="50" ry="42" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+        <ellipse cx="115" cy="228" rx="38" ry="30" fill="url(#palmShadow)"/>
+
+        <!-- 食指(1) -->
+        <g id="g-fin1" class="finger-g" data-n="1">
+          <rect x="70" y="135" width="18" height="70" rx="9" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="79" y="175" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">1</text>
+        </g>
+
+        <!-- 中指(2) -->
+        <g id="g-fin2" class="finger-g" data-n="2">
+          <rect x="93" y="115" width="18" height="82" rx="9" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="102" y="158" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">2</text>
+        </g>
+
+        <!-- 无名指(3) -->
+        <g id="g-fin3" class="finger-g" data-n="3">
+          <rect x="116" y="122" width="18" height="76" rx="9" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="125" y="163" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">3</text>
+        </g>
+
+        <!-- 小指(4) -->
+        <g id="g-fin4" class="finger-g" data-n="4">
+          <rect x="139" y="148" width="16" height="60" rx="8" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="147" y="180" text-anchor="middle" dominant-baseline="middle"
+                font-size="12" font-weight="800" fill="#aaa" class="fin-text">4</text>
+        </g>
+
+        <!-- ==================== 右手 (中心 x=365) ==================== -->
+        <!-- 袖子 -->
+        <rect x="322" y="240" width="86" height="50" rx="8" fill="url(#sleeve)" stroke="#2d6095" stroke-width="2"/>
+        <rect x="326" y="244" width="78" height="6" rx="3" fill="#2d6095" opacity="0.5"/>
+
+        <!-- 拇指 (右侧，倾斜) -->
+        <g id="g-fin10" class="finger-g" data-n="10">
+          <rect x="394" y="185" width="22" height="50" rx="11" fill="url(#skin)" stroke="#d49b78" stroke-width="2"
+                transform="rotate(22 405 185)"/>
+          <text x="405" y="215" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">10</text>
+        </g>
+
+        <!-- 掌心 -->
+        <ellipse cx="365" cy="235" rx="50" ry="42" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+        <ellipse cx="365" cy="228" rx="38" ry="30" fill="url(#palmShadow)"/>
+
+        <!-- 食指(6) -->
+        <g id="g-fin6" class="finger-g" data-n="6">
+          <rect x="304" y="148" width="16" height="60" rx="8" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="312" y="180" text-anchor="middle" dominant-baseline="middle"
+                font-size="12" font-weight="800" fill="#aaa" class="fin-text">6</text>
+        </g>
+
+        <!-- 中指(7) -->
+        <g id="g-fin7" class="finger-g" data-n="7">
+          <rect x="325" y="122" width="18" height="76" rx="9" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="334" y="163" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">7</text>
+        </g>
+
+        <!-- 无名指(8) -->
+        <g id="g-fin8" class="finger-g" data-n="8">
+          <rect x="348" y="115" width="18" height="82" rx="9" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="357" y="158" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">8</text>
+        </g>
+
+        <!-- 小指(9) -->
+        <g id="g-fin9" class="finger-g" data-n="9">
+          <rect x="371" y="135" width="18" height="70" rx="9" fill="url(#skin)" stroke="#d49b78" stroke-width="2"/>
+          <text x="380" y="175" text-anchor="middle" dominant-baseline="middle"
+                font-size="13" font-weight="800" fill="#aaa" class="fin-text">9</text>
+        </g>
+
+        <!-- ==================== 脚趾 (11-20) ==================== -->
+        <!-- 左脚 5趾 (中心 x=165, y=298) -->
+        <g id="g-toe11" class="toe-g" data-n="11">
+          <ellipse cx="145" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="145" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">11</text>
+        </g>
+        <g id="g-toe12" class="toe-g" data-n="12">
+          <ellipse cx="163" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="163" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">12</text>
+        </g>
+        <g id="g-toe13" class="toe-g" data-n="13">
+          <ellipse cx="181" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="181" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">13</text>
+        </g>
+        <g id="g-toe14" class="toe-g" data-n="14">
+          <ellipse cx="199" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="199" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">14</text>
+        </g>
+        <g id="g-toe15" class="toe-g" data-n="15">
+          <ellipse cx="217" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="217" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">15</text>
+        </g>
+
+        <!-- 右脚 5趾 (中心 x=315, y=298) -->
+        <g id="g-toe16" class="toe-g" data-n="16">
+          <ellipse cx="263" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="263" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">16</text>
+        </g>
+        <g id="g-toe17" class="toe-g" data-n="17">
+          <ellipse cx="281" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="281" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">17</text>
+        </g>
+        <g id="g-toe18" class="toe-g" data-n="18">
+          <ellipse cx="299" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="299" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">18</text>
+        </g>
+        <g id="g-toe19" class="toe-g" data-n="19">
+          <ellipse cx="317" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="317" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">19</text>
+        </g>
+        <g id="g-toe20" class="toe-g" data-n="20">
+          <ellipse cx="335" cy="294" rx="12" ry="10" fill="url(#skin)" stroke="#d49b78" stroke-width="1.5"/>
+          <text x="335" y="297" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#aaa" class="fin-text">20</text>
+        </g>
+      </svg>
     </div>
 
     <div class="result-card" id="resultCard">
@@ -580,24 +477,11 @@ function appendOp(op) {
   updateDisplay();
 }
 
-function clearCalc() {
-  expression = '';
-  justCalculated = false;
-  pendingResult = null;
-  resultEl.textContent = '0';
-  resultEl.className = 'display-result';
-  updateDisplay();
-}
-
-function backspace() {
-  if (justCalculated) return;
-  expression = expression.slice(0, -1);
-  updateDisplay();
-}
+function clearCalc() { expression = ''; justCalculated = false; pendingResult = null; resultEl.textContent = '0'; resultEl.className = 'display-result'; updateDisplay(); }
+function backspace() { if (justCalculated) return; expression = expression.slice(0,-1); updateDisplay(); }
 
 function updateDisplay() {
-  expEl.textContent = expression
-    .replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
+  expEl.textContent = expression.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
   if (resultEl.textContent.length > 6) resultEl.className = 'display-result big';
   else if (resultEl.textContent.length > 9) resultEl.className = 'display-result huge';
   else resultEl.className = 'display-result';
@@ -628,14 +512,51 @@ function calculate() {
 }
 
 // ====== 动画 ======
+function activateFinger(n, isActive) {
+  const prefix = n <= 10 ? 'g-fin' : 'g-toe';
+  const g = document.getElementById(prefix + n);
+  if (!g) return;
+
+  const rects = g.querySelectorAll('rect, ellipse');
+  const texts = g.querySelectorAll('text');
+
+  if (isActive === 'counting') {
+    rects.forEach(r => {
+      r.setAttribute('fill', 'url(#activeGreen)');
+      r.setAttribute('filter', 'url(#glow)');
+    });
+    texts.forEach(t => { t.setAttribute('fill', '#fff'); t.setAttribute('font-weight', '900'); });
+    // pulse 动画通过 CSS
+    g.style.transition = 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)';
+    g.style.transformOrigin = 'center';
+    g.style.transform = 'scale(1.2)';
+    setTimeout(() => { g.style.transform = 'scale(1)'; }, 280);
+  } else if (isActive === 'done') {
+    rects.forEach(r => {
+      r.setAttribute('fill', 'url(#activeGreen)');
+      r.removeAttribute('filter');
+    });
+    texts.forEach(t => { t.setAttribute('fill', '#fff'); });
+    g.style.transform = 'scale(1)';
+  } else {
+    // reset
+    const isFinger = n <= 10;
+    rects.forEach(r => {
+      r.setAttribute('fill', 'url(#skin)');
+      r.removeAttribute('filter');
+    });
+    texts.forEach(t => { t.setAttribute('fill', '#aaa'); t.setAttribute('font-weight', '800'); });
+    g.style.transform = 'scale(1)';
+  }
+}
+
 function startCounting(expr, result) {
   const overlay = document.getElementById('overlay');
   const exprBar = document.getElementById('exprBar');
   const thinking = document.getElementById('thinking');
-  const fingersArea = document.getElementById('fingersArea');
+  const handsWrapper = document.getElementById('handsWrapper');
   const thinkBubble = document.getElementById('thinkBubble');
   const crossIcon = document.getElementById('crossIcon');
-  const feetRow = document.getElementById('feetRow');
   const progressBar = document.getElementById('progressBar');
   const progressFill = document.getElementById('progressFill');
   const resultCard = document.getElementById('resultCard');
@@ -643,14 +564,15 @@ function startCounting(expr, result) {
   overlay.classList.add('active');
   exprBar.textContent = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−') + ' =';
 
-  resetAll();
-  resultCard.classList.remove('show','shake');
+  // 重置所有手指
+  for (let i = 1; i <= 20; i++) activateFinger(i, 'reset');
+  resultCard.classList.remove('show', 'shake');
 
   let t = 300;
 
   setTimeout(() => {
     thinking.textContent = '📱 让我数数…';
-    fingersArea.classList.add('show');
+    handsWrapper.classList.add('show');
     const thoughts = ['手指头…', '有几个来着？', '🤔 等一下'];
     thinkBubble.textContent = thoughts[Math.floor(Math.random()*thoughts.length)];
     thinkBubble.classList.add('show');
@@ -687,10 +609,7 @@ function startCounting(expr, result) {
         crossIcon.classList.remove('show');
         thinkBubble.classList.remove('show');
         thinking.textContent = '重新数！';
-        for (let i = 1; i <= 20; i++) {
-          const el = document.getElementById(i <= 10 ? 'fin'+i : 't'+i);
-          if (el) el.classList.remove('counted', 'counting');
-        }
+        for (let i = 1; i <= 20; i++) activateFinger(i, 'reset');
         count = 0;
         progressFill.style.width = '0%';
         setTimeout(countStep, 500);
@@ -701,14 +620,8 @@ function startCounting(expr, result) {
     progressFill.style.width = ((count + 1) / n * 100) + '%';
 
     const finId = count + 1;
-    const finEl = document.getElementById(finId <= 10 ? 'fin'+finId : 't'+finId);
-    if (finEl) {
-      finEl.classList.add('counting');
-      setTimeout(() => {
-        finEl.classList.remove('counting');
-        finEl.classList.add('counted');
-      }, 260);
-    }
+    activateFinger(finId, 'counting');
+    setTimeout(() => activateFinger(finId, 'done'), 280);
 
     // 思考气泡
     if (count === 2) {
@@ -722,8 +635,9 @@ function startCounting(expr, result) {
       thinking.textContent = '🦶 脚趾来帮忙…';
     }
     if (count === 9) {
-      feetRow.classList.add('show');
-      thinking.textContent = '🦶 脚趾也来帮忙…';
+      thinkBubble.textContent = '🦶 脚趾也来帮忙…';
+      thinkBubble.classList.add('show');
+      thinking.textContent = '🦶 脚趾也来…';
     }
     if (count === 14) {
       thinkBubble.textContent = '脚趾也不够用了…';
@@ -747,7 +661,7 @@ function showFinal(expr, result, resultCard, thinking, progressFill) {
     '数完了！手指都数酸了…',
     '🤓 这下记住了吧？'
   ];
-  document.getElementById('rcEq').textContent = expr.replace(/\*/g,'×').replace(/\*/g,'÷').replace(/-/g,'−') + ' =';
+  document.getElementById('rcEq').textContent = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−') + ' =';
   document.getElementById('rcResult').textContent = result;
   document.getElementById('rcSub').textContent = subs[Math.floor(Math.random() * subs.length)];
   setTimeout(() => {
@@ -756,19 +670,6 @@ function showFinal(expr, result, resultCard, thinking, progressFill) {
     resultEl.className = 'display-result';
     updateDisplay();
   }, 300);
-}
-
-function resetAll() {
-  for (let i = 1; i <= 20; i++) {
-    const el = document.getElementById(i <= 10 ? 'fin'+i : 't'+i);
-    if (el) el.classList.remove('counted', 'counting');
-  }
-  document.getElementById('thinkBubble').classList.remove('show');
-  document.getElementById('crossIcon').classList.remove('show');
-  document.getElementById('feetRow').classList.remove('show');
-  document.getElementById('progressBar').classList.remove('show');
-  document.getElementById('progressFill').style.width = '0%';
-  document.getElementById('fingersArea').classList.remove('show');
 }
 
 function closeAnim() {
