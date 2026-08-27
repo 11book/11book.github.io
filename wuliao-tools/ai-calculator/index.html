@@ -14,7 +14,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     overflow: hidden;
     user-select: none;
   }
@@ -23,9 +23,7 @@
     background: #2d2d2d;
     border-radius: 30px;
     padding: 20px;
-    box-shadow:
-      0 25px 60px rgba(0,0,0,0.6),
-      inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
     width: min(320px, 90vw);
   }
 
@@ -60,7 +58,11 @@
 
   .display-result.big { font-size: 36px; }
   .display-result.huge { font-size: 26px; }
-  .display-result.error { color: #ff6b6b; font-size: 18px; }
+  .display-result.waiting {
+    color: #555;
+    font-size: 36px;
+    letter-spacing: 0;
+  }
 
   .keypad {
     display: grid;
@@ -91,7 +93,7 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(26,26,46,0.97);
+    background: linear-gradient(160deg, #1a1a2e 0%, #0f0f1a 100%);
     display: none;
     flex-direction: column;
     align-items: center;
@@ -102,290 +104,218 @@
 
   .overlay.active { display: flex; }
 
+  .expr-bar {
+    position: absolute;
+    top: max(env(safe-area-inset-top), 30px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.07);
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-size: 20px;
+    color: #888;
+    letter-spacing: 2px;
+  }
+
   .thinking {
     color: #4ecca3;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
-    margin-bottom: 16px;
-    min-height: 30px;
+    margin-top: 20px;
+    min-height: 28px;
     text-align: center;
   }
 
-  .scene {
+  /* ===== 卡通手区域 ===== */
+  .hand-stage {
     position: relative;
-    width: 100%;
-    max-width: 500px;
-    height: 340px;
+    width: 300px;
+    height: 320px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
   }
 
-  /* 小孩手臂 + 手 */
-  .arm-container {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    opacity: 0;
-  }
-
-  .arm-container.show { opacity: 1; }
-
-  .arm-sleeve {
-    width: 60px;
-    height: 90px;
-    background: linear-gradient(180deg, #5b9bd5 0%, #4a8bc2 100%);
-    border-radius: 8px 8px 0 0;
-    position: relative;
-  }
-
-  /* 卡通手 */
-  .cartoon-hand {
-    position: relative;
-    width: 120px;
-    height: 140px;
-  }
-
-  /* 手掌 */
-  .palm {
+  /* 手掌SVG */
+  .hand-svg {
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 70px;
-    height: 55px;
-    background: #fad6a5;
-    border-radius: 35% 35% 40% 40%;
-    border: 2px solid #d4a574;
-    z-index: 2;
-  }
-
-  /* 手指 */
-  .finger-group {
-    position: absolute;
-    bottom: 48px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 4px;
-    z-index: 3;
-  }
-
-  .finger {
-    width: 14px;
-    height: 40px;
-    background: #fad6a5;
-    border: 2px solid #d4a574;
-    border-radius: 7px 7px 5px 5px;
-    transform-origin: bottom center;
-    transition: transform 0.25s ease;
-  }
-
-  .finger.bent {
-    transform: rotate(-55deg) translateY(-8px);
-    height: 32px;
-  }
-
-  /* 拇指 */
-  .thumb {
-    position: absolute;
-    bottom: 30px;
-    left: -8px;
-    width: 18px;
-    height: 30px;
-    background: #fad6a5;
-    border: 2px solid #d4a574;
-    border-radius: 9px;
-    transform: rotate(-30deg);
-    transform-origin: bottom right;
-    transition: transform 0.25s ease;
-    z-index: 4;
-  }
-
-  .thumb.bent {
-    transform: rotate(-70deg);
-  }
-
-  /* 面部表情（数数时） */
-  .face {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .face.show { opacity: 1; }
-
-  .eyes {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-
-  .eye {
-    width: 8px;
-    height: 8px;
-    background: #333;
-    border-radius: 50%;
-    animation: blink 3s infinite;
-  }
-
-  .mouth {
-    width: 12px;
-    height: 6px;
-    border: 2px solid #333;
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-  }
-
-  .mouth.open {
-    width: 14px;
-    height: 10px;
-    background: #333;
-    border-radius: 50%;
-    border: none;
-  }
-
-  .mouth.think {
-    width: 8px;
-    height: 8px;
-    border: 2px solid #333;
-    border-radius: 50%;
-    background: transparent;
-  }
-
-  @keyframes blink {
-    0%, 90%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.1); }
-  }
-
-  /* 数数气泡 */
-  .count-bubble {
-    position: absolute;
-    top: 10px;
-    right: -10px;
-    background: #fff;
-    color: #333;
-    font-size: 22px;
-    font-weight: bold;
-    padding: 4px 12px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.2s;
-    z-index: 10;
-  }
-
-  .count-bubble.show {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* 思考气泡 */
-  .think-bubble {
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    background: #fff;
-    color: #333;
-    font-size: 13px;
-    padding: 8px 14px;
-    border-radius: 16px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 10;
-  }
-
-  .think-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 20px;
-    border: 6px solid transparent;
-    border-top-color: #fff;
-  }
-
-  .think-bubble.show { opacity: 1; }
-
-  /* 脚趾模式 */
-  .feet-container {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 20px;
     opacity: 0;
     transition: opacity 0.4s;
   }
 
-  .feet-container.show { opacity: 1; }
+  .hand-svg.show { opacity: 1; }
 
-  .foot {
-    position: relative;
-    width: 55px;
-    height: 35px;
-  }
-
-  .foot-palm {
-    width: 55px;
-    height: 22px;
-    background: #fad6a5;
-    border: 2px solid #d4a574;
-    border-radius: 30px 30px 20px 20px;
-  }
-
-  .toes {
+  /* 表情气泡 */
+  .speech-bubble {
     position: absolute;
-    top: -10px;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: #fff;
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 6px 18px;
+    border-radius: 20px;
+    white-space: nowrap;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+    opacity: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: #fff;
+    border-bottom: none;
+  }
+
+  .speech-bubble.show {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+
+  /* 思考气泡 */
+  .thought-bubble {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.9);
+    color: #555;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .thought-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    right: 20px;
+    border: 6px solid transparent;
+    border-top-color: rgba(255,255,255,0.9);
+    border-bottom: none;
+  }
+
+  .thought-bubble.show { opacity: 1; }
+
+  /* 数数气泡 */
+  .count-ring {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    width: 52px;
+    height: 52px;
+    background: #4ecca3;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 4px 16px rgba(78,204,163,0.4);
+  }
+
+  .count-ring.show { transform: translateX(-50%) scale(1); }
+  .count-ring.pop {
+    animation: ringPop 0.3s ease;
+  }
+
+  @keyframes ringPop {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.3); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+
+  /* 错号 */
+  .cross-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    font-size: 80px;
+    color: #ff6b6b;
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .cross-mark.show {
+    transform: translate(-50%,-50%) scale(1);
+    opacity: 1;
+  }
+
+  /* 脚趾区域 */
+  .feet-row {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .feet-row.show { opacity: 1; }
+
+  .foot-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .foot-toes {
     display: flex;
     gap: 3px;
   }
 
-  .toe {
-    width: 10px;
+  .ft {
+    width: 12px;
     height: 14px;
-    background: #fad6a5;
-    border: 2px solid #d4a574;
-    border-radius: 5px 5px 3px 3px;
+    background: #f5c5a3;
+    border: 1.5px solid #d4a574;
+    border-radius: 6px 6px 3px 3px;
     transition: transform 0.2s;
   }
 
-  .toe.bent {
-    transform: rotate(-40deg) translateY(-4px);
-    height: 10px;
+  .ft.bent { transform: rotate(-45deg) translateY(-4px); height: 10px; }
+
+  .foot-sole {
+    width: 40px;
+    height: 18px;
+    background: #f5c5a3;
+    border: 1.5px solid #d4a574;
+    border-radius: 20px 20px 10px 10px;
   }
 
-  /* 结果气泡 */
+  /* 结果卡片 */
   .result-card {
     position: absolute;
-    bottom: 30px;
+    bottom: 20px;
     left: 50%;
-    transform: translateX(-50%) scale(0.5);
+    transform: translateX(-50%) scale(0.7);
     background: #fff;
     color: #000;
-    padding: 16px 30px;
+    padding: 18px 36px 16px;
     border-radius: 20px;
     text-align: center;
     opacity: 0;
-    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
-    max-width: 90vw;
+    transition: all 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   }
 
   .result-card.show {
@@ -395,12 +325,12 @@
 
   .rc-eq {
     font-size: 13px;
-    color: #999;
+    color: #aaa;
     margin-bottom: 2px;
   }
 
   .rc-result {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 700;
     letter-spacing: -1px;
     display: block;
@@ -413,58 +343,21 @@
     display: block;
   }
 
-  @keyframes shake {
+  @keyframes cardShake {
     0%,100% { transform: translateX(-50%) scale(1); }
-    20% { transform: translateX(calc(-50% - 10px)) scale(1.04); }
-    40% { transform: translateX(calc(-50% + 10px)) scale(1.04); }
-    60% { transform: translateX(calc(-50% - 5px)) scale(1.02); }
-    80% { transform: translateX(calc(-50% + 5px)) scale(1.02); }
+    20% { transform: translateX(calc(-50% - 8px)) scale(1.03); }
+    40% { transform: translateX(calc(-50% + 8px)) scale(1.03); }
+    60% { transform: translateX(calc(-50% - 4px)) scale(1.01); }
+    80% { transform: translateX(calc(-50% + 4px)) scale(1.01); }
   }
 
-  .result-card.shake { animation: shake 0.55s ease; }
+  .result-card.shake { animation: cardShake 0.5s ease; }
 
   .tap-hint {
     position: absolute;
     bottom: 5%;
     color: #444;
     font-size: 13px;
-  }
-
-  /* 数错了重新来 */
-  .wrong-mark {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 60px;
-    color: #ff6b6b;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 20;
-  }
-
-  .wrong-mark.show { opacity: 1; }
-
-  .sweat {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 12px;
-    height: 16px;
-    background: #87ceeb;
-    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
-    opacity: 0;
-    animation: none;
-  }
-
-  .sweat.show {
-    opacity: 1;
-    animation: sweatDrop 0.8s ease-in infinite;
-  }
-
-  @keyframes sweatDrop {
-    0% { transform: translateY(0); opacity: 0.8; }
-    100% { transform: translateY(20px); opacity: 0; }
   }
 </style>
 </head>
@@ -503,60 +396,68 @@
 
 <!-- 动画遮罩 -->
 <div class="overlay" id="overlay" onclick="closeAnim()">
+
+  <div class="expr-bar" id="exprBar"></div>
   <div class="thinking" id="thinking">🤔 让我想想…</div>
 
-  <div class="scene" id="scene">
-    <!-- 小孩手臂+手 -->
-    <div class="arm-container" id="arm">
-      <div class="face" id="face">
-        <div class="eyes">
-          <div class="eye"></div>
-          <div class="eye"></div>
-        </div>
-        <div class="mouth" id="mouth"></div>
-      </div>
-      <div class="cartoon-hand" id="hand">
-        <div class="count-bubble" id="countBubble">1</div>
-        <div class="think-bubble" id="thinkBubble">手指头…</div>
-        <div class="sweat" id="sweat"></div>
-        <div class="finger-group">
-          <div class="finger" id="f0"></div>
-          <div class="finger" id="f1"></div>
-          <div class="finger" id="f2"></div>
-          <div class="finger" id="f3"></div>
-        </div>
-        <div class="thumb" id="thumb"></div>
-        <div class="palm"></div>
-      </div>
-      <div class="arm-sleeve"></div>
+  <div class="hand-stage" id="handStage">
+    <!-- 手SVG -->
+    <div class="hand-svg" id="handSvg">
+      <svg width="180" height="200" viewBox="0 0 180 200" id="mainHand">
+        <!-- 手臂/袖子 -->
+        <rect x="55" y="140" width="70" height="60" rx="8" fill="#5b9bd5"/>
+        <!-- 手掌 -->
+        <ellipse cx="90" cy="138" rx="38" ry="28" fill="#f5c5a3" stroke="#d4a574" stroke-width="2"/>
+        <!-- 拇指 -->
+        <path id="thumbPath" d="M48 120 C38 110 32 100 38 92 C44 84 55 86 58 96 C60 104 56 114 52 120 Z" fill="#f5c5a3" stroke="#d4a574" stroke-width="1.5"/>
+        <!-- 食指 -->
+        <rect id="fi0" x="60" y="68" width="14" height="42" rx="7" fill="#f5c5a3" stroke="#d4a574" stroke-width="1.5" transform="rotate(-8, 67, 110)"/>
+        <!-- 中指 -->
+        <rect id="fi1" x="76" y="62" width="14" height="46" rx="7" fill="#f5c5a3" stroke="#d4a574" stroke-width="1.5"/>
+        <!-- 无名指 -->
+        <rect id="fi2" x="92" y="64" width="14" height="44" rx="7" fill="#f5c5a3" stroke="#d4a574" stroke-width="1.5" transform="rotate(5, 99, 108)"/>
+        <!-- 小指 -->
+        <rect id="fi3" x="106" y="72" width="12" height="38" rx="6" fill="#f5c5a3" stroke="#d4a574" stroke-width="1.5" transform="rotate(12, 112, 110)"/>
+        <!-- 关节线 -->
+        <line x1="63" y1="88" x2="71" y2="86" stroke="#d4a574" stroke-width="1" transform="rotate(-8, 67, 110)"/>
+        <line x1="79" y1="82" x2="87" y2="82" stroke="#d4a574" stroke-width="1"/>
+        <line x1="95" y1="84" x2="103" y2="86" stroke="#d4a574" stroke-width="1" transform="rotate(5, 99, 108)"/>
+        <line x1="109" y1="92" x2="115" y2="95" stroke="#d4a574" stroke-width="1" transform="rotate(12, 112, 110)"/>
+        <!-- 掌心纹路 -->
+        <path d="M70 130 Q90 138 110 130" stroke="#e8b89a" stroke-width="1" fill="none"/>
+        <path d="M75 125 Q90 130 105 125" stroke="#e8b89a" stroke-width="1" fill="none"/>
+      </svg>
     </div>
+
+    <!-- 气泡 -->
+    <div class="speech-bubble" id="speechBbl">1</div>
+    <div class="count-ring" id="countRing">1</div>
+    <div class="thought-bubble" id="thoughtBbl">手指头…</div>
+    <div class="cross-mark" id="crossMark">✗</div>
 
     <!-- 脚趾 -->
-    <div class="feet-container" id="feet">
-      <div class="foot" id="footL">
-        <div class="toes">
-          <div class="toe" id="tL0"></div>
-          <div class="toe" id="tL1"></div>
-          <div class="toe" id="tL2"></div>
-          <div class="toe" id="tL3"></div>
-          <div class="toe" id="tL4"></div>
+    <div class="feet-row" id="feetRow">
+      <div class="foot-icon" id="footL">
+        <div class="foot-toes">
+          <div class="ft" id="tL0"></div>
+          <div class="ft" id="tL1"></div>
+          <div class="ft" id="tL2"></div>
+          <div class="ft" id="tL3"></div>
+          <div class="ft" id="tL4"></div>
         </div>
-        <div class="foot-palm"></div>
+        <div class="foot-sole"></div>
       </div>
-      <div class="foot" id="footR">
-        <div class="toes">
-          <div class="toe" id="tR0"></div>
-          <div class="toe" id="tR1"></div>
-          <div class="toe" id="tR2"></div>
-          <div class="toe" id="tR3"></div>
-          <div class="toe" id="tR4"></div>
+      <div class="foot-icon" id="footR">
+        <div class="foot-toes">
+          <div class="ft" id="tR0"></div>
+          <div class="ft" id="tR1"></div>
+          <div class="ft" id="tR2"></div>
+          <div class="ft" id="tR3"></div>
+          <div class="ft" id="tR4"></div>
         </div>
-        <div class="foot-palm"></div>
+        <div class="foot-sole"></div>
       </div>
     </div>
-
-    <!-- 错号 -->
-    <div class="wrong-mark" id="wrongMark">✗</div>
 
     <!-- 结果 -->
     <div class="result-card" id="resultCard">
@@ -573,17 +474,10 @@
 // ====== 状态 ======
 let expression = '';
 let justCalculated = false;
+let pendingResult = null;
 
 const resultEl = document.getElementById('result');
 const expEl = document.getElementById('expression');
-
-function updateDisplay() {
-  expEl.textContent = expression
-    .replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
-  if (resultEl.textContent.length > 6) resultEl.className = 'display-result big';
-  else if (resultEl.textContent.length > 9) resultEl.className = 'display-result huge';
-  else resultEl.className = 'display-result';
-}
 
 // ====== 按键 ======
 function appendNum(n) {
@@ -605,6 +499,7 @@ function appendOp(op) {
 function clearCalc() {
   expression = '';
   justCalculated = false;
+  pendingResult = null;
   resultEl.textContent = '0';
   resultEl.className = 'display-result';
   updateDisplay();
@@ -616,9 +511,22 @@ function backspace() {
   updateDisplay();
 }
 
+function updateDisplay() {
+  expEl.textContent = expression
+    .replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
+  if (resultEl.textContent.length > 6) resultEl.className = 'display-result big';
+  else if (resultEl.textContent.length > 9) resultEl.className = 'display-result huge';
+  else resultEl.className = 'display-result';
+}
+
 // ====== 计算 ======
 function calculate() {
   if (!expression || justCalculated) return;
+
+  // 显示"正在算…"状态，不显示结果
+  resultEl.textContent = '…';
+  resultEl.className = 'display-result waiting';
+
   const jsExpr = expression.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
   let realResult;
   try {
@@ -628,188 +536,181 @@ function calculate() {
     if (!isFinite(realResult)) throw new Error();
   } catch(e) {
     resultEl.textContent = 'Error';
-    resultEl.classList.add('error');
+    resultEl.className = 'display-result error';
     justCalculated = true;
     return;
   }
+
   justCalculated = true;
-  resultEl.textContent = realResult;
-  updateDisplay();
-  setTimeout(() => startCounting(expression, realResult), 350);
+  pendingResult = realResult; // 先存着，动画完再显示
+
+  setTimeout(() => startCounting(expression, realResult), 200);
 }
 
-// ====== 动画核心 ======
+// ====== 动画 ======
 function startCounting(expr, result) {
   const overlay = document.getElementById('overlay');
+  const exprBar = document.getElementById('exprBar');
   const thinking = document.getElementById('thinking');
-  const arm = document.getElementById('arm');
-  const face = document.getElementById('face');
-  const mouth = document.getElementById('mouth');
-  const bubble = document.getElementById('countBubble');
-  const thinkBbl = document.getElementById('thinkBubble');
-  const sweat = document.getElementById('sweat');
-  const wrongMark = document.getElementById('wrongMark');
-  const feet = document.getElementById('feet');
+  const handSvg = document.getElementById('handSvg');
+  const speechBbl = document.getElementById('speechBbl');
+  const countRing = document.getElementById('countRing');
+  const thoughtBbl = document.getElementById('thoughtBbl');
+  const crossMark = document.getElementById('crossMark');
+  const feetRow = document.getElementById('feetRow');
   const resultCard = document.getElementById('resultCard');
-  const displayExpr = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
 
   overlay.classList.add('active');
-  resultCard.classList.remove('show','shake');
-  bubble.classList.remove('show');
-  thinkBbl.classList.remove('show');
-  sweat.classList.remove('show');
-  wrongMark.classList.remove('show');
-  feet.classList.remove('show');
-  face.classList.remove('show');
+  exprBar.textContent = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−') + ' =';
 
-  thinking.textContent = '🤔 等等…';
+  resetAnim();
+  resultCard.classList.remove('show','shake');
+
+  let t = 400;
+
+  // 手出现
+  setTimeout(() => {
+    thinking.textContent = '📱 让我数数…';
+    handSvg.classList.add('show');
+  }, t);
+  t += 600;
+
+  // 思考气泡
+  setTimeout(() => {
+    const thoughts = ['手指头…', '有几个？', '等等…', '让我想想'];
+    thoughtBbl.textContent = thoughts[Math.floor(Math.random() * thoughts.length)];
+    thoughtBbl.classList.add('show');
+  }, t);
+  t += 500;
 
   // 重置手指
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('f'+i).classList.remove('bent');
-  }
-  document.getElementById('thumb').classList.remove('bent');
-
-  let t = 500;
-
-  // 手臂出现
-  setTimeout(() => {
-    thinking.textContent = '📱 算算…';
-    arm.classList.add('show');
-    face.classList.add('show');
-    mouth.className = 'mouth';
-  }, t);
-  t += 600;
-
-  // 出现思考气泡
-  setTimeout(() => {
-    const thoughts = ['手指头…', '要数几个？', '让我想想…', '等等…', '🤔'];
-    thinkBbl.textContent = thoughts[Math.floor(Math.random() * thoughts.length)];
-    thinkBbl.classList.add('show');
-  }, t);
-  t += 600;
+  const fingerIds = ['fi0','fi1','fi2','fi3'];
+  const fingerEls = fingerIds.map(id => document.getElementById(id));
+  const thumbEl = document.getElementById('thumbPath');
 
   // 开始数数
   const abs = Math.abs(Math.round(result));
-  const n = Math.min(abs, 20); // 最多数20个（演示用）
+  const n = Math.min(abs, 20);
   let count = 0;
-  let wrongCount = 0;
-  const maxWrong = Math.random() > 0.6 ? 1 : 0; // 随机决定是否数错一次
-
-  const fingerEls = [
-    document.getElementById('f0'),
-    document.getElementById('f1'),
-    document.getElementById('f2'),
-    document.getElementById('f3'),
-    document.getElementById('thumb'),
-  ];
-
-  const mouthStates = ['', 'open', '', 'think', 'open', ''];
+  let wrongDone = false;
 
   const countStep = () => {
     if (count >= n) {
-      // 数完了，显示结果
-      showResult(displayExpr, result, resultCard, thinking);
+      showFinalResult(expr, result, resultCard, thinking);
       return;
     }
 
-    // 偶尔出错（整蛊点）
-    if (count === Math.floor(n * 0.4) && wrongCount < maxWrong) {
-      wrongCount++;
-      // 突然停下来思考
+    // 数到一半时随机出错（整蛊）
+    if (!wrongDone && count === Math.floor(n * 0.5) && n >= 4) {
+      wrongDone = true;
       thinking.textContent = '呃…数到哪了？';
-      mouth.className = 'mouth think';
-      thinkBbl.textContent = '刚才数到几了…';
-      thinkBbl.classList.add('show');
-      sweat.classList.add('show');
+      speechBbl.textContent = '?';
+      speechBbl.classList.add('show');
+      thoughtBbl.textContent = '刚才几个来着…';
+      thoughtBbl.classList.add('show');
 
       setTimeout(() => {
-        wrongMark.classList.add('show');
-        thinking.textContent = '啊！数错了！重新来！';
-      }, 500);
+        crossMark.classList.add('show');
+        thinking.textContent = '啊！数错了！';
+      }, 600);
 
       setTimeout(() => {
-        wrongMark.classList.remove('show');
-        sweat.classList.remove('show');
-        thinkBbl.classList.remove('show');
-        // 重置所有手指，重新数
-        fingerEls.forEach(f => f.classList.remove('bent'));
+        crossMark.classList.remove('show');
+        speechBbl.classList.remove('show');
+        thoughtBbl.classList.remove('show');
+        // 重置手指
+        fingerEls.forEach(el => el.setAttribute('transform', el.dataset.original || el.getAttribute('transform')));
+        thumbEl.setAttribute('d', thumbEl.dataset.original);
+        thinking.textContent = '重新数！';
         count = 0;
-        thinking.textContent = '📱 重新数…';
-        mouth.className = 'mouth';
-        setTimeout(countStep, 400);
-      }, 1200);
+        setTimeout(countStep, 500);
+      }, 1400);
       return;
     }
 
     const fi = count % 5;
-    // 弯手指
-    fingerEls[fi].classList.add('bent');
 
-    // 更新气泡数字
-    bubble.textContent = count + 1;
-    bubble.classList.add('show');
-    setTimeout(() => bubble.classList.remove('show'), 250);
+    // 气泡数字
+    countRing.textContent = count + 1;
+    countRing.classList.remove('pop');
+    void countRing.offsetWidth; // reflow
+    countRing.classList.add('show', 'pop');
 
-    // 更新表情
-    const ms = mouthStates[count % mouthStates.length];
-    if (ms) mouth.className = 'mouth ' + ms;
-
-    // 更新思考气泡（偶尔）
-    if (count === Math.floor(n * 0.3)) {
-      thinkBbl.textContent = '还没数完…';
-      thinkBbl.classList.add('show');
-      setTimeout(() => thinkBbl.classList.remove('show'), 800);
-    }
-    if (count === Math.floor(n * 0.7)) {
-      thinkBbl.textContent = '快了吧！';
-      thinkBbl.classList.add('show');
-      setTimeout(() => thinkBbl.classList.remove('show'), 800);
+    // 弯曲对应手指
+    if (fi < 4) {
+      const el = fingerEls[fi];
+      const orig = el.getAttribute('transform');
+      el.dataset.original = orig;
+      el.setAttribute('transform', orig + ' rotate(-45, ' + (fi === 0 ? 67 : fi === 2 ? 99 : fi === 3 ? 112 : 83) + ', 110)');
+    } else {
+      // 拇指
+      thumbEl.setAttribute('d', 'M52 120 C46 112 44 106 48 100 C52 94 58 96 57 104 C56 110 55 116 52 120 Z');
     }
 
-    // 数到10的时候提示脚趾
-    if (count === 4) {
-      setTimeout(() => {
-        thinkBbl.textContent = '手指用完了！';
-        thinkBbl.classList.add('show');
-      }, 200);
+    // 思考气泡（随机）
+    if (count === 3) {
+      thoughtBbl.textContent = '继续…';
+      thoughtBbl.classList.add('show');
+      setTimeout(() => thoughtBbl.classList.remove('show'), 600);
     }
     if (count === 9) {
+      thoughtBbl.textContent = '手指用完啦！';
+      thoughtBbl.classList.add('show');
       thinking.textContent = '🦶 用脚趾帮忙…';
-      feet.classList.add('show');
-      setTimeout(() => thinkBbl.classList.remove('show'), 600);
+      feetRow.classList.add('show');
     }
 
     count++;
-    setTimeout(countStep, 350 + Math.random() * 150);
+    setTimeout(countStep, 320 + Math.random() * 120);
   };
+
+  // 存储手指原始transform
+  fingerEls.forEach(el => el.dataset.original = el.getAttribute('transform'));
+  thumbEl.dataset.original = thumbEl.getAttribute('d');
 
   setTimeout(countStep, t);
 }
 
-function showResult(displayExpr, result, resultCard, thinking) {
-  thinking.textContent = '✅ 算出来了！';
+function showFinalResult(expr, result, resultCard, thinking) {
+  thinking.textContent = '✅ 算好了！';
   const subs = [
-    '一个一个数的，没有偷懒',
-    '数完了！就是有点费手指',
-    '答案正确，就是费了九牛二虎之力',
-    '手指头都数酸了…',
-    '终于数完了！',
+    '一个一个数的，没偷懒',
+    '数完手指数脚趾，终于算出来了',
+    '答案正确，就是费了好大劲',
+    '数完了！手指都有点酸…',
   ];
-  document.getElementById('rcEq').textContent = displayExpr + ' =';
+  document.getElementById('rcEq').textContent = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−') + ' =';
   document.getElementById('rcResult').textContent = result;
   document.getElementById('rcSub').textContent = subs[Math.floor(Math.random() * subs.length)];
   setTimeout(() => {
     resultCard.classList.add('show', 'shake');
+    // 最后才在计算器屏上显示结果
+    resultEl.textContent = result;
+    resultEl.className = 'display-result';
+    updateDisplay();
   }, 300);
+}
+
+function resetAnim() {
+  document.getElementById('countRing').classList.remove('show','pop');
+  document.getElementById('speechBbl').classList.remove('show');
+  document.getElementById('thoughtBbl').classList.remove('show');
+  document.getElementById('crossMark').classList.remove('show');
+  document.getElementById('feetRow').classList.remove('show');
+  document.getElementById('handSvg').classList.remove('show');
 }
 
 function closeAnim() {
   document.getElementById('overlay').classList.remove('active');
-  resultEl.classList.remove('error');
-  expression = '';
   justCalculated = false;
-  resultEl.textContent = '0';
+  expression = '';
+  if (pendingResult !== null) {
+    resultEl.textContent = pendingResult;
+    pendingResult = null;
+  } else {
+    resultEl.textContent = '0';
+  }
+  resultEl.className = 'display-result';
   updateDisplay();
 }
 
