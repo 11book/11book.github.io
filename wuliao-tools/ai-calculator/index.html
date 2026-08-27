@@ -2,290 +2,321 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>计算器</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  body {
+  html, body {
+    height: 100%;
     background: #000;
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-    overflow: hidden;
-    user-select: none;
+    min-height: 100vh;
+    padding: 0;
   }
 
-  .calculator {
+  .calc {
     width: 100%;
-    max-width: 380px;
-    padding: 20px;
+    max-width: 414px;
+    padding: 8px 6px 24px;
   }
 
   /* 显示屏 */
-  .display {
+  .disp {
     background: #000;
-    padding: 8px 4px 24px;
+    padding: 8px 6px 6px;
     text-align: right;
-    min-height: 120px;
+    min-height: 130px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    border-radius: 12px;
   }
 
-  .display-formula {
+  .disp-formula {
     color: #858585;
-    font-size: 36px;
+    font-size: clamp(26px, 7vw, 40px);
     font-weight: 300;
-    min-height: 44px;
+    min-height: 36px;
     line-height: 1.1;
     word-break: break-all;
     letter-spacing: -1px;
+    padding-right: 2px;
   }
 
-  .display-result {
+  .disp-result {
     color: #fff;
-    font-size: 80px;
+    font-size: clamp(56px, 16vw, 96px);
     font-weight: 100;
     letter-spacing: -4px;
     line-height: 1.05;
-    transition: font-size 0.15s;
+    transition: font-size 0.1s;
   }
 
-  .display-result.large { font-size: 60px; letter-spacing: -3px; }
-  .display-result.xlarge { font-size: 44px; letter-spacing: -2px; }
-  .display-result.xxlarge { font-size: 32px; letter-spacing: -1px; }
-
-  /* 按键 */
-  .keypad {
+  /* 按键网格 */
+  .keys {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1px;
-    background: #000;
+    padding: 8px 0 0;
   }
 
-  .btn {
-    height: 78px;
+  .key {
+    height: clamp(56px, 14vw, 80px);
     border-radius: 50%;
     border: none;
-    font-size: 32px;
+    font-size: clamp(22px, 6vw, 34px);
     font-weight: 400;
     cursor: pointer;
-    transition: background 0.1s, transform 0.08s;
     position: relative;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.06s, transform 0.06s;
+    /* 立体按钮效果 */
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.12);
   }
 
-  .btn:active {
-    transform: scale(0.94);
+  .key:active {
+    transform: scale(0.93);
+    box-shadow:
+      0 0px 1px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
-  .btn-num {
+  .k-num {
     background: #333;
     color: #fff;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      inset 0 -1px 0 rgba(0,0,0,0.2);
   }
 
-  .btn-num:active { background: #4a4a4a; }
+  .k-num:active { background: #484848; }
 
-  .btn-op {
+  .k-op {
     background: #ff9f0a;
     color: #fff;
+    box-shadow:
+      0 3px 6px rgba(217, 130, 5, 0.5),
+      inset 0 1px 0 rgba(255,220,100,0.25),
+      inset 0 -1px 0 rgba(0,0,0,0.2);
   }
 
-  .btn-op:active { background: #ffb33a; }
+  .k-op:active { background: #ffb030; }
 
-  .btn-fn {
+  .k-fn {
     background: #a5a5a5;
     color: #000;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -1px 0 rgba(0,0,0,0.1);
   }
 
-  .btn-fn:active { background: #bebebe; }
+  .k-fn:active { background: #bbbbbb; }
 
-  /* 0 按钮占两格 */
-  .btn-zero {
+  /* 0 宽两格 */
+  .k-zero {
     grid-column: span 2;
-    border-radius: 38px;
-    text-align: left;
-    padding-left: 36px;
+    border-radius: 36px;
+    justify-content: flex-start;
+    padding-left: calc(clamp(56px, 14vw, 80px) * 0.38);
+  }
+
+  /* 运算符号按钮有个内阴影模拟立体感 */
+  .k-eq {
+    background: #ff9f0a;
+    color: #fff;
+    box-shadow:
+      0 3px 6px rgba(217,130,5,0.5),
+      inset 0 1px 0 rgba(255,220,100,0.25),
+      inset 0 -1px 0 rgba(0,0,0,0.2);
   }
 
   /* ===== 动画遮罩 ===== */
   .overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    inset: 0;
     background: #000;
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 60px;
+    padding-bottom: 50px;
     z-index: 200;
     cursor: pointer;
   }
 
   .overlay.active { display: flex; }
 
-  .overlay-hint {
+  .ov-hint {
     position: absolute;
-    top: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #555;
-    font-size: 16px;
+    top: max(env(safe-area-inset-top), 20px);
+    left: 0; right: 0;
     text-align: center;
-    width: 90%;
+    color: #555;
+    font-size: 15px;
+    padding: 0 20px;
   }
 
-  .overlay-formula {
-    color: #666;
-    font-size: 28px;
+  .ov-formula {
+    color: #555;
+    font-size: clamp(20px, 5vw, 30px);
     font-weight: 200;
-    margin-bottom: 30px;
     letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-align: center;
   }
 
-  /* 手掌容器 */
-  .hands-area {
+  .hands-zone {
     display: flex;
     align-items: flex-end;
     justify-content: center;
     gap: 6px;
     flex-wrap: wrap;
-    min-height: 180px;
+    min-height: 150px;
+    max-width: 520px;
     width: 100%;
-    max-width: 540px;
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
-  .hand-wrap {
+  .hw {
     display: flex;
     flex-direction: column;
     align-items: center;
     opacity: 0;
-    transition: opacity 0.3s;
   }
 
-  .hand-wrap.show { opacity: 1; }
+  .hw.in { opacity: 1; }
 
-  .hand-wrap.slide-left {
-    animation: slideL 0.45s cubic-bezier(0.22,1,0.36,1) forwards;
-  }
-
-  .hand-wrap.slide-right {
-    animation: slideR 0.45s cubic-bezier(0.22,1,0.36,1) forwards;
-  }
+  .hw.left { animation: slideL 0.4s cubic-bezier(0.22,1,0.36,1) forwards; }
+  .hw.right { animation: slideR 0.4s cubic-bezier(0.22,1,0.36,1) forwards; }
 
   @keyframes slideL {
-    from { transform: translateX(-80px); opacity: 0; }
+    from { transform: translateX(-70px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
   }
 
   @keyframes slideR {
-    from { transform: translateX(80px); opacity: 0; }
+    from { transform: translateX(70px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
   }
 
-  .hand-label {
-    color: #444;
-    font-size: 12px;
+  .hw-label {
+    color: #3a3a3a;
+    font-size: 11px;
     margin-top: 4px;
   }
 
-  /* 结果气泡 */
   .result-card {
     position: absolute;
-    bottom: 100px;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.7);
     background: #fff;
     color: #000;
-    padding: 20px 36px;
-    border-radius: 16px;
+    padding: 18px 34px 16px;
+    border-radius: 18px;
     text-align: center;
     opacity: 0;
-    transform: scale(0.7);
     transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
-    max-width: 90vw;
+    min-width: 200px;
   }
 
   .result-card.show {
     opacity: 1;
-    transform: scale(1);
+    transform: translateX(-50%) scale(1);
   }
 
-  .result-card .rc-main {
-    font-size: 38px;
+  .rc-main {
+    font-size: clamp(30px, 9vw, 42px);
     font-weight: 600;
     display: block;
     letter-spacing: -1px;
   }
 
-  .result-card .rc-sub {
-    font-size: 14px;
-    color: #888;
-    margin-top: 4px;
+  .rc-sub {
+    font-size: 13px;
+    color: #999;
+    margin-top: 5px;
     display: block;
   }
 
-  @keyframes cardShake {
-    0%,100% { transform: translateX(0) scale(1); }
-    20% { transform: translateX(-10px) scale(1.04); }
-    40% { transform: translateX(10px) scale(1.04); }
-    60% { transform: translateX(-5px) scale(1.02); }
-    80% { transform: translateX(5px) scale(1.02); }
+  @keyframes shake {
+    0%,100% { transform: translateX(-50%) scale(1); }
+    20% { transform: translateX(calc(-50% - 10px)) scale(1.04); }
+    40% { transform: translateX(calc(-50% + 10px)) scale(1.04); }
+    60% { transform: translateX(calc(-50% - 5px)) scale(1.02); }
+    80% { transform: translateX(calc(-50% + 5px)) scale(1.02); }
   }
 
-  .result-card.shake { animation: cardShake 0.55s ease; }
+  .result-card.shake { animation: shake 0.5s ease; }
 
   .tap-hint {
     position: absolute;
-    bottom: 30px;
+    bottom: max(env(safe-area-inset-bottom), 24px);
     color: #444;
     font-size: 14px;
+    text-align: center;
+    width: 100%;
   }
 </style>
 </head>
 <body>
 
-<div class="calculator">
-  <div class="display">
-    <div class="display-formula" id="formula"></div>
-    <div class="display-result" id="result">0</div>
-  </div>
-  <div class="keypad">
-    <button class="btn btn-fn" onclick="clearAll()">AC</button>
-    <button class="btn btn-fn" onclick="toggleSign()">±</button>
-    <button class="btn btn-fn" onclick="percent()">%</button>
-    <button class="btn btn-op" onclick="setOp('÷')">÷</button>
+<div class="container">
+  <div class="calc">
+    <div class="disp">
+      <div class="disp-formula" id="fml"></div>
+      <div class="disp-result" id="res">0</div>
+    </div>
+    <div class="keys">
+      <div class="key k-fn" onclick="cls()">AC</div>
+      <div class="key k-fn" onclick="bksp()">⌫</div>
+      <div class="key k-fn" onclick="pct()">%</div>
+      <div class="key k-op" onclick="op('÷')">÷</div>
 
-    <button class="btn btn-num" onclick="inputDigit('7')">7</button>
-    <button class="btn btn-num" onclick="inputDigit('8')">8</button>
-    <button class="btn btn-num" onclick="inputDigit('9')">9</button>
-    <button class="btn btn-op" onclick="setOp('×')">×</button>
+      <div class="key k-num" onclick="dig('7')">7</div>
+      <div class="key k-num" onclick="dig('8')">8</div>
+      <div class="key k-num" onclick="dig('9')">9</div>
+      <div class="key k-op" onclick="op('×')">×</div>
 
-    <button class="btn btn-num" onclick="inputDigit('4')">4</button>
-    <button class="btn btn-num" onclick="inputDigit('5')">5</button>
-    <button class="btn btn-num" onclick="inputDigit('6')">6</button>
-    <button class="btn btn-op" onclick="setOp('-')">−</button>
+      <div class="key k-num" onclick="dig('4')">4</div>
+      <div class="key k-num" onclick="dig('5')">5</div>
+      <div class="key k-num" onclick="dig('6')">6</div>
+      <div class="key k-op" onclick="op('−')">−</div>
 
-    <button class="btn btn-num" onclick="inputDigit('1')">1</button>
-    <button class="btn btn-num" onclick="inputDigit('2')">2</button>
-    <button class="btn btn-num" onclick="inputDigit('3')">3</button>
-    <button class="btn btn-op" onclick="setOp('+')">+</button>
+      <div class="key k-num" onclick="dig('1')">1</div>
+      <div class="key k-num" onclick="dig('2')">2</div>
+      <div class="key k-num" onclick="dig('3')">3</div>
+      <div class="key k-eq" onclick="eq()">=</div>
 
-    <button class="btn btn-num btn-zero" onclick="inputDigit('0')">0</button>
-    <button class="btn btn-num" onclick="inputDigit('.')">.</button>
-    <button class="btn btn-op" onclick="equals()">=</button>
+      <div class="key k-num k-zero" onclick="dig('0')">0</div>
+      <div class="key k-num" onclick="dig('.')">.</div>
+    </div>
   </div>
 </div>
 
 <!-- 动画遮罩 -->
-<div class="overlay" id="overlay" onclick="dismiss()">
-  <div class="overlay-hint" id="overlayHint"></div>
-  <div class="overlay-formula" id="overlayFormula"></div>
-  <div class="hands-area" id="handsArea"></div>
-  <div class="result-card" id="resultCard">
+<div class="overlay" id="ov" onclick="dimiss()">
+  <div class="ov-hint" id="ovHint"></div>
+  <div class="ov-formula" id="ovFml"></div>
+  <div class="hands-zone" id="hz"></div>
+  <div class="result-card" id="rc">
     <span class="rc-main" id="rcMain"></span>
     <span class="rc-sub" id="rcSub"></span>
   </div>
@@ -294,291 +325,230 @@
 
 <script>
 // ====== 状态 ======
-let formula = '';
-let displayValue = '0';
-let lastResult = null;
-let justEquals = false;
+let fml = '', val = '0', last = null, done = false;
 
 // ====== 显示 ======
-function updateDisplay() {
-  document.getElementById('formula').textContent = formula
-    .replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
-  const el = document.getElementById('result');
-  el.textContent = displayValue;
-  if (displayValue.length > 6) el.className = 'display-result xlarge';
-  else if (displayValue.length > 9) el.className = 'display-result xxlarge';
-  else el.className = 'display-result';
+function ui() {
+  document.getElementById('fml').textContent = fml.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
+  const el = document.getElementById('res');
+  el.textContent = val;
 }
 
 // ====== 按键 ======
-function inputDigit(d) {
-  if (justEquals) {
-    formula = '';
-    justEquals = false;
-    displayValue = '0';
-  }
-  if (displayValue === '0' && d !== '.') displayValue = d;
-  else if (d === '.' && displayValue.includes('.')) return;
-  else displayValue += d;
-  updateDisplay();
+function dig(d) {
+  if (done) { fml = ''; done = false; val = '0'; }
+  if (val === '0' && d !== '.') val = d;
+  else if (d === '.' && val.includes('.')) return;
+  else val += d;
+  ui();
 }
 
-function setOp(op) {
-  if (justEquals && lastResult !== null) {
-    formula = String(lastResult);
-    justEquals = false;
-  }
-  formula += displayValue + op;
-  displayValue = '0';
-  updateDisplay();
+function op(o) {
+  if (done && last !== null) { fml = String(last); done = false; }
+  fml += val + o; val = '0'; ui();
 }
 
-function clearAll() {
-  formula = '';
-  displayValue = '0';
-  lastResult = null;
-  justEquals = false;
-  updateDisplay();
+function cls() { fml = ''; val = '0'; last = null; done = false; ui(); }
+
+function bksp() {
+  if (done) return;
+  val = val.length > 1 ? val.slice(0,-1) : '0';
+  ui();
 }
 
-function toggleSign() {
-  if (displayValue !== '0') {
-    displayValue = displayValue.startsWith('-')
-      ? displayValue.slice(1)
-      : '-' + displayValue;
-    updateDisplay();
-  }
-}
+function pct() { val = String((parseFloat(val)||0)/100); ui(); }
 
-function percent() {
-  displayValue = String((parseFloat(displayValue) || 0) / 100);
-  updateDisplay();
-}
-
-function backspace() {
-  if (justEquals) return;
-  displayValue = displayValue.length > 1 ? displayValue.slice(0,-1) : '0';
-  updateDisplay();
-}
-
-// ====== 计算 ======
-function equals() {
-  if (!formula) return;
-  const expr = formula + displayValue;
-  const jsExpr = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
-  let real;
+function eq() {
+  if (!fml) return;
+  const ex = fml + val;
+  const js = ex.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+  let r;
   try {
-    if (!/^[\d+\-*/.() ]+$/.test(jsExpr)) throw new Error();
+    if (!/^[\d+\-*/.() ]+$/.test(js)) throw 1;
     // eslint-disable-next-line no-eval
-    real = eval(jsExpr);
-    if (!isFinite(real)) throw new Error();
-  } catch(e) {
-    displayValue = 'Error';
-    updateDisplay();
-    return;
-  }
-  lastResult = real;
-  displayValue = String(real);
-  justEquals = true;
-  updateDisplay();
-  // 触发动画
-  setTimeout(() => animateCount(expr, real), 400);
+    r = eval(js);
+    if (!isFinite(r)) throw 1;
+  } catch(e) { val = 'Error'; ui(); return; }
+  last = r; val = String(r); done = true; ui();
+  setTimeout(() => anim(ex, r), 350);
 }
 
 // ====== 动画 ======
-function animateCount(expr, real) {
-  const overlay = document.getElementById('overlay');
-  const hint = document.getElementById('overlayHint');
-  const formulaEl = document.getElementById('overlayFormula');
-  const handsArea = document.getElementById('handsArea');
-  const card = document.getElementById('resultCard');
+function anim(ex, r) {
+  const ov = document.getElementById('ov');
+  const hz = document.getElementById('hz');
+  const hint = document.getElementById('ovHint');
+  const fmlEl = document.getElementById('ovFml');
+  const card = document.getElementById('rc');
 
-  overlay.classList.add('active');
-  handsArea.innerHTML = '';
-  card.classList.remove('show', 'shake');
+  ov.classList.add('active');
+  hz.innerHTML = ''; card.classList.remove('show','shake');
 
-  const displayExpr = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
-  formulaEl.textContent = displayExpr + ' = ';
+  const dx = ex.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
+  fmlEl.textContent = dx + ' = ';
   hint.textContent = '正在计算…';
 
-  // 计算要数多少"堆"
-  const target = Math.abs(Math.round(real));
-  const handsNeeded = Math.min(8, Math.ceil(target / 5));
-  const handCount = Math.max(1, handsNeeded);
-  const extras = target - handCount * 5;
+  const target = Math.abs(Math.round(r));
+  const nHands = Math.max(1, Math.min(8, Math.ceil(target / 5)));
 
-  let delay = 600;
-  for (let i = 0; i < handCount; i++) {
-    setTimeout(() => {
-      const wrap = document.createElement('div');
-      wrap.className = 'hand-wrap ' + (i % 2 === 0 ? 'slide-left' : 'slide-right');
-      const svg = createHandSVG(0);
-      const label = document.createElement('div');
-      label.className = 'hand-label';
-      label.textContent = i % 2 === 0 ? '左手' : '右手';
-      wrap.appendChild(svg);
-      wrap.appendChild(label);
-      handsArea.appendChild(wrap);
-    }, delay + i * 180);
-    delay += 180;
+  let t = 500;
+  for (let i = 0; i < nHands; i++) {
+    const hw = document.createElement('div');
+    hw.className = 'hw ' + (i%2===0?'left':'right');
+    hw.id = 'hw'+i;
+    const lb = document.createElement('div');
+    lb.className = 'hw-label';
+    lb.textContent = i%2===0?'左手':'右手';
+    hw.appendChild(createHandSVG(0));
+    hw.appendChild(lb);
+    hz.appendChild(hw);
+    setTimeout(() => hw.classList.add('in'), t);
+    t += 160;
   }
 
-  // 数数动画
-  let counted = 0;
-  let handIdx = 0;
-  let fingersUp = 0;
-
-  const countStep = () => {
-    if (counted >= target) return;
-    const hwrap = handsArea.children[handIdx];
-    if (!hwrap) return;
-    fingersUp = Math.min(5, counted % 5 + 1);
-    hwrap.innerHTML = '';
-    const svg = createHandSVG(fingersUp);
-    hwrap.appendChild(svg);
-    hwrap.appendChild(hwrap.querySelector('.hand-label') || document.createElement('div'));
-    hwrap.classList.add('show');
-    hint.textContent = `正在数第 ${counted + 1} 个…`;
-    counted++;
-    if (counted % 5 === 0) handIdx++;
-    setTimeout(countStep, 280);
+  let cnt = 0, hi = 0;
+  const step = () => {
+    if (cnt >= target) return;
+    const w = document.getElementById('hw'+hi);
+    if (!w) return;
+    const fingers = Math.min(5, cnt%5+1);
+    w.innerHTML = '';
+    w.appendChild(createHandSVG(fingers));
+    const lb = document.createElement('div');
+    lb.className = 'hw-label';
+    lb.textContent = hi%2===0?'左手':'右手';
+    w.appendChild(lb);
+    hint.textContent = `正在数第 ${cnt+1} 个…`;
+    cnt++;
+    if (cnt%5===0) hi++;
+    setTimeout(step, 260);
   };
+  setTimeout(step, t+150);
 
-  setTimeout(countStep, delay + 200);
-
-  // 显示结果
-  const doneTime = delay + target * 280 + 400;
+  const doneT = t + target*260 + 350;
   setTimeout(() => {
     hint.textContent = '';
-    formulaEl.textContent = displayExpr + ' = ';
-    const funny = getFunnyAnswer(real);
-    card.classList.add('show', 'shake');
+    const funny = funnyAns(r);
+    card.classList.add('show','shake');
     document.getElementById('rcMain').textContent = funny.main;
     document.getElementById('rcSub').textContent = funny.sub;
-  }, doneTime);
+  }, doneT);
 }
 
-function dismiss() {
-  document.getElementById('overlay').classList.remove('active');
-  clearAll();
-}
+function dimiss() { document.getElementById('ov').classList.remove('active'); cls(); }
 
 // ====== 无厘头答案 ======
-function getFunnyAnswer(n) {
-  const abs = Math.abs(n);
-  if (abs <= 3) {
-    const opts = [
-      { main: n + 1, sub: '手比较实诚，多算了一个' },
-      { main: Math.max(0, n - 1), sub: '偷偷藏了一个' },
-      { main: n + 2, sub: '刚才手抖了' },
-    ];
-    return opts[Math.floor(Math.random() * opts.length)];
+function funnyAns(n) {
+  const a = Math.abs(n);
+  if (a <= 3) {
+    const o = [{m:n+1,s:'手指比较实诚多算了一个'},{m:Math.max(0,n-1),s:'偷偷藏了一个'},{m:n+2,s:'刚才手抖了'}];
+    return o[Math.floor(Math.random()*3)];
   }
-  if (abs <= 10) {
-    const off = Math.floor(Math.random() * 7) - 2;
-    const main = Math.round(n + off);
-    if (off > 0) return { main, sub: `数到一半发现脚趾也能派上用场` };
-    if (off < 0) return { main, sub: `数完手指发现还不够` };
-    return { main, sub: '刚好数完，运气不错' };
+  if (a <= 10) {
+    const off = Math.floor(Math.random()*7)-2;
+    const m = Math.round(n+off);
+    if (off>0) return {m, s:'数到一半发现脚趾也能派上用场'};
+    if (off<0) return {m, s:'数完手指发现还不够'};
+    return {m, s:'刚好数完，运气不错'};
   }
-  if (abs <= 50) {
-    const mult = 0.6 + Math.random() * 0.8;
-    const main = Math.round(n * mult);
-    const s = ['手脚并用数完了', '头发贡献了两根', '耳朵也算上了', '胳膊肘派上用场了'][Math.floor(Math.random()*4)];
-    return { main, sub: s };
+  if (a <= 50) {
+    const m = Math.round(n*(0.6+Math.random()*0.8));
+    const s = ['手脚并用数完了','头发贡献了两根','耳朵也算上了','胳膊肘派上用场了'][Math.floor(Math.random()*4)];
+    return {m, s};
   }
-  if (abs <= 999) {
-    const main = Math.floor(Math.random() * 999) + 1;
+  if (a <= 999) {
+    const m = Math.floor(Math.random()*999)+1;
     const s = ['手指脚趾全用上还是不够','数着数着随便报了个数','太多数不过来了'][Math.floor(Math.random()*3)];
-    return { main, sub: s };
+    return {m, s};
   }
-  return {
-    main: '∞',
-    sub: ['数到天荒地老也没算出来','数字太大直接放弃了'][Math.floor(Math.random()*2)]
-  };
+  return {m:'∞', s:['数到天荒地老也没算出来','数字太大直接放弃了'][Math.floor(Math.random()*2)]};
 }
 
-// ====== 真实感手型SVG ======
-function createHandSVG(fingersExtended) {
-  // fingersExtended: 0-5 (拇指独立)
+// ====== 手型SVG（真实感） ======
+function createHandSVG(fingers) {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('width', '72');
-  svg.setAttribute('height', '130');
-  svg.setAttribute('viewBox', '0 0 72 130');
+  svg.setAttribute('width', '64');
+  svg.setAttribute('height', '115');
+  svg.setAttribute('viewBox', '0 0 64 115');
 
   // 手掌
-  const palm = document.createElementNS(NS, 'path');
-  palm.setAttribute('d', 'M18 75 C10 75 5 82 5 90 C5 108 8 120 16 122 C24 124 48 124 56 122 C64 120 67 108 67 90 C67 82 62 75 54 75 Z');
-  palm.setAttribute('fill', '#fad6a5');
-  palm.setAttribute('stroke', '#d4a574');
-  palm.setAttribute('stroke-width', '1.5');
+  const palm = document.createElementNS(NS, 'ellipse');
+  palm.setAttribute('cx','32'); palm.setAttribute('cy','95');
+  palm.setAttribute('rx','20'); palm.setAttribute('ry','16');
+  palm.setAttribute('fill','#fad6a5');
+  palm.setAttribute('stroke','#d4a574');
+  palm.setAttribute('stroke-width','1.5');
   svg.appendChild(palm);
 
-  // 食指
-  const fingers = [
-    { cx: 22, baseY: 75, tilt: -6,  len: 40, bend: 0 },
-    { cx: 32, baseY: 73, tilt: -1,  len: 46, bend: 0 },
-    { cx: 42, baseY: 73, tilt: 2,   len: 44, bend: 0 },
-    { cx: 51, baseY: 75, tilt: 7,   len: 38, bend: 0 },
+  // 四指（食指→小指）
+  const cfg = [
+    {x:17, tilt:-5,  len:36},
+    {x:27, tilt:-1,  len:42},
+    {x:37, tilt:2,   len:40},
+    {x:46, tilt:6,   len:34},
   ];
+  for (let i=0; i<4; i++) {
+    const c = cfg[i];
+    const ext = fingers > i;
+    const bend = ext ? 0 : 12;
+    const tip = 95 - c.len + bend;
 
-  for (let i = 0; i < 4; i++) {
-    const f = fingers[i];
-    const extended = fingersExtended > i;
-    const bendY = extended ? 0 : 14;
-    const tipY = f.baseY - f.len + bendY;
-    const curve = extended ? 0 : 8;
+    const g = document.createElementNS(NS,'g');
 
-    const path = document.createElementNS(NS, 'path');
-    const d = `M${f.cx-5} ${f.baseY}
-               C${f.cx-6+f.tilt*0.3} ${f.baseY-15} ${f.cx-4+f.tilt} ${tipY+curve} ${f.cx} ${tipY}
-               C${f.cx+4+f.tilt} ${tipY+curve} ${f.cx+6+f.tilt*0.3} ${f.baseY-15} ${f.cx+5} ${f.baseY} Z`;
-    path.setAttribute('d', d);
-    path.setAttribute('fill', '#fad6a5');
-    path.setAttribute('stroke', '#d4a574');
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('stroke-linejoin', 'round');
-    if (!extended) {
-      // 弯曲的手指：加个关节线
-      const joint = document.createElementNS(NS, 'path');
-      joint.setAttribute('d', `M${f.cx-3+f.tilt*0.5} ${tipY+curve+6} Q${f.cx} ${tipY+curve+10} ${f.cx+3+f.tilt*0.5} ${tipY+curve+6}`);
-      joint.setAttribute('stroke', '#d4a574');
-      joint.setAttribute('stroke-width', '1');
-      joint.setAttribute('fill', 'none');
-      svg.appendChild(joint);
+    // 手指（胶囊形）
+    const path = document.createElementNS(NS,'path');
+    path.setAttribute('d',`M${c.x-4.5} 95
+      C${c.x-5+c.tilt*0.2} ${95-12} ${c.x-4+c.tilt} ${tip+7} ${c.x} ${tip}
+      C${c.x+4+c.tilt} ${tip+7} ${c.x+5+c.tilt*0.2} ${95-12} ${c.x+4.5} 95 Z`);
+    path.setAttribute('fill','#fad6a5');
+    path.setAttribute('stroke','#d4a574');
+    path.setAttribute('stroke-width','1.5');
+    g.appendChild(path);
+
+    // 弯曲时有第二指节
+    if (!ext) {
+      const j2 = document.createElementNS(NS,'path');
+      j2.setAttribute('d',`M${c.x-3.5} ${tip+10}
+        Q${c.x} ${tip+16} ${c.x+3.5} ${tip+10}`);
+      j2.setAttribute('stroke','#d4a574');
+      j2.setAttribute('stroke-width','1');
+      j2.setAttribute('fill','none');
+      g.appendChild(j2);
     }
-    svg.appendChild(path);
+    svg.appendChild(g);
   }
 
-  // 拇指（侧面）
-  const thumbExt = fingersExtended > 3;
-  const thumbPath = document.createElementNS(NS, 'path');
-  const tx = thumbExt ? 6 : 10;
-  const ty = thumbExt ? 50 : 60;
-  thumbPath.setAttribute('d', `M12 72 C8 68 4 62 6 54 C8 46 14 42 18 46 C22 50 20 58 16 64 C14 68 13 70 12 72 Z`);
-  thumbPath.setAttribute('fill', '#fad6a5');
-  thumbPath.setAttribute('stroke', '#d4a574');
-  thumbPath.setAttribute('stroke-width', '1.5');
-  svg.appendChild(thumbPath);
+  // 拇指
+  const thumbExt = fingers > 3;
+  const tp = document.createElementNS(NS,'path');
+  if (thumbExt) {
+    tp.setAttribute('d','M10 78 C6 73 4 66 7 60 C10 54 17 52 20 57 C23 62 20 70 15 76 Z');
+  } else {
+    tp.setAttribute('d','M14 78 C11 74 9 68 12 63 C15 58 20 58 21 62 C22 67 18 73 16 77 Z');
+  }
+  tp.setAttribute('fill','#fad6a5');
+  tp.setAttribute('stroke','#d4a574');
+  tp.setAttribute('stroke-width','1.5');
+  svg.appendChild(tp);
 
   return svg;
 }
 
-// ====== 键盘支持 ======
+// ====== 键盘 ======
 document.addEventListener('keydown', e => {
-  if (e.key >= '0' && e.key <= '9') inputDigit(e.key);
-  else if (e.key === '.') inputDigit('.');
-  else if (e.key === '+') setOp('+');
-  else if (e.key === '-') setOp('-');
-  else if (e.key === '*') setOp('×');
-  else if (e.key === '/') setOp('÷');
-  else if (e.key === 'Enter' || e.key === '=') equals();
-  else if (e.key === 'Escape') clearAll();
-  else if (e.key === 'Backspace') backspace();
+  if (e.key>='0'&&e.key<='9') dig(e.key);
+  else if (e.key==='.') dig('.');
+  else if (e.key==='+') op('+');
+  else if (e.key==='-') op('-');
+  else if (e.key==='*') op('×');
+  else if (e.key==='/') op('÷');
+  else if (e.key==='Enter'||e.key==='=') eq();
+  else if (e.key==='Escape') cls();
+  else if (e.key==='Backspace') bksp();
 });
 
-updateDisplay();
+ui();
 </script>
 </body>
 </html>
