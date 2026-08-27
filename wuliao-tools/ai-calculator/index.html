@@ -29,12 +29,6 @@
     width: min(320px, 90vw);
   }
 
-  @media (max-width: 360px) {
-    .calculator { width: 92vw; padding: 14px; }
-    .btn { height: 56px; font-size: 22px; }
-    .keypad { gap: 8px; }
-  }
-
   .display {
     background: #0d0d0d;
     border-radius: 12px;
@@ -45,7 +39,6 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    overflow: hidden;
   }
 
   .display-expression {
@@ -83,12 +76,9 @@
     font-weight: 400;
     cursor: pointer;
     transition: all 0.1s;
-    position: relative;
-    overflow: hidden;
   }
 
   .btn:active { transform: scale(0.93); }
-
   .btn-num { background: #333; color: #fff; }
   .btn-num:hover { background: #3d3d3d; }
   .btn-op { background: #ff9f0a; color: #fff; }
@@ -98,7 +88,7 @@
   .btn-eq { background: #ff9f0a; color: #fff; border-radius: 50%; }
 
   /* ===== 动画遮罩 ===== */
-  .anim-zone {
+  .overlay {
     position: fixed;
     inset: 0;
     background: rgba(26,26,46,0.97);
@@ -110,244 +100,371 @@
     cursor: pointer;
   }
 
-  .anim-zone.active { display: flex; }
+  .overlay.active { display: flex; }
 
-  .calc-mini {
-    position: absolute;
-    top: 16px;
-    transform: scale(0.5);
-    opacity: 0.25;
-    pointer-events: none;
-  }
-
-  .thinking-text {
+  .thinking {
     color: #4ecca3;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
-    margin-bottom: 28px;
-    min-height: 32px;
+    margin-bottom: 16px;
+    min-height: 30px;
     text-align: center;
   }
 
-  .anim-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
+  .scene {
+    position: relative;
     width: 100%;
     max-width: 500px;
-    padding: 0 20px;
-  }
-
-  /* 手指数数 */
-  .hands-row {
+    height: 340px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
   }
 
-  .hand-wrap {
+  /* 小孩手臂 + 手 */
+  .arm-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.35s, transform 0.35s;
   }
 
-  .hand-wrap.appear { opacity: 1; transform: translateY(0); }
+  .arm-container.show { opacity: 1; }
 
-  .hand-wrap.slide-l { animation: slideL 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
-  .hand-wrap.slide-r { animation: slideR 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
-
-  @keyframes slideL {
-    from { transform: translateX(-80px) translateY(20px); opacity: 0; }
-    to { transform: translateX(0) translateY(0); opacity: 1; }
+  .arm-sleeve {
+    width: 60px;
+    height: 90px;
+    background: linear-gradient(180deg, #5b9bd5 0%, #4a8bc2 100%);
+    border-radius: 8px 8px 0 0;
+    position: relative;
   }
 
-  @keyframes slideR {
-    from { transform: translateX(80px) translateY(20px); opacity: 0; }
-    to { transform: translateX(0) translateY(0); opacity: 1; }
+  /* 卡通手 */
+  .cartoon-hand {
+    position: relative;
+    width: 120px;
+    height: 140px;
   }
 
-  .hand-lbl {
-    color: #666;
-    font-size: 11px;
-    margin-top: 5px;
+  /* 手掌 */
+  .palm {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 55px;
+    background: #fad6a5;
+    border-radius: 35% 35% 40% 40%;
+    border: 2px solid #d4a574;
+    z-index: 2;
   }
 
-  /* 竖式计算 */
-  .竖式 {
+  /* 手指 */
+  .finger-group {
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    z-index: 3;
+  }
+
+  .finger {
+    width: 14px;
+    height: 40px;
+    background: #fad6a5;
+    border: 2px solid #d4a574;
+    border-radius: 7px 7px 5px 5px;
+    transform-origin: bottom center;
+    transition: transform 0.25s ease;
+  }
+
+  .finger.bent {
+    transform: rotate(-55deg) translateY(-8px);
+    height: 32px;
+  }
+
+  /* 拇指 */
+  .thumb {
+    position: absolute;
+    bottom: 30px;
+    left: -8px;
+    width: 18px;
+    height: 30px;
+    background: #fad6a5;
+    border: 2px solid #d4a574;
+    border-radius: 9px;
+    transform: rotate(-30deg);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease;
+    z-index: 4;
+  }
+
+  .thumb.bent {
+    transform: rotate(-70deg);
+  }
+
+  /* 面部表情（数数时） */
+  .face {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 40px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Courier New', monospace;
-  }
-
-  .竖式-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 28px;
-    color: #ddd;
-    letter-spacing: 3px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .竖式-row.show { opacity: 1; }
-
-  .竖式-digit {
-    display: inline-block;
-    width: 28px;
-    text-align: center;
-    transition: transform 0.3s, color 0.3s;
-  }
-
-  .竖式-digit.pop {
-    animation: digitPop 0.4s ease;
-    color: #4ecca3;
-  }
-
-  .竖式-op { color: #ff9f0a; font-size: 22px; }
-
-  .竖式-line {
-    width: 180px;
-    height: 2px;
-    background: #555;
-    margin: 4px 0;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  .竖式-line.show { opacity: 1; }
-
-  .竖式-result {
-    font-size: 36px;
-    color: #fff;
-    font-weight: bold;
-    letter-spacing: 3px;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  .竖式-result.show { opacity: 1; }
-
-  /* 算筹 */
-  .算筹舞台 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    max-width: 400px;
-  }
-
-  .算筹行 {
-    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    height: 20px;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  .算筹行.show { opacity: 1; }
-
-  .筹棍 {
-    width: 4px;
-    height: 18px;
-    background: #fad6a5;
-    border-radius: 2px;
-    transition: transform 0.25s ease, opacity 0.25s;
-  }
-
-  .筹棍横 { width: 18px; height: 4px; }
-
-  .筹棍.pop {
-    animation: 棍动 0.3s ease;
-  }
-
-  @keyframes 棍动 {
-    0% { transform: scaleY(0); }
-    60% { transform: scaleY(1.3); }
-    100% { transform: scaleY(1); }
-  }
-
-  .算筹-label {
-    font-size: 13px;
-    color: #555;
-    margin-top: 4px;
     opacity: 0;
     transition: opacity 0.3s;
   }
 
-  .算筹-label.show { opacity: 1; }
+  .face.show { opacity: 1; }
+
+  .eyes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .eye {
+    width: 8px;
+    height: 8px;
+    background: #333;
+    border-radius: 50%;
+    animation: blink 3s infinite;
+  }
+
+  .mouth {
+    width: 12px;
+    height: 6px;
+    border: 2px solid #333;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .mouth.open {
+    width: 14px;
+    height: 10px;
+    background: #333;
+    border-radius: 50%;
+    border: none;
+  }
+
+  .mouth.think {
+    width: 8px;
+    height: 8px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    background: transparent;
+  }
+
+  @keyframes blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  /* 数数气泡 */
+  .count-bubble {
+    position: absolute;
+    top: 10px;
+    right: -10px;
+    background: #fff;
+    color: #333;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .count-bubble.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* 思考气泡 */
+  .think-bubble {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    background: #fff;
+    color: #333;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 16px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+
+  .think-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 20px;
+    border: 6px solid transparent;
+    border-top-color: #fff;
+  }
+
+  .think-bubble.show { opacity: 1; }
+
+  /* 脚趾模式 */
+  .feet-container {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .feet-container.show { opacity: 1; }
+
+  .foot {
+    position: relative;
+    width: 55px;
+    height: 35px;
+  }
+
+  .foot-palm {
+    width: 55px;
+    height: 22px;
+    background: #fad6a5;
+    border: 2px solid #d4a574;
+    border-radius: 30px 30px 20px 20px;
+  }
+
+  .toes {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 3px;
+  }
+
+  .toe {
+    width: 10px;
+    height: 14px;
+    background: #fad6a5;
+    border: 2px solid #d4a574;
+    border-radius: 5px 5px 3px 3px;
+    transition: transform 0.2s;
+  }
+
+  .toe.bent {
+    transform: rotate(-40deg) translateY(-4px);
+    height: 10px;
+  }
 
   /* 结果气泡 */
-  .result-bubble {
+  .result-card {
     position: absolute;
-    bottom: 12%;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
     background: #fff;
     color: #000;
     padding: 16px 30px;
-    border-radius: 18px;
+    border-radius: 20px;
     text-align: center;
     opacity: 0;
-    transform: scale(0.5);
     transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
     max-width: 90vw;
   }
 
-  .result-bubble.show { opacity: 1; transform: scale(1); }
+  .result-card.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
 
-  .bubble-eq {
+  .rc-eq {
     font-size: 13px;
     color: #999;
     margin-bottom: 2px;
   }
 
-  .bubble-result {
-    font-size: 34px;
+  .rc-result {
+    font-size: 36px;
     font-weight: 700;
-    display: block;
     letter-spacing: -1px;
+    display: block;
   }
 
-  .bubble-sub {
+  .rc-sub {
     font-size: 12px;
     color: #bbb;
     margin-top: 4px;
     display: block;
   }
 
-  @keyframes bubbleShake {
-    0%,100% { transform: translateX(0) scale(1); }
-    20% { transform: translateX(-8px) scale(1.04); }
-    40% { transform: translateX(8px) scale(1.04); }
-    60% { transform: translateX(-4px) scale(1.02); }
-    80% { transform: translateX(4px) scale(1.02); }
+  @keyframes shake {
+    0%,100% { transform: translateX(-50%) scale(1); }
+    20% { transform: translateX(calc(-50% - 10px)) scale(1.04); }
+    40% { transform: translateX(calc(-50% + 10px)) scale(1.04); }
+    60% { transform: translateX(calc(-50% - 5px)) scale(1.02); }
+    80% { transform: translateX(calc(-50% + 5px)) scale(1.02); }
   }
 
-  .result-bubble.shake { animation: bubbleShake 0.55s ease; }
+  .result-card.shake { animation: shake 0.55s ease; }
 
   .tap-hint {
     position: absolute;
-    bottom: 4%;
+    bottom: 5%;
     color: #444;
     font-size: 13px;
   }
 
-  /* 手指弯曲动画 */
-  @keyframes fingerBend {
-    0% { transform: rotate(0deg) translateY(0); }
-    50% { transform: rotate(-50deg) translateY(-4px); }
-    100% { transform: rotate(-35deg) translateY(0); }
+  /* 数错了重新来 */
+  .wrong-mark {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+    color: #ff6b6b;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 20;
+  }
+
+  .wrong-mark.show { opacity: 1; }
+
+  .sweat {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 16px;
+    background: #87ceeb;
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+    opacity: 0;
+    animation: none;
+  }
+
+  .sweat.show {
+    opacity: 1;
+    animation: sweatDrop 0.8s ease-in infinite;
+  }
+
+  @keyframes sweatDrop {
+    0% { transform: translateY(0); opacity: 0.8; }
+    100% { transform: translateY(20px); opacity: 0; }
   }
 </style>
 </head>
@@ -384,23 +501,71 @@
   </div>
 </div>
 
-<!-- 缩小计算器（动画时显示在顶部） -->
-<div class="calculator calc-mini">
-  <div class="display">
-    <div class="display-expression" id="expMini"></div>
-    <div class="display-result" id="resMini">0</div>
-  </div>
-</div>
-
 <!-- 动画遮罩 -->
-<div class="anim-zone" id="animZone" onclick="closeAnim()">
-  <div class="thinking-text" id="thinkingText">🤔 AI正在思考…</div>
-  <div class="anim-area" id="animArea"></div>
-  <div class="result-bubble" id="resultBubble">
-    <div class="bubble-eq" id="bubbleEq"></div>
-    <span class="bubble-result" id="bubbleResult"></span>
-    <span class="bubble-sub" id="bubbleSub"></span>
+<div class="overlay" id="overlay" onclick="closeAnim()">
+  <div class="thinking" id="thinking">🤔 让我想想…</div>
+
+  <div class="scene" id="scene">
+    <!-- 小孩手臂+手 -->
+    <div class="arm-container" id="arm">
+      <div class="face" id="face">
+        <div class="eyes">
+          <div class="eye"></div>
+          <div class="eye"></div>
+        </div>
+        <div class="mouth" id="mouth"></div>
+      </div>
+      <div class="cartoon-hand" id="hand">
+        <div class="count-bubble" id="countBubble">1</div>
+        <div class="think-bubble" id="thinkBubble">手指头…</div>
+        <div class="sweat" id="sweat"></div>
+        <div class="finger-group">
+          <div class="finger" id="f0"></div>
+          <div class="finger" id="f1"></div>
+          <div class="finger" id="f2"></div>
+          <div class="finger" id="f3"></div>
+        </div>
+        <div class="thumb" id="thumb"></div>
+        <div class="palm"></div>
+      </div>
+      <div class="arm-sleeve"></div>
+    </div>
+
+    <!-- 脚趾 -->
+    <div class="feet-container" id="feet">
+      <div class="foot" id="footL">
+        <div class="toes">
+          <div class="toe" id="tL0"></div>
+          <div class="toe" id="tL1"></div>
+          <div class="toe" id="tL2"></div>
+          <div class="toe" id="tL3"></div>
+          <div class="toe" id="tL4"></div>
+        </div>
+        <div class="foot-palm"></div>
+      </div>
+      <div class="foot" id="footR">
+        <div class="toes">
+          <div class="toe" id="tR0"></div>
+          <div class="toe" id="tR1"></div>
+          <div class="toe" id="tR2"></div>
+          <div class="toe" id="tR3"></div>
+          <div class="toe" id="tR4"></div>
+        </div>
+        <div class="foot-palm"></div>
+      </div>
+    </div>
+
+    <!-- 错号 -->
+    <div class="wrong-mark" id="wrongMark">✗</div>
+
+    <!-- 结果 -->
+    <div class="result-card" id="resultCard">
+      <div class="rc-eq" id="rcEq"></div>
+      <span class="rc-result" id="rcResult"></span>
+      <span class="rc-sub" id="rcSub"></span>
+    </div>
   </div>
+
   <div class="tap-hint">点击继续</div>
 </div>
 
@@ -411,14 +576,10 @@ let justCalculated = false;
 
 const resultEl = document.getElementById('result');
 const expEl = document.getElementById('expression');
-const resMini = document.getElementById('resMini');
-const expMini = document.getElementById('expMini');
 
 function updateDisplay() {
   expEl.textContent = expression
     .replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
-  resMini.textContent = resultEl.textContent;
-  expMini.textContent = expEl.textContent;
   if (resultEl.textContent.length > 6) resultEl.className = 'display-result big';
   else if (resultEl.textContent.length > 9) resultEl.className = 'display-result huge';
   else resultEl.className = 'display-result';
@@ -474,362 +635,182 @@ function calculate() {
   justCalculated = true;
   resultEl.textContent = realResult;
   updateDisplay();
-  setTimeout(() => startAnim(expression, realResult), 350);
+  setTimeout(() => startCounting(expression, realResult), 350);
 }
 
-// ====== 动画启动 ======
-function startAnim(expr, result) {
-  const zone = document.getElementById('animZone');
-  const area = document.getElementById('animArea');
-  const thinking = document.getElementById('thinkingText');
-  const bubble = document.getElementById('resultBubble');
-
-  zone.classList.add('active');
-  area.innerHTML = '';
-  bubble.classList.remove('show', 'shake');
-
+// ====== 动画核心 ======
+function startCounting(expr, result) {
+  const overlay = document.getElementById('overlay');
+  const thinking = document.getElementById('thinking');
+  const arm = document.getElementById('arm');
+  const face = document.getElementById('face');
+  const mouth = document.getElementById('mouth');
+  const bubble = document.getElementById('countBubble');
+  const thinkBbl = document.getElementById('thinkBubble');
+  const sweat = document.getElementById('sweat');
+  const wrongMark = document.getElementById('wrongMark');
+  const feet = document.getElementById('feet');
+  const resultCard = document.getElementById('resultCard');
   const displayExpr = expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
 
-  const abs = Math.abs(result);
-  if (abs <= 10) {
-    animFingers(displayExpr, result, thinking, area, bubble);
-  } else if (abs <= 999) {
-    anim竖式(displayExpr, result, thinking, area, bubble);
-  } else {
-    anim算筹(displayExpr, result, thinking, area, bubble);
+  overlay.classList.add('active');
+  resultCard.classList.remove('show','shake');
+  bubble.classList.remove('show');
+  thinkBbl.classList.remove('show');
+  sweat.classList.remove('show');
+  wrongMark.classList.remove('show');
+  feet.classList.remove('show');
+  face.classList.remove('show');
+
+  thinking.textContent = '🤔 等等…';
+
+  // 重置手指
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('f'+i).classList.remove('bent');
   }
-}
+  document.getElementById('thumb').classList.remove('bent');
 
-// ====== 动画1: 手指数数 (1-10) ======
-function animFingers(displayExpr, result, thinking, area, bubble) {
-  thinking.textContent = '🤔 让我掰指头算算…';
-  area.innerHTML = '';
+  let t = 500;
 
-  const n = Math.abs(Math.round(result));
-  const isNeg = result < 0;
-  const hands = Math.ceil(n / 5);
+  // 手臂出现
+  setTimeout(() => {
+    thinking.textContent = '📱 算算…';
+    arm.classList.add('show');
+    face.classList.add('show');
+    mouth.className = 'mouth';
+  }, t);
+  t += 600;
 
-  const row = document.createElement('div');
-  row.className = 'hands-row';
-  area.appendChild(row);
+  // 出现思考气泡
+  setTimeout(() => {
+    const thoughts = ['手指头…', '要数几个？', '让我想想…', '等等…', '🤔'];
+    thinkBbl.textContent = thoughts[Math.floor(Math.random() * thoughts.length)];
+    thinkBbl.classList.add('show');
+  }, t);
+  t += 600;
 
-  const handEls = [];
-  let t = 400;
+  // 开始数数
+  const abs = Math.abs(Math.round(result));
+  const n = Math.min(abs, 20); // 最多数20个（演示用）
+  let count = 0;
+  let wrongCount = 0;
+  const maxWrong = Math.random() > 0.6 ? 1 : 0; // 随机决定是否数错一次
 
-  for (let h = 0; h < hands; h++) {
-    const hw = document.createElement('div');
-    hw.className = 'hand-wrap ' + (h%2===0 ? 'slide-l' : 'slide-r');
-    const lbl = document.createElement('div');
-    lbl.className = 'hand-lbl';
-    lbl.textContent = h%2===0 ? '左手' : '右手';
-    hw.appendChild(createHandSVG(0));
-    hw.appendChild(lbl);
-    row.appendChild(hw);
-    handEls.push(hw);
-    setTimeout(() => hw.classList.add('appear'), t);
-    t += 180;
-  }
+  const fingerEls = [
+    document.getElementById('f0'),
+    document.getElementById('f1'),
+    document.getElementById('f2'),
+    document.getElementById('f3'),
+    document.getElementById('thumb'),
+  ];
 
-  t += 300;
+  const mouthStates = ['', 'open', '', 'think', 'open', ''];
 
-  // 数数动画：每数一个数，一根手指弯下去
-  let counted = 0;
-  const step = () => {
-    if (counted >= n) {
-      showResult(displayExpr, result, bubble);
+  const countStep = () => {
+    if (count >= n) {
+      // 数完了，显示结果
+      showResult(displayExpr, result, resultCard, thinking);
       return;
     }
-    const handIdx = Math.floor(counted / 5);
-    const fingerIdx = counted % 5;
-    const hw = handEls[handIdx];
-    if (!hw) { counted++; setTimeout(step, 50); return; }
 
-    hw.innerHTML = '';
-    hw.appendChild(createHandSVG(fingerIdx + 1));
-    hw.appendChild(hw.querySelector('.hand-lbl') || document.createElement('div'));
-    thinking.textContent = `正在数第 ${counted + 1} 个…`;
-    counted++;
-    setTimeout(step, 300);
+    // 偶尔出错（整蛊点）
+    if (count === Math.floor(n * 0.4) && wrongCount < maxWrong) {
+      wrongCount++;
+      // 突然停下来思考
+      thinking.textContent = '呃…数到哪了？';
+      mouth.className = 'mouth think';
+      thinkBbl.textContent = '刚才数到几了…';
+      thinkBbl.classList.add('show');
+      sweat.classList.add('show');
+
+      setTimeout(() => {
+        wrongMark.classList.add('show');
+        thinking.textContent = '啊！数错了！重新来！';
+      }, 500);
+
+      setTimeout(() => {
+        wrongMark.classList.remove('show');
+        sweat.classList.remove('show');
+        thinkBbl.classList.remove('show');
+        // 重置所有手指，重新数
+        fingerEls.forEach(f => f.classList.remove('bent'));
+        count = 0;
+        thinking.textContent = '📱 重新数…';
+        mouth.className = 'mouth';
+        setTimeout(countStep, 400);
+      }, 1200);
+      return;
+    }
+
+    const fi = count % 5;
+    // 弯手指
+    fingerEls[fi].classList.add('bent');
+
+    // 更新气泡数字
+    bubble.textContent = count + 1;
+    bubble.classList.add('show');
+    setTimeout(() => bubble.classList.remove('show'), 250);
+
+    // 更新表情
+    const ms = mouthStates[count % mouthStates.length];
+    if (ms) mouth.className = 'mouth ' + ms;
+
+    // 更新思考气泡（偶尔）
+    if (count === Math.floor(n * 0.3)) {
+      thinkBbl.textContent = '还没数完…';
+      thinkBbl.classList.add('show');
+      setTimeout(() => thinkBbl.classList.remove('show'), 800);
+    }
+    if (count === Math.floor(n * 0.7)) {
+      thinkBbl.textContent = '快了吧！';
+      thinkBbl.classList.add('show');
+      setTimeout(() => thinkBbl.classList.remove('show'), 800);
+    }
+
+    // 数到10的时候提示脚趾
+    if (count === 4) {
+      setTimeout(() => {
+        thinkBbl.textContent = '手指用完了！';
+        thinkBbl.classList.add('show');
+      }, 200);
+    }
+    if (count === 9) {
+      thinking.textContent = '🦶 用脚趾帮忙…';
+      feet.classList.add('show');
+      setTimeout(() => thinkBbl.classList.remove('show'), 600);
+    }
+
+    count++;
+    setTimeout(countStep, 350 + Math.random() * 150);
   };
 
-  setTimeout(step, t);
+  setTimeout(countStep, t);
 }
 
-// ====== 动画2: 竖式计算 (11-999) ======
-function anim竖式(displayExpr, result, thinking, area, bubble) {
-  thinking.textContent = '📝 列个竖式算算…';
-  area.innerHTML = '';
-
-  const abs = Math.abs(result);
-  const isNeg = result < 0;
-
-  // 分解数字为位数数组
-  const digits = String(abs).split('').map(Number);
-
-  // 构造竖式DOM
-  const 竖 = document.createElement('div');
- 竖.className = '竖式';
-  area.appendChild(竖);
-
-  // 第一行：被加数/被减数
-  const row1 = document.createElement('div');
-  row1.className = '竖式-row';
-  if (isNeg) {
-    const neg = document.createElement('span');
-    neg.className = '竖式-op';
-    neg.textContent = '−';
-    row1.appendChild(neg);
-  }
-  digits.forEach((d, i) => {
-    const sp = document.createElement('span');
-    sp.className = '竖式-digit';
-    sp.textContent = d;
-    sp.dataset.idx = i;
-    row1.appendChild(sp);
-  });
-  竖.appendChild(row1);
-
-  // 第二行：运算符 + 另一个数（从表达式解析）
-  const row2 = document.createElement('div');
-  row2.className = '竖式-row';
-  const opSpan = document.createElement('span');
-  opSpan.className = '竖式-op';
-  // 尝试从expression提取第二个数
-  const parts = displayExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').split(/([+\-×÷])/);
-  opSpan.textContent = displayExpr.match(/[+\-×÷]/)?.[0] || '+';
-  row2.appendChild(opSpan);
-
-  // 用一个随机数填第二行（整蛊效果）
-  const num2 = Math.floor(Math.abs(Math.round(result)) * (0.3 + Math.random() * 0.7));
-  const digits2 = String(num2).padStart(digits.length, '0').split('').slice(-digits.length);
-  digits2.forEach(d => {
-    const sp = document.createElement('span');
-    sp.className = '竖式-digit';
-    sp.textContent = d;
-    row2.appendChild(sp);
-  });
-  竖.appendChild(row2);
-
-  // 横线
-  const ln = document.createElement('div');
-  ln.className = '竖式-line';
-  竖.appendChild(ln);
-
-  // 结果行
-  const rowR = document.createElement('div');
-  rowR.className = '竖式-row 竖式-result';
-  const resultDigits = String(abs).split('');
-  if (isNeg) {
-    const neg = document.createElement('span');
-    neg.className = '竖式-op';
-    neg.textContent = '−';
-    rowR.appendChild(neg);
-  }
-  resultDigits.forEach(d => {
-    const sp = document.createElement('span');
-    sp.className = '竖式-digit';
-    sp.textContent = d;
-    rowR.appendChild(sp);
-  });
-  竖.appendChild(rowR);
-
-  // 动画时序
-  let t = 400;
-  row1.querySelectorAll('.竖式-digit').forEach((el, i) => {
-    setTimeout(() => { el.classList.add('pop'); row1.classList.add('show'); }, t + i * 80);
-  });
-  t += digits.length * 80 + 300;
-
-  row2.querySelectorAll('.竖式-digit').forEach((el, i) => {
-    setTimeout(() => { el.classList.add('pop'); row2.classList.add('show'); }, t + i * 80);
-  });
-  t += digits.length * 80 + 400;
-
-  setTimeout(() => ln.classList.add('show'), t);
-  t += 400;
-
-  rowR.querySelectorAll('.竖式-digit').forEach((el, i) => {
-    setTimeout(() => { el.classList.add('pop'); rowR.classList.add('show'); }, t + i * 120);
-  });
-  t += digits.length * 120 + 500;
-
+function showResult(displayExpr, result, resultCard, thinking) {
   thinking.textContent = '✅ 算出来了！';
-  setTimeout(() => showResult(displayExpr, result, bubble), t);
-}
-
-// ====== 动画3: 算筹 (1000+) ======
-function anim算筹(displayExpr, result, thinking, area, bubble) {
-  thinking.textContent = '🧮 用算筹来算…';
-  area.innerHTML = '';
-
-  const abs = Math.abs(result);
-  const isNeg = result < 0;
-  const numStr = String(abs);
-  const len = numStr.length;
-
-  // 创建算筹舞台
-  const 舞台 = document.createElement('div');
-  舞台.className = '算筹舞台';
-  area.appendChild(舞台);
-
-  // 每位数字一行算筹
-  const digitRows = [];
-  for (let i = 0; i < Math.min(len, 5); i++) { // 最多显示5行
-    const 行 = document.createElement('div');
-    行.className = '算筹行';
-    const lbl = document.createElement('div');
-    lbl.className = '算筹-label';
-    lbl.textContent = numStr[i] + ' =';
-    行.appendChild(lbl);
-
-    // 画算筹棍：每5根横过来为一组
-    const d = parseInt(numStr[i]);
-    const groups = Math.floor(d / 5);
-    const remainder = d % 5;
-
-    for (let g = 0; g < groups; g++) {
-      // 5根横棍
-      for (let k = 0; k < 5; k++) {
-        const 棍 = document.createElement('div');
-        棍.className = '筹棍 筹棍横';
-        行.appendChild(棍);
-      }
-    }
-    // 剩余竖棍
-    for (let k = 0; k < remainder; k++) {
-      const 棍 = document.createElement('div');
-      棍.className = '筹棍';
-      行.appendChild(棍);
-    }
-
-    舞台.appendChild(行);
-    digitRows.push(行);
-  }
-
-  if (len > 5) {
-    const more = document.createElement('div');
-    more.className = '算筹-label';
-    more.textContent = `… 共 ${len} 位`;
-    more.style.opacity = '1';
-    more.style.color = '#666';
-    舞台.appendChild(more);
-  }
-
-  // 动画时序
-  let t = 400;
-  digitRows.forEach((行, ri) => {
-    setTimeout(() => {
-      行.classList.add('show');
-      const 棍s = 行.querySelectorAll('.筹棍');
-      棍s.forEach((棍, ci) => {
-        setTimeout(() => 棍.classList.add('pop'), ci * 40);
-      });
-    }, t + ri * 250);
-    t += 250;
-  });
-
-  t += digitRows.length * 250 + 600;
-  thinking.textContent = '✅ 算出来了！';
-  setTimeout(() => showResult(displayExpr, result, bubble), t);
-}
-
-// ====== 显示正确结果 ======
-function showResult(displayExpr, result, bubble) {
-  thinking.textContent = '';
-  bubble.classList.add('show', 'shake');
-
-  const resultStr = String(result);
-  document.getElementById('bubbleEq').textContent = displayExpr + ' =';
-  document.getElementById('bubbleResult').textContent = resultStr;
-
   const subs = [
-    '算对了，就是费手',
-    '答案正确，就是过程有点离谱',
-    '手指数完、脚趾数完，算筹也用上了',
-    '用算筹验算过了，确实是这个数',
-    '没错，就是费了点功夫',
+    '一个一个数的，没有偷懒',
+    '数完了！就是有点费手指',
+    '答案正确，就是费了九牛二虎之力',
+    '手指头都数酸了…',
+    '终于数完了！',
   ];
-  document.getElementById('bubbleSub').textContent = subs[Math.floor(Math.random() * subs.length)];
+  document.getElementById('rcEq').textContent = displayExpr + ' =';
+  document.getElementById('rcResult').textContent = result;
+  document.getElementById('rcSub').textContent = subs[Math.floor(Math.random() * subs.length)];
+  setTimeout(() => {
+    resultCard.classList.add('show', 'shake');
+  }, 300);
 }
 
 function closeAnim() {
-  document.getElementById('animZone').classList.remove('active');
+  document.getElementById('overlay').classList.remove('active');
   resultEl.classList.remove('error');
   expression = '';
   justCalculated = false;
   resultEl.textContent = '0';
   updateDisplay();
-}
-
-// ====== 手型SVG ======
-function createHandSVG(fingersExtended) {
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('width', '72');
-  svg.setAttribute('height', '120');
-  svg.setAttribute('viewBox', '0 0 72 120');
-
-  // 手掌
-  const palm = document.createElementNS(NS, 'ellipse');
-  palm.setAttribute('cx', '36'); palm.setAttribute('cy', '95');
-  palm.setAttribute('rx', '22'); palm.setAttribute('ry', '17');
-  palm.setAttribute('fill', '#fad6a5');
-  palm.setAttribute('stroke', '#d4a574');
-  palm.setAttribute('stroke-width', '1.5');
-  svg.appendChild(palm);
-
-  // 四指（食指→小指）
-  const cfg = [
-    {x:20, tilt:-5,  len:38},
-    {x:30, tilt:-1,  len:44},
-    {x:40, tilt:2,   len:42},
-    {x:49, tilt:6,   len:36},
-  ];
-
-  for (let i = 0; i < 4; i++) {
-    const c = cfg[i];
-    const ext = fingersExtended > i;
-    const bend = ext ? 0 : 14;
-    const tip = 95 - c.len + bend;
-
-    const g = document.createElementNS(NS, 'g');
-
-    const path = document.createElementNS(NS, 'path');
-    path.setAttribute('d',
-      `M${c.x-5} 95 ` +
-      `C${c.x-6+c.tilt*0.2} ${95-14} ${c.x-4+c.tilt} ${tip+8} ${c.x} ${tip} ` +
-      `C${c.x+4+c.tilt} ${tip+8} ${c.x+6+c.tilt*0.2} ${95-14} ${c.x+5} 95 Z`
-    );
-    path.setAttribute('fill', '#fad6a5');
-    path.setAttribute('stroke', '#d4a574');
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('stroke-linejoin', 'round');
-    if (!ext) {
-      const j2 = document.createElementNS(NS, 'path');
-      j2.setAttribute('d', `M${c.x-3.5} ${tip+10} Q${c.x} ${tip+17} ${c.x+3.5} ${tip+10}`);
-      j2.setAttribute('stroke', '#d4a574');
-      j2.setAttribute('stroke-width', '1');
-      j2.setAttribute('fill', 'none');
-      g.appendChild(j2);
-    }
-    g.appendChild(path);
-    svg.appendChild(g);
-  }
-
-  // 拇指
-  const thumbExt = fingersExtended > 3;
-  const tp = document.createElementNS(NS, 'path');
-  if (thumbExt) {
-    tp.setAttribute('d', 'M10 80 C6 75 4 68 7 62 C10 56 17 54 20 59 C23 64 20 72 15 78 Z');
-  } else {
-    tp.setAttribute('d', 'M14 80 C11 76 9 70 12 65 C15 60 20 60 21 64 C22 69 18 75 16 79 Z');
-  }
-  tp.setAttribute('fill', '#fad6a5');
-  tp.setAttribute('stroke', '#d4a574');
-  tp.setAttribute('stroke-width', '1.5');
-  svg.appendChild(tp);
-
-  return svg;
 }
 
 // ====== 键盘 ======
