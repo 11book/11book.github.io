@@ -75,26 +75,68 @@
     }, 200);
 
     // 隐藏鼠标
-    document.addEventListener('mousemove', e => {
+    document.addEventListener('mousemove', () => {
       document.body.style.cursor = 'none';
-      bsod.style.cursor = 'none';
     });
 
-    const exit = () => {
+    // ─── 全屏 API（兼容 Win/macOS + Safari/Chrome/Edge）──────────────────────
+    function requestFS(elem) {
+      const fn = elem.requestFullscreen
+        || elem.webkitRequestFullscreen      // Safari
+        || elem.mozRequestFullScreen         // Firefox old
+        || elem.msRequestFullscreen;         // IE/Edge old
+      if (fn) fn.call(elem);
+    }
+
+    function exitFS() {
+      const fn = document.exitFullscreen
+        || document.webkitExitFullscreen     // Safari
+        || document.mozCancelFullScreen
+        || document.msExitFullscreen;
+      if (fn) fn.call(document);
+    }
+
+    function isFS() {
+      return !!(
+        document.fullscreenElement
+        || document.webkitFullscreenElement
+        || document.mozFullScreenElement
+        || document.msFullscreenElement
+      );
+    }
+
+    // ─── 退出整蛊 ───────────────────────────────────────────────────────────
+    function exitPranks() {
       document.body.style.cursor = 'auto';
       bsod.style.opacity = '0';
       bsod.style.transition = 'opacity 0.3s';
       setTimeout(() => { bsod.style.display = 'none'; }, 300);
-    };
+      // 延迟退出全屏，等渐隐动画完成
+      setTimeout(() => { if (isFS()) exitFS(); }, 350);
+    }
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') exit(); });
+    // ─── 退出监听（ESC / 点击 / 全屏变化）────────────────────────────────────
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') exitPranks(); });
+
     document.addEventListener('click', () => {
-      if (document.querySelector('.qr').textContent === '100% 完成') exit();
+      if (document.querySelector('.qr').textContent === '100% 完成') exitPranks();
     });
-    // 点击任意处退出（整蛊用）
+
+    // 3秒后可点击任意处退出
     setTimeout(() => {
-      document.addEventListener('click', exit, { once: true });
+      document.addEventListener('click', exitPranks, { once: true });
     }, 3000);
+
+    // 监听用户主动退出全屏（按 ESC 时浏览器会自动退，BSOD 也应跟随消失）
+    document.addEventListener('fullscreenchange', () => { if (!isFS()) exitPranks(); });
+    document.addEventListener('webkitfullscreenchange', () => { if (!isFS()) exitPranks(); });
+
+    // ─── 页面加载后自动进全屏 ───────────────────────────────────────────────
+    // 隐式触发：大部分浏览器允许（用户在地址栏敲了 URL）
+    window.addEventListener('load', () => requestFS(document.documentElement));
+
+    // 兜底：点击页面任意处触发（应对浏览器拦截隐式全屏）
+    document.addEventListener('click', () => requestFS(document.documentElement), { once: true });
   </script>
 </body>
 </html>
