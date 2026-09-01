@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>📖 今日命运手册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #06060f;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+  }
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 0;
+    text-align: center;
+  }
+  .screen.active { display: flex; }
+
+  /* ─── HOME ─── */
+  #screen-home {
+    background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #06060f 70%);
+    justify-content: center;
+    padding: 24px 20px;
+  }
+  .title-main {
+    font-size: clamp(28px, 8vw, 46px);
+    font-weight: 900;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .title-sub {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 36px;
+    letter-spacing: 4px;
+  }
+
+  /* ─── JENG ─── */
+  .jeng-wrap {
+    position: relative;
+    width: 160px;
+    height: 260px;
+    margin: 0 auto 36px;
+    cursor: pointer;
+  }
+  .jeng-tube {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 200px;
+    background: linear-gradient(180deg, #8B0000 0%, #cc2222 30%, #8B0000 100%);
+    border-radius: 14px 14px 24px 24px;
+    box-shadow: 0 0 50px rgba(255,50,50,0.2), inset 0 2px 6px rgba(255,200,200,0.2);
+    overflow: visible;
+  }
+  .jeng-tube::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+  }
+  .jeng-tube::after {
+    content: '';
+    position: absolute;
+    top: -6px; left: -6px; right: -6px;
+    height: 16px;
+    background: linear-gradient(180deg, #cc2222, #6B0000);
+    border-radius: 8px;
+    box-shadow: 0 -2px 8px rgba(255,100,100,0.3);
+  }
+  .jeng-sticks {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 160px;
+  }
+  .sk-stick {
+    position: absolute;
+    width: 7px;
+    background: linear-gradient(180deg, #f5deb3, #d4a96a);
+    border-radius: 3.5px;
+    left: 50%;
+    transform-origin: bottom center;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+  .sk-stick::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px; height: 6px;
+    background: #8B0000;
+    border-radius: 3px;
+  }
+  .s1 { height: 95px;  --br: -18deg; }
+  .s2 { height: 105px; --br: -8deg; }
+  .s3 { height: 90px;  --br: 0deg; }
+  .s4 { height: 100px; --br: 9deg; }
+  .s5 { height: 88px;  --br: 18deg; }
+  .s6 { height: 98px;  --br: -3deg; }
+  .s7 { height: 92px;  --br: 5deg; }
+  .sk-stick {
+    transform: translateX(-50%) rotate(var(--br));
+    --br: 0deg;
+  }
+
+  /* shake */
+  .is-shaking .jeng-tube { animation: tubeShake 0.12s ease-in-out infinite; }
+  .is-shaking .sk-stick { animation: stickJump 0.12s ease-in-out infinite; }
+  @keyframes tubeShake {
+    0%,100% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(-5deg) translateX(-3px); }
+    75% { transform: translateX(-50%) rotate(5deg) translateX(3px); }
+  }
+  @keyframes stickJump {
+    0%,100% { transform: translateX(-50%) rotate(var(--br)) translateY(0); }
+    50% { transform: translateX(-50%) rotate(var(--br)) translateY(-18px); }
+  }
+
+  .jeng-base {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 28px;
+    background: linear-gradient(180deg, #6B1010, #3a0808);
+    border-radius: 6px 6px 16px 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  }
+  .tube-shadow {
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    width: 80px; height: 12px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.5), transparent);
+    border-radius: 50%;
+  }
+
+  /* button */
+  .btn-shake {
+    background: linear-gradient(135deg, #cc1111, #ff4444);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 18px 56px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(255,50,50,0.35);
+    letter-spacing: 2px;
+    transition: transform 0.1s, box-shadow 0.2s;
+    font-family: inherit;
+  }
+  .btn-shake:active { transform: scale(0.96); }
+  .btn-shake.is-shaking {
+    background: linear-gradient(135deg, #666, #888);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    animation: btnPulse 0.2s ease infinite;
+  }
+  @keyframes btnPulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(0.97); }
+  }
+
+  /* ─── REVEAL ─── */
+  #screen-reveal {
+    background: #06060f;
+    padding: 0;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  /* starfield background */
+  .starfield {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    animation: twinkle var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: var(--op); transform: scale(1); }
+    50% { opacity: calc(var(--op) * 0.3); transform: scale(0.8); }
+  }
+
+  /* result card */
+  .result-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* custom image area - FOR TEMPLATE USE */
+  .result-image-zone {
+    width: 100%;
+    height: 180px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, #1a1a3e 0%, #0d0d2a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    /* PLACEHOLDER: replace background with your image */
+  }
+  /* ── TEMPLATE CUSTOMIZATION AREA START ──
+     To use your own image:
+     1. Replace the background below with: background: url('YOUR_IMAGE_URL') center/cover;
+     2. Or remove background and add an <img> tag inside .result-image-zone
+  */
+  .result-image-zone {
+    background:
+      radial-gradient(ellipse at 30% 50%, rgba(100,60,180,0.6) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 30%, rgba(60,100,180,0.5) 0%, transparent 60%),
+      linear-gradient(160deg, #1a1a3e 0%, #0d0d2a 100%);
+  }
+  /* ── TEMPLATE CUSTOMIZATION AREA END ── */
+
+  .result-image-zone-inner {
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    letter-spacing: 2px;
+    /* TEMPLATE: Put your logo/avatar image here */
+    /* Example: <img src="your-logo.png" style="height:100%;object-fit:contain;"> */
+  }
+
+  /* divider */
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd93d, transparent);
+    margin: 0 auto 24px;
+    border-radius: 1px;
+  }
+
+  /* lucky number badge */
+  .lucky-num {
+    font-size: 11px;
+    color: #ffd93d;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
+
+  /* fortune title */
+  .fortune-title {
+    font-size: clamp(26px, 7vw, 38px);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+
+  /* tag */
+  .fortune-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+    font-weight: 600;
+  }
+  .tag-great { background: rgba(107,203,119,0.15); color: #6bcb77; border: 1px solid rgba(107,203,119,0.3); }
+  .tag-medium { background: rgba(255,217,61,0.12); color: #ffd93d; border: 1px solid rgba(255,217,61,0.25); }
+  .tag-bad { background: rgba(255,80,80,0.12); color: #ff6b6b; border: 1px solid rgba(255,80,80,0.25); }
+  .tag-weird { background: rgba(200,100,255,0.12); color: #c864ff; border: 1px solid rgba(200,100,255,0.25); }
+
+  /* description */
+  .fortune-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.9;
+    max-width: 320px;
+    margin: 0 auto 36px;
+  }
+
+  /* decorative line */
+  .deco-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(180deg, rgba(255,217,61,0.6), transparent);
+    margin: 0 auto 28px;
+  }
+
+  /* result stick visual */
+  .result-stick-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .result-stick {
+    width: 12px;
+    height: 140px;
+    background: linear-gradient(180deg, #f5deb3 0%, #d4a96a 100%);
+    border-radius: 6px;
+    box-shadow: 0 0 25px rgba(245,222,179,0.4);
+    animation: stickFlyIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    position: relative;
+    transform-origin: bottom center;
+  }
+  .result-stick::after {
+    content: '';
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 16px; height: 50px;
+    background: linear-gradient(180deg, #8B0000, #cc2222);
+    border-radius: 8px;
+  }
+  @keyframes stickFlyIn {
+    0% { transform: translateY(-200px) rotate(0deg) scale(0.3); opacity: 0; }
+    60% { transform: translateY(10px) rotate(8deg) scale(1.05); }
+    100% { transform: translateY(0) rotate(4deg) scale(1); opacity: 1; }
+  }
+
+  /* restart button - beautiful */
+  .btn-restart {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    padding: 12px 28px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 1px;
+    transition: all 0.25s ease;
+    margin-top: 8px;
+  }
+  .btn-restart:hover {
+    border-color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.05);
+  }
+  .btn-restart svg { transition: transform 0.3s ease; }
+  .btn-restart:hover svg { transform: rotate(180deg); }
+
+  /* theme colors */
+  .theme-great .fortune-title { color: #6bcb77; }
+  .theme-medium .fortune-title { color: #ffd93d; }
+  .theme-bad .fortune-title { color: #ff6b6b; }
+  .theme-weird .fortune-title { color: #c864ff; }
+  .theme-great .result-stick { box-shadow: 0 0 35px rgba(107,203,119,0.5); }
+  .theme-medium .result-stick { box-shadow: 0 0 35px rgba(255,217,61,0.5); }
+  .theme-bad .result-stick { box-shadow: 0 0 35px rgba(255,80,80,0.4); }
+  .theme-weird .result-stick { box-shadow: 0 0 35px rgba(200,100,255,0.5); }
+
+  /* particles */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    animation: particleFly 0.8s ease-out forwards;
+    z-index: 10;
+  }
+  @keyframes particleFly {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx),var(--ty)) scale(0); opacity: 0; }
+  }
+  .glow-ring {
+    position: fixed;
+    border-radius: 50%;
+    border: 2px solid;
+    pointer-events: none;
+    animation: glowExpand 1s ease-out forwards;
+    z-index: 10;
+  }
+  @keyframes glowExpand {
+    0% { width: 0; height: 0; opacity: 1; transform: translate(-50%,-50%); }
+    100% { width: 320px; height: 320px; opacity: 0; transform: translate(-50%,-50%); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HOME ─── -->
+<div class="screen active" id="screen-home">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 20px;width:100%;">
+    <div class="title-main">📖 今日命运手册</div>
+    <div class="title-sub">每天一次，看看今天的运</div>
+
+    <div class="jeng-wrap" id="jengWrap">
+      <div class="tube-shadow"></div>
+      <div class="jeng-tube" id="jengTube">
+        <div class="jeng-sticks">
+          <div class="sk-stick s1"></div>
+          <div class="sk-stick s2"></div>
+          <div class="sk-stick s3"></div>
+          <div class="sk-stick s4"></div>
+          <div class="sk-stick s5"></div>
+          <div class="sk-stick s6"></div>
+          <div class="sk-stick s7"></div>
+        </div>
+      </div>
+      <div class="jeng-base"></div>
+    </div>
+
+    <button class="btn-shake" id="btnShake">摇一摇 🔮</button>
+  </div>
+</div>
+
+<!-- ─── REVEAL ─── -->
+<div class="screen" id="screen-reveal">
+  <!-- starfield bg -->
+  <div class="starfield" id="starfield"></div>
+
+  <div class="result-card">
+    <!-- ═══ TEMPLATE ZONE: 顶部图片区（放Logo/品牌图/头像）═════════
+         替换方法：找到 .result-image-zone 样式，把 background 换成你的图片URL
+         示例：background: url('https://你的图片.jpg') center/cover;
+         或者在这个 div 里直接加 <img src="..."> 标签
+    ══════════════════════════════════════════════════════════════ -->
+    <div class="result-image-zone">
+      <!-- TEMPLATE: 在这里插入你的图片，如: -->
+      <!-- <img src="YOUR_IMAGE_URL" style="width:100%;height:100%;object-fit:cover;"> -->
+      <div class="result-image-zone-inner">
+        <!-- 品牌 logo / 头像 / 图腾 可放在这里 -->
+      </div>
+    </div>
+
+    <!-- 装饰签 -->
+    <div class="result-stick-wrap">
+      <div class="result-stick" id="resultStick"></div>
+    </div>
+
+    <div class="lucky-num" id="resultNum">第 00 签</div>
+
+    <div class="divider"></div>
+
+    <div class="fortune-title" id="resultTitle"></div>
+
+    <div class="fortune-tag" id="resultTag"></div>
+
+    <!-- 装饰线 -->
+    <div class="deco-line"></div>
+
+    <div class="fortune-desc" id="resultDesc"></div>
+
+    <!--
+    ═══ TEMPLATE ZONE: 底部文案自定义区 ════════════════════════════
+    如需修改文案，直接改 HTML 里对应元素的 textContent
+    例如：
+      resultNum → "第 XX 签"
+      resultTitle → "大吉 · 标题文字"
+      resultDesc → "正文内容"
+      resultTag → "标签文字"
+    ══════════════════════════════════════════════════════════════ -->
+
+    <button class="btn-restart" id="btnAgain">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+      再摇一次
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const fortunes = [
+    { num:1,  level:'great',  title:'大吉 · 出门捡到钱',        tag:'✨ 超好运',    desc:'今日出门必有意外之财。不是大钱，但足够你买杯奶茶然后假装没丢。这是宇宙给你的一点甜，继续保持。' },
+    { num:2,  level:'great',  title:'大吉 · 被夸了',            tag:'✨ 人缘爆发',  desc:'今天有人会真诚地夸你。不是客套那种，是真的觉得你很厉害。记得说谢谢，别谦虚回去。' },
+    { num:3,  level:'medium', title:'中吉 · 摸鱼成功',          tag:'🟡 稳稳当当',  desc:'今天工作推进顺利，任务自动完成，或者同事帮你扛了。摸鱼没被抓到，功德+1。' },
+    { num:4,  level:'weird',  title:'奇签 · 必有一失',          tag:'🔮 离谱但准',  desc:'今天你会丢失一样东西——可能是耳机、钥匙、或者某个群的消息免打扰。别慌，它会回来的。' },
+    { num:5,  level:'bad',    title:'凶签 · 水逆预警',            tag:'🔴 谨慎操作',  desc:'今天电子设备可能会跟你作对。电脑蓝屏、手机死机、耳机只响一边。保持冷静，深呼吸，重启解决80%的问题。' },
+    { num:6,  level:'weird',  title:'奇签 · 梦中启示',          tag:'🔮 玄学时刻',  desc:'今天你会突然想到一个很久以前的梦，或对某件事有了很确定的感觉。相信直觉，它比逻辑准。' },
+    { num:7,  level:'medium', title:'中吉 · 吃的运气',            tag:'🟡 口福不错',  desc:'今天你会吃到一样特别好吃的东西。可能是新店，可能是老店翻红，可能是外卖小哥送错了——都是缘分。' },
+    { num:8,  level:'great',  title:'大吉 · 灵感爆棚',            tag:'✨ 创造力MAX', desc:'今天脑子特别好使。之前想不通的突然通了，没灵感的突然来了。快拿手机记下来！' },
+    { num:9,  level:'bad',    title:'凶签 · 选择困难',            tag:'🔴 二选一必死',desc:'今天你会面临一个选择，两个都想要但只能选一个。相信第一反应，选完别回头想。' },
+    { num:10, level:'weird',  title:'奇签 · 尴尬时刻',            tag:'🔮 社死预警',  desc:'今天大概率会发生一件让你想找地缝钻进去的事。但放心，三天后你会当笑话讲出来。' },
+    { num:11, level:'medium', title:'中吉 · 小确幸',              tag:'🟡 知足常乐',  desc:'今天会有小事让你觉得「啊，还行」。晴天、收到消息、椅子坐着舒服。别小看这些。' },
+    { num:12, level:'great',  title:'大吉 · 桃花预警',          tag:'✨ 心动信号',  desc:'今天你可能会遇到一个让你心跳加速的人。不一定是爱情，但那种感觉会让你记住今天。' },
+    { num:13, level:'weird',  title:'奇签 · 破防了',            tag:'🔮 情绪过山车',desc:'今天情绪可能会有起伏。别憋着，想哭就哭想笑就笑。今天的眼泪和笑声都是真的。' },
+    { num:14, level:'medium', title:'中吉 · 贵人运',              tag:'🟡 有人帮你',  desc:'今天如果遇到麻烦，会有人主动来帮你。不一定是大事，但刚好是你需要的那个帮助。' },
+    { num:15, level:'bad',    title:'凶签 · 计划泡汤',            tag:'🔴 随缘吧',    desc:'今天你做的计划大概率会变化。不是坏事，只是宇宙有更好安排。接受它。' },
+    { num:16, level:'weird',  title:'奇签 · 偶遇故人',            tag:'🔮 缘分到了',  desc:'今天可能会偶遇一个很久没联系的人。不要惊讶，缘分到了自然遇见。聊几句吧。' },
+    { num:17, level:'great',  title:'大吉 · 今天休息',            tag:'✨ 躺赢信号',  desc:'今天适合躺平。不需要努力不需要卷，躺着就是对的。今天的成就是：活着，挺好。' },
+    { num:18, level:'medium', title:'中吉 · 买东西便宜',          tag:'🟡 省钱体质',  desc:'今天你可能会意外省到钱，或用很低的价格买到想要的东西。不是省了，是宇宙帮你砍了价。' },
+    { num:19, level:'weird',  title:'奇签 · 直觉超准',            tag:'🔮 第六感爆发',desc:'今天请相信直觉。你对某些事的判断比平时准很多，尤其是对人。跟着感觉走。' },
+    { num:20, level:'great',  title:'大吉 · 万事皆可',            tag:'✨ 满分运气',  desc:'今天是你近期运气的巅峰。做什么都比较顺，想做什么就去做。这天的运气不用白不用。' }
+  ];
+
+  let shaking = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(function(s){
+      s.classList.remove('active');
+      s.style.display = 'none';
+    });
+    var t = document.getElementById(id);
+    t.classList.add('active');
+    t.style.display = 'flex';
+  }
+
+  function makeStarfield() {
+    var sf = document.getElementById('starfield');
+    sf.innerHTML = '';
+    for (var i = 0; i < 60; i++) {
+      var s = document.createElement('div');
+      s.className = 'star';
+      var sz = Math.random() * 2.5 + 0.5;
+      s.style.cssText = [
+        'width:'+sz+'px','height:'+sz+'px',
+        'left:'+(Math.random()*100)+'%',
+        'top:'+(Math.random()*100)+'%',
+        '--op:'+(Math.random()*0.7+0.2).toFixed(2),
+        '--dur:'+(Math.random()*3+2).toFixed(1)+'s',
+        '--delay:'+(Math.random()*3).toFixed(1)+'s'
+      ].join(';');
+      sf.appendChild(s);
+    }
+  }
+
+  function burstParticles(color) {
+    for (var i = 0; i < 24; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var size = Math.random() * 10 + 4;
+      var angle = Math.random() * Math.PI * 2;
+      var dist = Math.random() * 140 + 60;
+      p.style.cssText = [
+        'width:'+size+'px','height:'+size+'px',
+        'background:'+color,
+        'left:50%','top:30%',
+        '--tx:'+Math.cos(angle)*dist+'px',
+        '--ty:'+Math.sin(angle)*dist+'px'
+      ].join(';');
+      document.body.appendChild(p);
+      setTimeout(function(p){ p.remove(); }, 800, p);
+    }
+  }
+
+  function glowRing(color, x, y) {
+    var ring = document.createElement('div');
+    ring.className = 'glow-ring';
+    ring.style.cssText = 'left:'+x+'px;top:'+y+'px;border-color:'+color;
+    document.body.appendChild(ring);
+    setTimeout(function(){ ring.remove(); }, 1000);
+  }
+
+  function startShake() {
+    if (shaking) return;
+    shaking = true;
+    var wrap = document.getElementById('jengWrap');
+    var btn = document.getElementById('btnShake');
+    wrap.classList.add('is-shaking');
+    btn.classList.add('is-shaking');
+    btn.textContent = '抽签中...';
+
+    if (navigator.vibrate) navigator.vibrate([80,40,80,40,80]);
+
+    var fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+
+    setTimeout(function() {
+      wrap.classList.remove('is-shaking');
+      btn.classList.remove('is-shaking');
+      btn.textContent = '摇一摇 🔮';
+      shaking = false;
+      showFortune(fortune);
+    }, 2200);
+  }
+
+  var lastShakeTime = 0;
+  if (window.DeviceMotionEvent) {
+    window.addEventListener('devicemotion', function(e) {
+      var acc = e.accelerationIncludingGravity;
+      if (!acc) return;
+      var speed = Math.abs(acc.x||0) + Math.abs(acc.y||0) + Math.abs(acc.z||0);
+      var now = Date.now();
+      if (speed > 22 && now - lastShakeTime > 3000) {
+        lastShakeTime = now;
+        startShake();
+      }
+    });
+  }
+
+  function showFortune(f) {
+    makeStarfield();
+    showScreen('screen-reveal');
+
+    var colors = { great:'#6bcb77', medium:'#ffd93d', bad:'#ff6b6b', weird:'#c864ff' };
+    var c = colors[f.level];
+
+    var scr = document.getElementById('screen-reveal');
+    scr.className = 'screen active theme-' + f.level;
+
+    document.getElementById('resultNum').textContent = '第 ' + String(f.num).padStart(2,'0') + ' 签';
+    document.getElementById('resultTitle').textContent = f.title;
+    document.getElementById('resultDesc').textContent = f.desc;
+    var tagEl = document.getElementById('resultTag');
+    tagEl.className = 'fortune-tag tag-' + f.level;
+    tagEl.textContent = f.tag;
+
+    var stick = document.getElementById('resultStick');
+    stick.style.animation = 'none';
+    void stick.offsetHeight;
+    stick.style.animation = 'stickFlyIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards';
+
+    burstParticles(c);
+    glowRing(c, window.innerWidth/2, window.innerHeight*0.28);
+  }
+
+  function restart() {
+    showScreen('screen-home');
+  }
+
+  document.getElementById('btnShake').addEventListener('click', startShake);
+  document.getElementById('jengWrap').addEventListener('click', startShake);
+  document.getElementById('btnAgain').addEventListener('click', restart);
+})();
+</script>
+</body>
+</html>
