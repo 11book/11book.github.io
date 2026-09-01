@@ -33,6 +33,7 @@
       color: var(--text);
       display: flex;
       height: 100vh;
+      overflow: hidden;
     }
 
     /* ─── SIDEBAR ─── */
@@ -45,9 +46,13 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      position: relative;
-      z-index: 10;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      transition: transform 0.25s ease;
     }
+    .sidebar.hidden { transform: translateX(-100%); }
 
     .sidebar-header {
       padding: 20px 16px 14px;
@@ -201,7 +206,38 @@
       height: 100vh;
       overflow-y: auto;
       background: var(--bg);
+      margin-left: 0;
+      transition: margin-left 0.25s ease;
     }
+    .sidebar.hidden ~ .main { margin-left: 0; }
+
+    /* mobile overlay backdrop */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+    }
+    .sidebar-overlay.show { display: block; }
+
+    /* hamburger */
+    .hamburger {
+      display: none;
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 200;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    .hamburger.show { display: block; }
     .main::-webkit-scrollbar { width: 6px; }
     .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -348,12 +384,22 @@
     /* hidden search mode */
     .sidebar.search-mode .nav-tree { display: none; }
     .sidebar.search-mode .nav-group-header { display: none; }
+
+    @media (max-width: 640px) {
+      .sidebar {
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+      }
+      .main { width: 100vw; }
+    }
   </style>
 </head>
 <body>
 
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
 <!-- ─── SIDEBAR ─── -->
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar hidden" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-title">🧪 无厘头工具箱</div>
     <div class="search-wrap">
@@ -693,6 +739,28 @@ document.getElementById('searchInput').addEventListener('keydown', function(e) {
 
 // ─── INIT ───
 buildNav();
+
+// Mobile: show hamburger when sidebar is hidden on desktop
+function checkMobile() {
+  var sidebar = document.getElementById('sidebar');
+  var hamburger = document.getElementById('hamburger');
+  if (window.innerWidth <= 640) {
+    sidebar.classList.add('hidden');
+    hamburger.classList.add('show');
+  } else {
+    sidebar.classList.remove('hidden');
+    hamburger.classList.remove('show');
+  }
+}
+checkMobile();
+window.addEventListener('resize', checkMobile);
+
+function toggleSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('hidden');
+  overlay.classList.toggle('show');
+}
 
 // Open first tool by default if URL has ?tool=xxx
 var params = new URLSearchParams(location.search);
