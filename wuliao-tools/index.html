@@ -9,136 +9,698 @@
   <style>
     :root {
       --bg: #0a0a0f;
+      --sidebar-bg: #0d0d16;
+      --sidebar-width: 280px;
       --surface: #13131a;
-      --border: #2a2a3a;
+      --surface-hover: #1a1a24;
+      --border: #1e1e2a;
+      --border-active: #2a2a3e;
       --text: #c9b896;
-      --text-dim: #6a6a7a;
+      --text-dim: #5a5a6a;
+      --text-bright: #e8dcc0;
       --primary: #e8a838;
-      --primary-glow: rgba(232,168,56,0.2);
+      --primary-glow: rgba(232,168,56,0.15);
+      --accent: #c864ff;
+      --green: #6bcb77;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; overflow: hidden; }
+
     body {
       font-family: "Noto Sans SC", sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
-      padding: 40px 20px;
+      display: flex;
+      height: 100vh;
     }
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(232,168,56,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       position: relative;
-      z-index: 1;
+      z-index: 10;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 48px;
+
+    .sidebar-header {
+      padding: 20px 16px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
     }
-    .header h1 {
+
+    .sidebar-title {
       font-family: "Noto Serif SC", serif;
-      font-size: 2rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--primary);
-      letter-spacing: 4px;
-      text-shadow: 0 0 30px var(--primary-glow);
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .header p {
-      font-size: 0.85rem;
+
+    /* search */
+    .search-wrap {
+      position: relative;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       color: var(--text-dim);
-      margin-top: 8px;
+      font-size: 13px;
+      pointer-events: none;
     }
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      padding: 8px 10px 8px 32px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: var(--text-dim); }
+    .search-input:focus { border-color: var(--primary); }
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: none;
+    }
+    .search-clear.show { display: block; }
+    .search-clear:hover { color: var(--text); }
+
+    /* nav tree */
+    .nav-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0 16px;
+    }
+    .nav-tree::-webkit-scrollbar { width: 4px; }
+    .nav-tree::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .nav-group { margin-bottom: 2px; }
+
+    .nav-group-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      user-select: none;
+      transition: color 0.15s;
+    }
+    .nav-group-header:hover { color: var(--text); }
+    .nav-group-header.active { color: var(--primary); }
+
+    .nav-arrow {
+      font-size: 9px;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .nav-group-header.open .nav-arrow { transform: rotate(90deg); }
+
+    .nav-items { display: none; padding-left: 8px; }
+    .nav-items.open { display: block; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px 8px 22px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text);
+      border-radius: 8px;
+      margin: 1px 8px;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+      position: relative;
+    }
+    .nav-item:hover {
+      background: var(--surface-hover);
+      color: var(--text-bright);
+    }
+    .nav-item.active {
+      background: var(--primary-glow);
+      color: var(--primary);
+      font-weight: 500;
+    }
+    .nav-item-icon { font-size: 14px; flex-shrink: 0; }
+    .nav-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-item-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #000;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .nav-item-badge.new { background: var(--accent); color: #fff; }
+
+    /* no results */
+    .no-results {
+      padding: 20px 16px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      display: none;
+    }
+    .no-results.show { display: block; }
+
+    /* ─── MAIN ─── */
+    .main {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+    .main::-webkit-scrollbar { width: 6px; }
+    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* welcome screen */
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .welcome-icon { font-size: 4rem; margin-bottom: 16px; }
+    .welcome-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    .welcome-sub {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      max-width: 360px;
+    }
+
+    /* tool detail view */
+    .tool-detail { display: none; }
+    .tool-detail.active { display: block; }
+
+    .tool-detail-header {
+      border-bottom: 1px solid var(--border);
+      padding: 24px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .tool-detail-icon { font-size: 2.5rem; flex-shrink: 0; }
+    .tool-detail-info { flex: 1; }
+    .tool-detail-name {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 4px;
+    }
+    .tool-detail-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+    .tool-detail-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: var(--primary-glow);
+      color: var(--primary);
+      margin-top: 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .tool-open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .tool-open-btn:hover { opacity: 0.85; }
+
+    .tool-detail-body { padding: 28px; }
+
+    /* grid in detail view */
     .tools-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+      gap: 14px;
     }
-    .tool-card {
+
+    .tool-card-mini {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 14px;
+      padding: 18px;
       cursor: pointer;
       text-decoration: none;
       color: var(--text);
       display: block;
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
-    .tool-card:hover {
+    .tool-card-mini:hover {
       border-color: var(--primary);
-      box-shadow: 0 0 20px var(--primary-glow);
+      box-shadow: 0 0 16px var(--primary-glow);
       transform: translateY(-2px);
+      color: var(--text-bright);
     }
-    .tool-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .tool-name {
-      font-family: "Noto Serif SC", serif;
-      font-size: 1.1rem;
+    .tool-card-mini.active {
+      border-color: var(--primary);
+      background: var(--primary-glow);
+    }
+    .tcm-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .tcm-name {
+      font-size: 0.9rem;
       font-weight: 600;
-      color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      color: var(--text-bright);
     }
-    .tool-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
-    .tool-status {
-      display: inline-block;
-      margin-top: 12px;
-      font-size: 0.7rem;
-      padding: 3px 8px;
-      border-radius: 20px;
-      background: rgba(232,168,56,0.15);
-      color: var(--primary);
+    .tcm-desc { font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; }
+
+    /* stat bar */
+    .stat-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin: 0 28px 24px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
     }
+    .stat-item { display: flex; flex-direction: column; gap: 2px; }
+    .stat-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+    .stat-label { font-size: 10px; color: var(--text-dim); letter-spacing: 0.5px; }
+
+    /* section title */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0 28px 10px;
+    }
+
+    /* hidden search mode */
+    .sidebar.search-mode .nav-tree { display: none; }
+    .sidebar.search-mode .nav-group-header { display: none; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🧪 无厘头工具箱</h1>
-      <p>整蛊 · 玄学 · 预知未来 · 时空穿越</p>
-    </div>
-    <div class="tools-grid">
-      <a class="tool-card" href="tools/fortune-box/">
-        <div class="tool-icon">🔮</div>
-        <div class="tool-name">逆天改命盲盒</div>
-        <div class="tool-desc">输入文字，AI 分析后给出一个无厘头的命运结果，附带刮奖揭示动画</div>
-        <span class="tool-status">🔥 热门</span>
-      </a>
-      <a class="tool-card" href="tools/fake-bsod/">
-        <div class="tool-icon">💀</div>
-        <div class="tool-name">假装蓝屏</div>
-        <div class="tool-desc">整蛊神器，打开后假装系统崩溃，按 ESC 或等几秒恢复</div>
-        <span class="tool-status">🆕 新上线</span>
-      </a>
-      <a class="tool-card" href="tools/countdown-trick/">
-        <div class="tool-icon">⏳</div>
-        <div class="tool-name">倒计时整蛊</div>
-        <div class="tool-desc">输入秒数开始倒计时，到 0 时给你一个"惊喜"</div>
-        <span class="tool-status">🆕 新上线</span>
-      </a>
-      <a class="tool-card" href="tools/timetravel/">
-        <div class="tool-icon">⏰</div>
-        <div class="tool-name">时空穿越器</div>
-        <div class="tool-desc">选择目标时间，启动穿越特效，10 秒后"到达"未来/过去</div>
-        <span class="tool-status">🆕 新上线</span>
-      </a>
-      <a class="tool-card" href="tools/cow-horse-test/">
-        <div class="tool-icon">🐴</div>
-        <div class="tool-name">测测你是什么牛马</div>
-        <div class="tool-desc">3道题测出你的职场人格，摸鱼大师还是PPT纺织工？打工人专属趣味测试</div>
-        <span class="tool-status">🆕 新上线</span>
-      </a>
-      <a class="tool-card" href="tools/wuliao-fortune-shake/">
-        <div class="tool-icon">📖</div>
-        <div class="tool-name">今日命运手册</div>
-        <div class="tool-desc">摇一摇抽签，每天一次，20种命运随机揭示，玄学星空背景</div>
-        <span class="tool-status">🆕 新上线</span>
-      </a>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">🧪 无厘头工具箱</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" placeholder="搜索工具..." autocomplete="off">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
     </div>
   </div>
+
+  <nav class="nav-tree" id="navTree">
+    <div class="no-results" id="noResults">没有找到匹配的工具</div>
+  </nav>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<main class="main" id="main">
+
+  <!-- Welcome screen -->
+  <div class="welcome" id="welcome">
+    <div class="welcome-icon">🧪</div>
+    <div class="welcome-title">欢迎来到无厘头工具箱</div>
+    <div class="welcome-sub">
+      从左侧选择一个工具<br>
+      或者搜索找到你想要的
+    </div>
+  </div>
+
+  <!-- Tool detail view (reuses grid) -->
+  <div class="tool-detail" id="toolDetail">
+    <div class="tool-detail-header">
+      <div class="tool-detail-icon" id="detailIcon"></div>
+      <div class="tool-detail-info">
+        <div class="tool-detail-name" id="detailName"></div>
+        <div class="tool-detail-desc" id="detailDesc"></div>
+        <span class="tool-detail-badge" id="detailBadge"></span>
+      </div>
+      <a class="tool-open-btn" id="detailOpenBtn" href="#" target="_blank">
+        打开 →
+      </a>
+    </div>
+    <div class="stat-bar" id="statBar"></div>
+    <div class="section-title" id="sectionTitle"></div>
+    <div class="tool-detail-body">
+      <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ─── TOOL DATA ───
+// 每个工具有：id, name, desc, icon, badge, badgeType, category, tags, href
+const TOOLS = [
+  {
+    id: 'cow-horse-test',
+    name: '测测你是什么牛马',
+    desc: '3道题测出你的职场人格，摸鱼大师还是PPT纺织工？打工人专属趣味测试',
+    icon: '🐴',
+    badge: '新上线',
+    badgeType: 'new',
+    category: '测试类',
+    tags: ['测试', '职场', '打工人', '趣味'],
+    href: 'tools/cow-horse-test/'
+  },
+  {
+    id: 'wuliao-fortune-shake',
+    name: '今日命运手册',
+    desc: '摇一摇抽签，每天一次，20种命运随机揭示，玄学星空背景',
+    icon: '📖',
+    badge: '新上线',
+    badgeType: 'new',
+    category: '玄学类',
+    tags: ['玄学', '抽签', '命运', '每日'],
+    href: 'tools/wuliao-fortune-shake/'
+  },
+  {
+    id: 'fortune-box',
+    name: '逆天改命盲盒',
+    desc: '输入文字，AI分析后给出一个无厘头的命运结果，附带刮奖揭示动画',
+    icon: '🔮',
+    badge: '热门',
+    badgeType: 'hot',
+    category: '玄学类',
+    tags: ['玄学', 'AI', '盲盒', '命运'],
+    href: 'tools/fortune-box/'
+  },
+  {
+    id: 'fake-bsod',
+    name: '假装蓝屏',
+    desc: '整蛊神器，打开后假装系统崩溃，按ESC或等几秒恢复',
+    icon: '💀',
+    badge: null,
+    badgeType: null,
+    category: '整蛊类',
+    tags: ['整蛊', '蓝屏', '恶作剧'],
+    href: 'tools/fake-bsod/'
+  },
+  {
+    id: 'countdown-trick',
+    name: '倒计时整蛊',
+    desc: '输入秒数开始倒计时，到0时给你一个惊喜',
+    icon: '⏳',
+    badge: null,
+    badgeType: null,
+    category: '整蛊类',
+    tags: ['整蛊', '倒计时', '恶作剧'],
+    href: 'tools/countdown-trick/'
+  },
+  {
+    id: 'timetravel',
+    name: '时空穿越器',
+    desc: '选择目标时间，启动穿越特效，10秒后到达未来或过去',
+    icon: '⏰',
+    badge: null,
+    badgeType: null,
+    category: '整蛊类',
+    tags: ['整蛊', '穿越', '恶作剧'],
+    href: 'tools/timetravel/'
+  },
+  {
+    id: 'ai-calculator',
+    name: 'AI计算器',
+    desc: '假装在计算，实际在和AI对话的整蛊计算器',
+    icon: '🧮',
+    badge: null,
+    badgeType: null,
+    category: '整蛊类',
+    tags: ['整蛊', '计算器', 'AI'],
+    href: 'tools/ai-calculator/'
+  },
+];
+
+// ─── CATEGORIES ───
+const CATEGORIES = ['整蛊类', '玄学类', '测试类', '视频模板类'];
+
+// Build nav tree
+function buildNav() {
+  const navTree = document.getElementById('navTree');
+  navTree.innerHTML = '<div class="no-results" id="noResults">没有找到匹配的工具</div>';
+
+  CATEGORIES.forEach(function(cat) {
+    const toolsInCat = TOOLS.filter(function(t) { return t.category === cat; });
+    if (toolsInCat.length === 0) return;
+
+    const group = document.createElement('div');
+    group.className = 'nav-group';
+
+    const header = document.createElement('div');
+    header.className = 'nav-group-header';
+    header.dataset.category = cat;
+    header.innerHTML = '<span class="nav-arrow">▶</span><span>' + cat + '</span><span style="margin-left:auto;font-size:10px;color:var(--text-dim)">' + toolsInCat.length + '</span>';
+
+    const items = document.createElement('div');
+    items.className = 'nav-items';
+
+    toolsInCat.forEach(function(tool) {
+      const item = document.createElement('a');
+      item.className = 'nav-item';
+      item.href = '#';
+      item.dataset.id = tool.id;
+      item.innerHTML =
+        '<span class="nav-item-icon">' + tool.icon + '</span>' +
+        '<span class="nav-item-name">' + tool.name + '</span>' +
+        (tool.badge ? '<span class="nav-item-badge ' + tool.badgeType + '">' + tool.badge + '</span>' : '');
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        showTool(tool.id);
+      });
+      items.appendChild(item);
+    });
+
+    header.addEventListener('click', function() {
+      var isOpen = header.classList.contains('open');
+      header.classList.toggle('open', !isOpen);
+      items.classList.toggle('open', !isOpen);
+    });
+    // auto-open first group
+    header.classList.add('open');
+    items.classList.add('open');
+
+    group.appendChild(header);
+    group.appendChild(items);
+    navTree.appendChild(group);
+  });
+
+  // Also add a top-level "全部工具" that shows all
+  const allGroup = document.createElement('div');
+  allGroup.className = 'nav-group';
+  const allHeader = document.createElement('div');
+  allHeader.className = 'nav-group-header open';
+  allHeader.innerHTML = '<span class="nav-arrow">▶</span><span>📋 全部工具</span><span style="margin-left:auto;font-size:10px;color:var(--text-dim)">' + TOOLS.length + '</span>';
+  const allItems = document.createElement('div');
+  allItems.className = 'nav-items open';
+  TOOLS.forEach(function(tool) {
+    const item = document.createElement('a');
+    item.className = 'nav-item';
+    item.href = '#';
+    item.dataset.id = tool.id;
+    item.innerHTML =
+      '<span class="nav-item-icon">' + tool.icon + '</span>' +
+      '<span class="nav-item-name">' + tool.name + '</span>' +
+      (tool.badge ? '<span class="nav-item-badge ' + tool.badgeType + '">' + tool.badge + '</span>' : '');
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      showTool(tool.id);
+    });
+    allItems.appendChild(item);
+  });
+  allHeader.addEventListener('click', function() {
+    var isOpen = allHeader.classList.contains('open');
+    allHeader.classList.toggle('open', !isOpen);
+    allItems.classList.toggle('open', !isOpen);
+  });
+  allGroup.appendChild(allHeader);
+  allGroup.appendChild(allItems);
+  navTree.insertBefore(allGroup, navTree.firstChild);
+}
+
+// ─── SHOW TOOL ───
+function showTool(id) {
+  var tool = TOOLS.find(function(t) { return t.id === id; });
+  if (!tool) return;
+
+  // Highlight nav item
+  document.querySelectorAll('.nav-item').forEach(function(i) {
+    i.classList.toggle('active', i.dataset.id === id);
+  });
+
+  // Fill detail header
+  document.getElementById('detailIcon').textContent = tool.icon;
+  document.getElementById('detailName').textContent = tool.name;
+  document.getElementById('detailDesc').textContent = tool.desc;
+  document.getElementById('detailBadge').textContent = tool.badge || '';
+  document.getElementById('detailBadge').style.display = tool.badge ? '' : 'none';
+  document.getElementById('detailOpenBtn').href = tool.href;
+  document.getElementById('detailOpenBtn').textContent = '打开 →';
+
+  // Stat bar
+  var related = TOOLS.filter(function(t) { return t.category === tool.category && t.id !== tool.id; });
+  document.getElementById('statBar').innerHTML =
+    '<div class="stat-item"><div class="stat-num">' + TOOLS.length + '</div><div class="stat-label">全部工具</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + related.length + '</div><div class="stat-label">同分类工具</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + tool.tags.length + '</div><div class="stat-label">标签数</div></div>';
+
+  // Section title
+  document.getElementById('sectionTitle').textContent = '同分类其他工具';
+
+  // Related tools grid
+  var grid = document.getElementById('toolsGrid');
+  if (related.length === 0) {
+    grid.innerHTML = '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:40px;">暂无其他工具</div>';
+  } else {
+    grid.innerHTML = related.map(function(t) {
+      return '<a class="tool-card-mini" href="#" onclick="showTool(\'' + t.id + '\');return false">' +
+        '<div class="tcm-icon">' + t.icon + '</div>' +
+        '<div class="tcm-name">' + t.name + '</div>' +
+        '<div class="tcm-desc">' + t.desc + '</div>' +
+        '</a>';
+    }).join('');
+  }
+
+  // Switch views
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('toolDetail').classList.add('active');
+  document.getElementById('main').scrollTop = 0;
+}
+
+// ─── SEARCH ───
+function getSearchResults(query) {
+  if (!query) return null; // null = no filter, show all
+  var q = query.trim().toLowerCase();
+  if (!q) return null;
+  return TOOLS.filter(function(t) {
+    return t.name.toLowerCase().includes(q) ||
+           t.desc.toLowerCase().includes(q) ||
+           t.tags.some(function(tag) { return tag.toLowerCase().includes(q); });
+  });
+}
+
+function renderSearchResults(results) {
+  var navTree = document.getElementById('navTree');
+  var noResults = document.getElementById('noResults');
+
+  if (!results) {
+    // Restore full nav
+    buildNav();
+    document.getElementById('sidebar').classList.remove('search-mode');
+    noResults.classList.remove('show');
+    return;
+  }
+
+  document.getElementById('sidebar').classList.add('search-mode');
+  navTree.innerHTML = '';
+  noResults.classList.toggle('show', results.length === 0);
+
+  if (results.length === 0) {
+    navTree.appendChild(noResults);
+    return;
+  }
+
+  results.forEach(function(tool) {
+    var item = document.createElement('a');
+    item.className = 'nav-item';
+    item.href = '#';
+    item.dataset.id = tool.id;
+    item.innerHTML =
+      '<span class="nav-item-icon">' + tool.icon + '</span>' +
+      '<span class="nav-item-name">' + tool.name + '</span>' +
+      '<span style="font-size:10px;color:var(--text-dim);margin-left:4px">' + tool.category + '</span>' +
+      (tool.badge ? '<span class="nav-item-badge ' + tool.badgeType + '">' + tool.badge + '</span>' : '');
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      clearSearch();
+      showTool(tool.id);
+    });
+    navTree.appendChild(item);
+  });
+}
+
+function clearSearch() {
+  var input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  renderSearchResults(null);
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  var q = this.value.trim();
+  document.getElementById('searchClear').classList.toggle('show', q.length > 0);
+  var results = getSearchResults(q);
+  renderSearchResults(results);
+});
+
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') clearSearch();
+});
+
+// ─── INIT ───
+buildNav();
+
+// Open first tool by default if URL has ?tool=xxx
+var params = new URLSearchParams(location.search);
+var initial = params.get('tool');
+if (initial) {
+  var t = TOOLS.find(function(x) { return x.id === initial; });
+  if (t) showTool(t.id);
+}
+</script>
 </body>
 </html>
