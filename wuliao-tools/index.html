@@ -604,7 +604,7 @@ function buildNav() {
       (tool.badge ? '<span class="nav-item-badge ' + tool.badgeType + '">' + tool.badge + '</span>' : '');
     item.addEventListener('click', function(e) {
       e.preventDefault();
-      showTool(tool.id);
+      window.location.href = tool.href;
     });
     allItems.appendChild(item);
   });
@@ -712,8 +712,7 @@ function renderSearchResults(results) {
       (tool.badge ? '<span class="nav-item-badge ' + tool.badgeType + '">' + tool.badge + '</span>' : '');
     item.addEventListener('click', function(e) {
       e.preventDefault();
-      clearSearch();
-      showTool(tool.id);
+      window.location.href = tool.href;
     });
     navTree.appendChild(item);
   });
