@@ -9,7 +9,6 @@
     html, body { width: 100%; height: 100%; overflow: hidden; }
 
     body {
-      /* 纯橙屏，不是浅橙，是那种工程模式原生的深橙 */
       background: #cc6600;
       font-family: "Courier New", Consolas, monospace;
       color: #1a0600;
@@ -17,127 +16,180 @@
       position: relative;
     }
 
-    /* 左上角主内容区 */
-    .content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      padding: 32px 24px;
-      font-size: clamp(11px, 3vw, 14px);
-      line-height: 1.9;
-      letter-spacing: 0.5px;
-    }
-
-    /* 分隔线 */
-    .sep {
-      border: none;
-      border-top: 1px dashed rgba(0,0,0,0.3);
-      margin: 12px 0;
-      width: 100%;
-    }
-
-    /* 底部提示 */
-    .footer {
-      position: absolute;
-      bottom: 24px;
-      left: 24px;
-      font-size: clamp(9px, 2.5vw, 11px);
-      color: rgba(26,6,0,0.5);
-      letter-spacing: 0.5px;
-      animation: blink 2s step-end infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.1; }
-    }
-
-    /* 扫描线 */
-    body::after {
+    /* 扫描线 — 工程屏固有瑕疵感 */
+    body::before {
       content: '';
       position: fixed;
       inset: 0;
       background: repeating-linear-gradient(
         0deg,
         transparent,
-        transparent 3px,
-        rgba(0,0,0,0.04) 3px,
-        rgba(0,0,0,0.04) 4px
+        transparent 2px,
+        rgba(0,0,0,0.05) 2px,
+        rgba(0,0,0,0.05) 4px
       );
       pointer-events: none;
-      z-index: 5;
+      z-index: 10;
     }
 
-    /* 揭晓 */
-    .reveal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.93);
-      z-index: 100;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px;
+    /* 左侧内容 */
+    .left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 28px 20px;
+      font-size: clamp(10px, 2.8vw, 13px);
+      line-height: 2;
+      letter-spacing: 0.3px;
     }
-    .reveal.show { display: flex; }
-    .reveal h2 { font-size: 30px; color: #e8a838; margin-bottom: 14px; }
-    .reveal p { font-size: 15px; color: #aaa; line-height: 1.8; max-width: 280px; }
-    .reveal button {
-      margin-top: 28px; padding: 12px 36px; background: #e8a838;
-      border: none; border-radius: 50px; color: #1a0a00;
-      font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+
+    /* 闪烁光标 */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: #1a0600;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
     }
-    .hint {
-      position: fixed; top: 10px; right: 16px;
-      font-size: 11px; color: rgba(26,6,0,0.4); z-index: 20; pointer-events: none;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* 底部状态栏 */
+    .statusbar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 20px;
+      font-size: clamp(8px, 2vw, 10px);
+      color: rgba(26,6,0,0.55);
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid rgba(0,0,0,0.15);
+      letter-spacing: 0.3px;
+    }
+
+    /* 右上角小闪烁点 */
+    .indicator {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1a0600;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    /* 右侧进度区 */
+    .right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 28px 20px;
+      text-align: right;
+      font-size: clamp(9px, 2.2vw, 11px);
+      line-height: 2;
+      color: rgba(26,6,0,0.6);
+    }
+
+    .progress-label {
+      font-size: clamp(8px, 2vw, 10px);
+      color: rgba(26,6,0,0.45);
+      margin-bottom: 4px;
+    }
+
+    .progress-bar {
+      width: 120px;
+      height: 4px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-left: auto;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1a0600;
+      border-radius: 2px;
+      animation: load 4s linear infinite;
+      width: 0%;
+    }
+    @keyframes load {
+      0% { width: 0%; }
+      40% { width: 60%; }
+      70% { width: 85%; }
+      100% { width: 100%; }
+    }
+
+    .counter {
+      margin-top: 6px;
+      font-size: clamp(8px, 2vw, 10px);
+      color: rgba(26,6,0,0.5);
     }
   </style>
 </head>
 <body>
 
-  <div class="hint">点屏幕揭晓</div>
+  <!-- 右上角状态点 -->
+  <div class="indicator"></div>
 
-  <!-- 左上角贴边，模拟真实工程模式屏幕 -->
-  <div class="content">
-    <div>QUSB_BULK_SN: E8AC606F</div>
-    <div style="margin-top:8px;">Qualcomm CrashDump Mode</div>
-
-    <hr class="sep">
-
-    <div>Sahara: protocol mismatch</div>
-    <div style="margin-top:6px;">FIREHOSE version: 3.1</div>
-    <div>Loader mismatch</div>
-
-    <hr class="sep">
-
-    <div>Device: QCOM_SDM845</div>
-    <div>Memory: 8GB LPDDR4</div>
-    <div>Storage: 256GB UFS</div>
-
-    <hr class="sep">
-
-    <div>Port: QDLoader 9008 (COM3)</div>
-    <div>Status: connected</div>
+  <!-- 左侧主信息 -->
+  <div class="left">
+    <div>QUSB_BULK_SN: E8AC606F<span class="cursor"></span></div>
+    <div style="margin-top:10px;">Qualcomm CrashDump Mode v2.0</div>
+    <div style="border-top:1px dashed rgba(0,0,0,0.25);margin:10px 0;padding-top:10px;">
+      <div>Sahara protocol mismatch</div>
+      <div>FIREHOSE version: 3.1</div>
+      <div>Loader handshake failed</div>
+    </div>
+    <div style="border-top:1px dashed rgba(0,0,0,0.25);padding-top:10px;">
+      <div>HW: QCOM_SDM845</div>
+      <div>RAM: 8GB LPDDR4X</div>
+      <div>eMMC: 256GB UFS</div>
+    </div>
+    <div style="border-top:1px dashed rgba(0,0,0,0.25);margin-top:10px;padding-top:10px;">
+      <div>Port: QDLoader 9008</div>
+      <div>COM: 3&nbsp;&nbsp;Speed: 460800</div>
+      <div>Driver: installed</div>
+    </div>
   </div>
 
-  <div class="footer">[ POWER OFF TO EXIT ]</div>
+  <!-- 右侧进度 -->
+  <div class="right">
+    <div class="progress-label"> analyzing...</div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+    <div class="counter" id="counter">00:00:00</div>
+  </div>
 
-  <!-- 揭晓 -->
-  <div class="reveal" id="reveal">
-    <h2>😂 整蛊成功！</h2>
-    <p>手机其实没坏<br>这是整蛊工具 😄</p>
-    <button onclick="closeReveal()">关闭</button>
+  <!-- 底部状态栏 -->
+  <div class="statusbar">
+    <span>USB: connected</span>
+    <span>Battery: 78%</span>
+    <span>Temp: 36°C</span>
   </div>
 
   <script>
-    document.body.addEventListener('click', () => {
-      document.getElementById('reveal').classList.add('show');
-    });
-    function closeReveal() {
-      document.getElementById('reveal').classList.remove('show');
-    }
+    // 计时器
+    var seconds = 0;
+    setInterval(function() {
+      seconds++;
+      var h = Math.floor(seconds / 3600);
+      var m = Math.floor((seconds % 3600) / 60);
+      var s = seconds % 60;
+      document.getElementById('counter').textContent =
+        String(h).padStart(2,'0') + ':' +
+        String(m).padStart(2,'0') + ':' +
+        String(s).padStart(2,'0');
+    }, 1000);
   </script>
 </body>
 </html>
