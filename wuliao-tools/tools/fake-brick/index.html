@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>手机变砖了</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #ff8c00;
+      --orange-dark: #cc6600;
+      --orange-glow: rgba(255, 140, 0, 0.6);
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --text: #c9b896;
+      --text-dim: #6a6a7a;
+      --primary: #e8a838;
+      --font-mono: "Roboto Mono", "Consolas", "Monaco", monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    /* 顶部提示 */
+    .hint-bar {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    /* 手机框架 */
+    .phone-frame {
+      width: 280px;
+      background: #1a1a24;
+      border-radius: 36px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 1px #2a2a3a,
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+      position: relative;
+    }
+
+    /* 动态金属边框 */
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 36px;
+      padding: 1px;
+      background: linear-gradient(135deg, #4a4a5a 0%, #2a2a3a 50%, #4a4a5a 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* 屏幕 */
+    .screen {
+      background: var(--orange);
+      border-radius: 26px;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      animation: orangePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes orangePulse {
+      0%, 100% { background: #ff8c00; }
+      50% { background: #e07800; }
+    }
+
+    /* 扫描线效果 */
+    .screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 屏幕碎角 */
+    .screen::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 60px;
+      background: radial-gradient(circle at top right, transparent 60%, rgba(0,0,0,0.15) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 顶部状态栏 */
+    .status-bar {
+      position: absolute;
+      top: 12px;
+      left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(0,0,0,0.6);
+      z-index: 2;
+    }
+
+    /* QPST 图标 */
+    .qpst-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 8px rgba(0,0,0,0.3));
+      z-index: 2;
+    }
+
+    /* 主要文字 */
+    .main-text {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: rgba(0,0,0,0.85);
+      text-align: center;
+      letter-spacing: 1px;
+      z-index: 2;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .main-text.large {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    /* 分隔线 */
+    .divider {
+      width: 120px;
+      height: 1px;
+      background: rgba(0,0,0,0.25);
+      margin: 12px 0;
+      z-index: 2;
+    }
+
+    /* 描述文字 */
+    .desc {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(0,0,0,0.6);
+      text-align: center;
+      line-height: 1.8;
+      z-index: 2;
+      max-width: 200px;
+    }
+
+    /* 底部下载提示 */
+    .download-hint {
+      position: absolute;
+      bottom: 20px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: rgba(0,0,0,0.5);
+      text-align: center;
+      z-index: 2;
+      animation: blink 1.2s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* 底部指示条 */
+    .home-bar {
+      width: 100px;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      margin-top: 16px;
+    }
+
+    /* 闪光故障效果 */
+    .glitch {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      pointer-events: none;
+      z-index: 3;
+      animation: glitch 4s steps(1) infinite;
+    }
+
+    @keyframes glitch {
+      0%, 90% { background: rgba(255,255,255,0); }
+      91% { background: rgba(255,255,255,0.08); }
+      92% { background: rgba(255,255,255,0); }
+      93% { background: rgba(255,255,255,0.05); }
+      94% { background: rgba(255,255,255,0); }
+    }
+
+    /* 底部文字 */
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .footer .model {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      opacity: 0.6;
+    }
+
+    /* 全屏警告（点击后触发） */
+    .full-warning {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #1a0a00;
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .full-warning.show { display: flex; }
+
+    .full-warning h2 {
+      font-family: var(--font-mono);
+      color: #ff6b35;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .full-warning p {
+      color: #ffaa77;
+      font-size: 14px;
+      line-height: 1.8;
+      max-width: 300px;
+    }
+
+    .full-warning button {
+      margin-top: 24px;
+      padding: 10px 28px;
+      background: #ff6b35;
+      border: none;
+      border-radius: 50px;
+      color: #1a0a00;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hint-bar">👆 把手机屏幕展示给朋友看，然后点击屏幕</div>
+
+  <div class="phone-frame">
+    <div class="screen" id="screen">
+      <div class="glitch"></div>
+      <div class="status-bar">
+        <span>8:00</span>
+        <span>🔋 0%</span>
+      </div>
+
+      <div class="qpst-icon">🔧</div>
+      <div class="main-text large">⚠️ 系统崩溃</div>
+      <div class="main-text">enter QPST mode!</div>
+
+      <div class="divider"></div>
+
+      <div class="desc">
+        QUALCOMM Product Support Tool<br>
+        <br>
+        Flash failed: 0x7F0007<br>
+        Device ID: QCOM_SDM845<br>
+        SECURE BOOT VIOLATION<br>
+        <br>
+        请连接电脑重新刷机
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="download-hint">[ RECOVERY MODE ACTIVE ]</div>
+    </div>
+    <div class="home-bar"></div>
+  </div>
+
+  <div class="footer">
+    <p>🔧 无厘头工具箱 · 整蛊系列</p>
+    <div class="model">fake-brick v1.0</div>
+  </div>
+
+  <!-- 全屏警告弹窗 -->
+  <div class="full-warning" id="warning">
+    <h2>⚠️ 变砖了！</h2>
+    <p>这是整蛊工具，不是真的坏了 😂<br><br>朋友是不是信以为真了？</p>
+    <button onclick="closeWarning()">关闭</button>
+  </div>
+
+  <script>
+    const screen = document.getElementById('screen');
+    const warning = document.getElementById('warning');
+
+    // 点击屏幕触发整蛊
+    screen.addEventListener('click', () => {
+      warning.classList.add('show');
+    });
+
+    function closeWarning() {
+      warning.classList.remove('show');
+    }
+  </script>
+</body>
+</html>
