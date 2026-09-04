@@ -3,20 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>QPST Mode</title>
+  <title>CrashDump Mode</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
 
     body {
-      background: #ff8c00;
-      font-family: "Courier New", "Consolas", monospace;
-      color: #1a0a00;
+      background: #cc6600;
+      font-family: "Courier New", Consolas, monospace;
+      color: #1a0800;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -33,101 +28,87 @@
       background: repeating-linear-gradient(
         0deg,
         transparent,
-        transparent 3px,
-        rgba(0,0,0,0.04) 3px,
-        rgba(0,0,0,0.04) 4px
+        transparent 2px,
+        rgba(0,0,0,0.06) 2px,
+        rgba(0,0,0,0.06) 4px
       );
       pointer-events: none;
       z-index: 10;
     }
 
-    /* 底部黑边 */
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 8%;
-      background: #1a0a00;
-      z-index: 5;
-    }
-
-    .container {
-      text-align: center;
-      padding: 20px;
+    .screen {
+      width: 100%;
+      max-width: 400px;
+      padding: 32px 28px;
+      text-align: left;
       position: relative;
       z-index: 2;
     }
 
-    /* 主要文字 */
-    .main-msg {
-      font-size: clamp(18px, 5vw, 28px);
+    /* XIAOMI 标题 */
+    .header {
+      font-size: clamp(13px, 4vw, 16px);
       font-weight: 700;
       letter-spacing: 2px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.25);
+      padding-bottom: 10px;
+      margin-bottom: 18px;
     }
 
-    .sub-msg {
-      font-size: clamp(12px, 3.5vw, 16px);
-      letter-spacing: 1px;
-      opacity: 0.75;
-      margin-bottom: 20px;
+    /* 主描述 */
+    .desc {
+      font-size: clamp(10px, 3vw, 12px);
+      line-height: 1.9;
+      opacity: 0.85;
+      margin-bottom: 16px;
     }
 
-    .divider {
-      width: 80%;
-      max-width: 300px;
-      height: 1px;
-      background: rgba(0,0,0,0.2);
-      margin: 16px auto;
+    /* 分隔线 */
+    .sep {
+      border: none;
+      border-top: 1px dashed rgba(0,0,0,0.3);
+      margin: 16px 0;
     }
 
-    /* 信息区域 */
-    .info {
-      font-size: clamp(9px, 2.5vw, 12px);
+    /* 错误信息 */
+    .error {
+      font-size: clamp(9px, 2.8vw, 11px);
       line-height: 2;
       opacity: 0.7;
-      letter-spacing: 0.5px;
     }
 
-    .info-row {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
+    /* 状态行 */
+    .status {
+      font-size: clamp(9px, 2.8vw, 11px);
+      line-height: 2;
+      opacity: 0.6;
+      margin-top: 12px;
     }
 
-    .info-item {
-      white-space: nowrap;
-    }
-
-    /* 底部提示 */
-    .footer-hint {
+    /* 底部指示 */
+    .footer {
       position: fixed;
-      bottom: 2%;
-      left: 0;
-      right: 0;
+      bottom: 18px;
+      left: 0; right: 0;
       text-align: center;
-      font-size: clamp(8px, 2vw, 10px);
-      color: #cc6600;
-      letter-spacing: 1px;
-      z-index: 6;
-      animation: blink 1.5s step-end infinite;
+      font-size: clamp(8px, 2.2vw, 10px);
+      color: rgba(26,8,0,0.5);
+      letter-spacing: 0.5px;
+      z-index: 5;
+      animation: blink 2s step-end infinite;
     }
 
     @keyframes blink {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
+      50% { opacity: 0.15; }
     }
 
-    /* 整蛊揭晓 */
-    .reveal-overlay {
+    /* 揭晓 */
+    .reveal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0,0,0,0.93);
       z-index: 100;
       flex-direction: column;
       align-items: center;
@@ -135,26 +116,23 @@
       text-align: center;
       padding: 40px;
     }
+    .reveal.show { display: flex; }
 
-    .reveal-overlay.show { display: flex; }
-
-    .reveal-title {
-      font-size: 32px;
-      color: #ff8c00;
-      margin-bottom: 16px;
+    .reveal h2 {
+      font-size: 30px;
+      color: #e8a838;
+      margin-bottom: 14px;
     }
-
-    .reveal-text {
-      font-size: 16px;
-      color: #ccc;
+    .reveal p {
+      font-size: 15px;
+      color: #aaa;
       line-height: 1.8;
-      max-width: 300px;
+      max-width: 280px;
     }
-
-    .reveal-close {
+    .reveal button {
       margin-top: 28px;
       padding: 12px 36px;
-      background: #ff8c00;
+      background: #e8a838;
       border: none;
       border-radius: 50px;
       color: #1a0a00;
@@ -164,15 +142,13 @@
       font-family: inherit;
     }
 
-    /* hint bar */
     .hint {
       position: fixed;
-      top: 12px;
-      left: 0;
-      right: 0;
+      top: 10px;
+      left: 0; right: 0;
       text-align: center;
-      font-size: 12px;
-      color: rgba(26,10,0,0.5);
+      font-size: 11px;
+      color: rgba(26,8,0,0.45);
       z-index: 20;
       pointer-events: none;
     }
@@ -180,44 +156,42 @@
 </head>
 <body>
 
-  <div class="hint">👆 把屏幕展示给朋友看，然后点击屏幕</div>
+  <div class="hint">👆 把屏幕展示给朋友看，然后点一下屏幕</div>
 
-  <div class="container">
-    <div class="main-msg">⚠ enter QPST mode!</div>
-    <div class="sub-msg">QPST — Qualcomm Product Support Tool</div>
+  <div class="screen">
+    <div class="header">XIAOMI CrashDump Mode</div>
 
-    <div class="divider"></div>
+    <div class="desc">
+      Your device has crashed,<br>
+      you can either get full memory dump using qpst,<br>
+      or select to save it in fact partition!
+    </div>
 
-    <div class="info">
-      <div class="info-row">
-        <span class="info-item">Flash failed: 0x7F0007</span>
-        <span class="info-item">SOC: QCOM_SDM845</span>
-      </div>
-      <div style="margin-top:6px;">SECURE BOOT VIOLATION</div>
-      <div style="margin-top:6px;">Device ID: QDLoader 9008 (COM3)</div>
-      <div style="margin-top:6px;">————————————</div>
-      <div style="margin-top:6px;">Please connect to PC and run QPST</div>
+    <hr class="sep">
+
+    <div class="error">
+      Ramdump partition not found,<br>
+      enter QPST mode!
+    </div>
+
+    <div class="status">
+      Dump Region — all ok
     </div>
   </div>
 
-  <div class="footer-hint">[ RECOVERY MODE ACTIVE ]</div>
+  <div class="footer">[ POWER OFF TO EXIT ]</div>
 
   <!-- 揭晓 -->
-  <div class="reveal-overlay" id="reveal">
-    <div class="reveal-title">😂 整蛊成功！</div>
-    <div class="reveal-text">
-      手机其实没坏<br>
-      这是整蛊工具 😄<br><br>
-      朋友的表情精彩吗？
-    </div>
-    <button class="reveal-close" onclick="closeReveal()">关闭</button>
+  <div class="reveal" id="reveal">
+    <h2>😂 整蛊成功！</h2>
+    <p>手机其实没坏<br>这是整蛊工具 😄</p>
+    <button onclick="closeReveal()">关闭</button>
   </div>
 
   <script>
     document.body.addEventListener('click', () => {
       document.getElementById('reveal').classList.add('show');
     });
-
     function closeReveal() {
       document.getElementById('reveal').classList.remove('show');
     }
