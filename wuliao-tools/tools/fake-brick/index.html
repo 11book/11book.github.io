@@ -3,104 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CrashDump Mode</title>
+  <title>QPST</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
 
     body {
+      /* 纯橙屏，不是浅橙，是那种工程模式原生的深橙 */
       background: #cc6600;
       font-family: "Courier New", Consolas, monospace;
-      color: #1a0800;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      color: #1a0600;
       min-height: 100vh;
       position: relative;
     }
 
-    /* 扫描线 */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.06) 2px,
-        rgba(0,0,0,0.06) 4px
-      );
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .screen {
-      width: 100%;
-      max-width: 400px;
-      padding: 32px 28px;
-      text-align: left;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* XIAOMI 标题 */
-    .header {
-      font-size: clamp(13px, 4vw, 16px);
-      font-weight: 700;
-      letter-spacing: 2px;
-      border-bottom: 1px solid rgba(0,0,0,0.25);
-      padding-bottom: 10px;
-      margin-bottom: 18px;
-    }
-
-    /* 主描述 */
-    .desc {
-      font-size: clamp(10px, 3vw, 12px);
+    /* 左上角主内容区 */
+    .content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 32px 24px;
+      font-size: clamp(11px, 3vw, 14px);
       line-height: 1.9;
-      opacity: 0.85;
-      margin-bottom: 16px;
+      letter-spacing: 0.5px;
     }
 
     /* 分隔线 */
     .sep {
       border: none;
       border-top: 1px dashed rgba(0,0,0,0.3);
-      margin: 16px 0;
+      margin: 12px 0;
+      width: 100%;
     }
 
-    /* 错误信息 */
-    .error {
-      font-size: clamp(9px, 2.8vw, 11px);
-      line-height: 2;
-      opacity: 0.7;
-    }
-
-    /* 状态行 */
-    .status {
-      font-size: clamp(9px, 2.8vw, 11px);
-      line-height: 2;
-      opacity: 0.6;
-      margin-top: 12px;
-    }
-
-    /* 底部指示 */
+    /* 底部提示 */
     .footer {
-      position: fixed;
-      bottom: 18px;
-      left: 0; right: 0;
-      text-align: center;
-      font-size: clamp(8px, 2.2vw, 10px);
-      color: rgba(26,8,0,0.5);
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      font-size: clamp(9px, 2.5vw, 11px);
+      color: rgba(26,6,0,0.5);
       letter-spacing: 0.5px;
-      z-index: 5;
       animation: blink 2s step-end infinite;
     }
 
     @keyframes blink {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.15; }
+      50% { opacity: 0.1; }
+    }
+
+    /* 扫描线 */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.04) 3px,
+        rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 5;
     }
 
     /* 揭晓 */
@@ -117,66 +82,44 @@
       padding: 40px;
     }
     .reveal.show { display: flex; }
-
-    .reveal h2 {
-      font-size: 30px;
-      color: #e8a838;
-      margin-bottom: 14px;
-    }
-    .reveal p {
-      font-size: 15px;
-      color: #aaa;
-      line-height: 1.8;
-      max-width: 280px;
-    }
+    .reveal h2 { font-size: 30px; color: #e8a838; margin-bottom: 14px; }
+    .reveal p { font-size: 15px; color: #aaa; line-height: 1.8; max-width: 280px; }
     .reveal button {
-      margin-top: 28px;
-      padding: 12px 36px;
-      background: #e8a838;
-      border: none;
-      border-radius: 50px;
-      color: #1a0a00;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
+      margin-top: 28px; padding: 12px 36px; background: #e8a838;
+      border: none; border-radius: 50px; color: #1a0a00;
+      font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
     }
-
     .hint {
-      position: fixed;
-      top: 10px;
-      left: 0; right: 0;
-      text-align: center;
-      font-size: 11px;
-      color: rgba(26,8,0,0.45);
-      z-index: 20;
-      pointer-events: none;
+      position: fixed; top: 10px; right: 16px;
+      font-size: 11px; color: rgba(26,6,0,0.4); z-index: 20; pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="hint">👆 把屏幕展示给朋友看，然后点一下屏幕</div>
+  <div class="hint">点屏幕揭晓</div>
 
-  <div class="screen">
-    <div class="header">XIAOMI CrashDump Mode</div>
-
-    <div class="desc">
-      Your device has crashed,<br>
-      you can either get full memory dump using qpst,<br>
-      or select to save it in fact partition!
-    </div>
+  <!-- 左上角贴边，模拟真实工程模式屏幕 -->
+  <div class="content">
+    <div>QUSB_BULK_SN: E8AC606F</div>
+    <div style="margin-top:8px;">Qualcomm CrashDump Mode</div>
 
     <hr class="sep">
 
-    <div class="error">
-      Ramdump partition not found,<br>
-      enter QPST mode!
-    </div>
+    <div>Sahara: protocol mismatch</div>
+    <div style="margin-top:6px;">FIREHOSE version: 3.1</div>
+    <div>Loader mismatch</div>
 
-    <div class="status">
-      Dump Region — all ok
-    </div>
+    <hr class="sep">
+
+    <div>Device: QCOM_SDM845</div>
+    <div>Memory: 8GB LPDDR4</div>
+    <div>Storage: 256GB UFS</div>
+
+    <hr class="sep">
+
+    <div>Port: QDLoader 9008 (COM3)</div>
+    <div>Status: connected</div>
   </div>
 
   <div class="footer">[ POWER OFF TO EXIT ]</div>
