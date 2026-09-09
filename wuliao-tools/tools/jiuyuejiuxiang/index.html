@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>九月九日忆山东兄弟</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a0e06;
+      --surface: #2d1a0a;
+      --text: #f5e6d0;
+      --text-dim: #c4a882;
+      --accent: #d4832a;
+      --accent-light: #e8a44a;
+      --gold: #f0c060;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 山峦背景 */
+    .mountains {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .mountain-layer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .mountain-layer svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 飘落叶子 */
+    .leaf {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 0 50% 50% 50%;
+      transform: rotate(45deg);
+      opacity: 0;
+      animation: fall linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes fall {
+      0% { opacity: 0; transform: rotate(45deg) translateY(-10vh) translateX(0); }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.5; }
+      100% { opacity: 0; transform: rotate(405deg) translateY(105vh) translateX(40px); }
+    }
+
+    /* 主内容 */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* 日期标签 */
+    .date-tag {
+      display: inline-block;
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: var(--accent-light);
+      text-transform: uppercase;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.3s forwards;
+    }
+
+    /* 诗歌区 */
+    .poem-section {
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.6s forwards;
+    }
+
+    .poem-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(28px, 7vw, 42px);
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 6px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .poem-body {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 300;
+      color: var(--text-dim);
+      line-height: 2.4;
+      letter-spacing: 4px;
+    }
+
+    .poem-body .line {
+      display: block;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .poem-body .line:nth-child(1) { animation-delay: 0.9s; }
+    .poem-body .line:nth-child(2) { animation-delay: 1.1s; }
+    .poem-body .line:nth-child(3) { animation-delay: 1.3s; }
+    .poem-body .line:nth-child(4) { animation-delay: 1.5s; }
+
+    /* 分隔线 */
+    .divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      margin: 0 auto 56px;
+      opacity: 0;
+      animation: fadeIn 1s ease 1.8s forwards;
+    }
+
+    /* 说明区 */
+    .note-section {
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 1s ease 2.0s forwards;
+    }
+
+    .note-label {
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .note-text {
+      font-size: clamp(14px, 3.8vw, 17px);
+      color: var(--text-dim);
+      line-height: 2;
+      font-weight: 300;
+    }
+
+    /* 核心信息 */
+    .core-section {
+      opacity: 0;
+      animation: fadeUp 1s ease 2.4s forwards;
+    }
+
+    .core-section p {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(16px, 4.2vw, 20px);
+      font-weight: 300;
+      color: var(--text);
+      line-height: 2.2;
+      letter-spacing: 2px;
+    }
+
+    .core-section .highlight {
+      color: var(--accent-light);
+      font-weight: 400;
+    }
+
+    .core-section .big-text {
+      display: block;
+      font-size: clamp(22px, 6vw, 34px);
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 8px;
+      margin-top: 8px;
+    }
+
+    /* 署名 */
+    .signature {
+      margin-top: 72px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 1s ease 2.8s forwards;
+    }
+
+    .signature .author {
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: var(--accent);
+    }
+
+    .signature .year {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      letter-spacing: 2px;
+      opacity: 0.6;
+    }
+
+    /* 动画 */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* 背景光晕 */
+    .glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,131,42,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 { top: -200px; left: 50%; transform: translateX(-50%); }
+    .glow-2 { bottom: -300px; right: -200px; }
+  </style>
+</head>
+<body>
+
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <!-- 山峦背景 -->
+  <div class="mountains">
+    <div class="mountain-layer" style="opacity:0.25">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none">
+        <path fill="#d4832a" d="M0,400 L0,250 Q180,150 360,220 Q540,290 720,180 Q900,70 1080,160 Q1260,250 1440,200 L1440,400 Z"/>
+      </svg>
+    </div>
+    <div class="mountain-layer" style="opacity:0.15">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none">
+        <path fill="#e8a44a" d="M0,400 L0,300 Q240,200 480,280 Q720,360 960,260 Q1200,160 1440,240 L1440,400 Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 飘落叶子容器 -->
+  <div id="leaves"></div>
+
+  <div class="container">
+
+    <div class="date-tag">农历九月初九 · 重阳节</div>
+
+    <div class="poem-section">
+      <div class="poem-title">九月九日忆山东兄弟</div>
+      <div class="poem-body">
+        <span class="line">独在异乡为异客，</span>
+        <span class="line">每逢佳节倍思亲。</span>
+        <span class="line">遥知兄弟登高处，</span>
+        <span class="line">遍插茱萸少一人。</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="note-section">
+      <div class="note-label">诗说</div>
+      <div class="note-text">
+        王维，山西永济人。<br>
+        "山东"——华山以东，非山东省。<br>
+        今日重阳，借诗忆故人。
+      </div>
+    </div>
+
+    <div class="core-section">
+      <p>
+        我是<span class="highlight">山东</span>的，<br>
+        山西的朋友，你们好吗？
+        <span class="big-text">想念你们 🍂</span>
+      </p>
+    </div>
+
+    <div class="signature">
+      <div class="author">—— 致我的山西兄弟</div>
+      <div class="year">二〇二六年九月九日</div>
+    </div>
+
+  </div>
+
+  <script>
+    // 生成飘落叶子
+    const leafContainer = document.getElementById('leaves');
+    const leafCount = 12;
+
+    for (let i = 0; i < leafCount; i++) {
+      const leaf = document.createElement('div');
+      leaf.className = 'leaf';
+      leaf.style.left = Math.random() * 100 + 'vw';
+      leaf.style.animationDuration = (6 + Math.random() * 8) + 's';
+      leaf.style.animationDelay = Math.random() * 10 + 's';
+      leaf.style.width = (10 + Math.random() * 12) + 'px';
+      leaf.style.height = leaf.style.width;
+      leafContainer.appendChild(leaf);
+    }
+  </script>
+
+</body>
+</html>
