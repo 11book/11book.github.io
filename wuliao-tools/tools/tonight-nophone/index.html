@@ -11,8 +11,8 @@
 
     body {
       font-family: "Noto Serif SC", serif;
-      background: #080505;
-      color: #d0d0d0;
+      background: #101010;
+      color: #f0f0f0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -32,8 +32,8 @@
       font-size: clamp(14px, 3.5vw, 18px);
       font-weight: 300;
       letter-spacing: 4px;
-      color: #888;
-      margin-bottom: 40px;
+      color: #a0a0a0;
+      margin-bottom: 36px;
       opacity: 0;
       animation: fadeUp 1s ease 0.4s forwards;
     }
@@ -42,15 +42,15 @@
       font-size: clamp(15px, 4vw, 20px);
       font-weight: 300;
       letter-spacing: 3px;
-      color: #aaa;
-      margin-bottom: 56px;
+      color: #c0c0c0;
+      margin-bottom: 48px;
       opacity: 0;
       animation: fadeUp 1s ease 0.7s forwards;
     }
 
     /* 核心区 */
     .core {
-      margin-bottom: 56px;
+      margin-bottom: 52px;
     }
 
     .core .line {
@@ -63,32 +63,30 @@
       font-size: clamp(13px, 3.2vw, 17px);
       font-weight: 300;
       letter-spacing: 4px;
-      color: #888;
+      color: #a0a0a0;
       line-height: 2.8;
     }
 
     .line-red {
-      font-size: clamp(28px, 7.5vw, 52px);
+      font-size: clamp(30px, 8vw, 56px);
       font-weight: 900;
-      color: #c84040;
+      color: #ff4040;
       letter-spacing: 4px;
       line-height: 1.5;
-      text-shadow: 0 0 30px rgba(200,64,64,0.4);
     }
 
-    .line-red-small {
-      font-size: clamp(18px, 4.5vw, 28px);
+    .line-red-mid {
+      font-size: clamp(22px, 5.5vw, 36px);
       font-weight: 700;
-      color: #c84040;
-      letter-spacing: 4px;
-      line-height: 2.4;
-      text-shadow: 0 0 20px rgba(200,64,64,0.3);
+      color: #ff4040;
+      letter-spacing: 3px;
+      line-height: 2;
     }
 
-    .line-grey {
-      font-size: clamp(20px, 5vw, 30px);
+    .line-light {
+      font-size: clamp(16px, 4vw, 22px);
       font-weight: 400;
-      color: #888;
+      color: #c8c8c8;
       letter-spacing: 6px;
       line-height: 2.2;
     }
@@ -99,10 +97,7 @@
     .core .line:nth-child(3) { animation-delay: 1.6s; }
     .core .line:nth-child(4) { animation-delay: 1.9s; }
 
-    /* 分隔 */
-    .gap {
-      height: 48px;
-    }
+    .gap { height: 32px; }
 
     /* 底部 */
     .bottom {
@@ -114,7 +109,7 @@
       display: block;
       font-size: clamp(11px, 2.8vw, 14px);
       font-weight: 300;
-      color: #555;
+      color: #707070;
       letter-spacing: 3px;
       line-height: 2.4;
     }
@@ -130,7 +125,7 @@
     }
 
     ::selection {
-      background: rgba(200,64,64,0.2);
+      background: rgba(255,64,64,0.2);
     }
   </style>
 </head>
@@ -146,7 +141,7 @@
       <span class="line line-normal">好好看书 &nbsp;好好工作 &nbsp;好好休息</span>
       <div class="gap"></div>
       <span class="line line-red">但你还是刷到了我</span>
-      <span class="line line-grey">我们都是这样</span>
+      <span class="line line-light">我们都是这样</span>
     </div>
 
     <div class="bottom">
