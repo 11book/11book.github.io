@@ -21,7 +21,6 @@
       position: relative;
     }
 
-    /* 手绘云朵 */
     .cloud {
       position: fixed;
       background: rgba(255,255,255,0.25);
@@ -38,7 +37,6 @@
       50% { transform: translateY(-12px) translateX(8px); }
     }
 
-    /* 远山剪影 */
     .hills {
       position: fixed;
       bottom: 0;
@@ -50,7 +48,6 @@
 
     .hills svg { width: 100%; height: 100%; }
 
-    /* 飘叶 */
     .leaf {
       position: fixed;
       width: 20px;
@@ -70,7 +67,6 @@
       100% { opacity: 0; transform: rotate(405deg) translateY(105vh) translateX(50px); }
     }
 
-    /* 内容 */
     .container {
       position: relative;
       z-index: 2;
@@ -79,7 +75,7 @@
     }
 
     .title {
-      font-size: clamp(20px, 5vw, 30px);
+      font-size: clamp(22px, 5.5vw, 34px);
       letter-spacing: 6px;
       color: #5a2a0a;
       margin-bottom: 48px;
@@ -87,7 +83,12 @@
       opacity: 0;
       animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
     }
-    .title .red { color: #c83010; }
+
+    .title .hl {
+      color: #8B0000;
+      font-weight: bold;
+    }
+
     .poem {
       font-size: clamp(20px, 5vw, 30px);
       line-height: 2.8;
@@ -113,14 +114,18 @@
     }
 
     .greeting {
-      font-size: clamp(22px, 6vw, 38px);
+      font-size: clamp(24px, 6.5vw, 40px);
       letter-spacing: 10px;
       color: #7a3010;
       opacity: 0;
       animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.8s forwards;
     }
 
-    /* 手绘装饰线 */
+    .greeting .hl {
+      color: #8B0000;
+      font-weight: bold;
+    }
+
     .deco-line {
       position: fixed;
       bottom: 28px;
@@ -144,11 +149,8 @@
 
   <div class="hills">
     <svg viewBox="0 0 1440 500" preserveAspectRatio="none">
-      <!-- 山1 -->
       <path fill="#b85c28" opacity="0.6" d="M0,500 L0,350 Q180,250 360,320 Q540,390 720,280 Q900,170 1080,260 Q1260,350 1440,300 L1440,500 Z"/>
-      <!-- 山2 -->
       <path fill="#d4784a" opacity="0.5" d="M0,500 L0,400 Q300,320 540,380 Q780,440 1020,360 Q1260,280 1440,360 L1440,500 Z"/>
-      <!-- 树 -->
       <circle cx="120" cy="420" r="40" fill="#a04a1a" opacity="0.5"/>
       <circle cx="200" cy="400" r="30" fill="#a04a1a" opacity="0.4"/>
       <circle cx="1300" cy="410" r="35" fill="#a04a1a" opacity="0.5"/>
@@ -159,14 +161,14 @@
   <div id="leaves"></div>
 
   <div class="container">
-    <div class="title">九月九日忆<span class="red">山东</span>兄弟</div>
+    <div class="title">九月九日忆<span class="hl">山东</span>兄弟</div>
     <div class="poem">
       <span class="line">独在异乡为异客，</span>
       <span class="line">每逢佳节倍思亲。</span>
       <span class="line">遥知兄弟登高处，</span>
       <span class="line">遍插茱萸少一人。</span>
     </div>
-    <div class="greeting"><span class="red">山西</span>的朋友，你们好吗？</div>
+    <div class="greeting"><span class="hl">山西</span>的朋友，你们好吗？</div>
   </div>
 
   <div class="deco-line"></div>
