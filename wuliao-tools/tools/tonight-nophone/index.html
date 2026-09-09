@@ -5,165 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>致——说今晚不刷手机的你</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: "Noto Serif SC", serif;
-      background: #0a0a0a;
-      color: #e0e0e0;
+      background: #080505;
+      color: #d0d0d0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      position: relative;
-    }
-
-    /* 微光背景 */
-    .glow {
-      position: fixed;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(80,80,120,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .glow-1 { top: -150px; left: 50%; transform: translateX(-50%); }
-    .glow-2 { bottom: -200px; right: -100px; }
-
-    /* 屏幕竖线装饰 */
-    .screen-line {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      width: 1px;
-      height: 100%;
-      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.03) 70%, transparent);
-      pointer-events: none;
     }
 
     .container {
-      position: relative;
-      z-index: 2;
-      max-width: 560px;
-      padding: 0 36px;
+      max-width: 600px;
+      padding: 0 40px;
       text-align: center;
     }
 
-    /* 标题 */
-    .title {
-      font-size: clamp(20px, 5.5vw, 30px);
+    /* 开场 */
+    .open {
+      font-size: clamp(14px, 3.5vw, 18px);
       font-weight: 300;
-      letter-spacing: 8px;
-      color: #c0c0c0;
-      margin-bottom: 64px;
+      letter-spacing: 4px;
+      color: #888;
+      margin-bottom: 40px;
       opacity: 0;
-      animation: fadeUp 1.5s ease 0.5s forwards;
+      animation: fadeUp 1s ease 0.4s forwards;
     }
 
-    /* 主体文字 */
-    .main-text {
-      font-size: clamp(17px, 4.5vw, 24px);
+    .open-question {
+      font-size: clamp(15px, 4vw, 20px);
       font-weight: 300;
-      line-height: 2.4;
       letter-spacing: 3px;
-      color: #b0b0b0;
-      margin-bottom: 72px;
-      text-align: left;
+      color: #aaa;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.7s forwards;
     }
 
-    .main-text .line {
+    /* 核心区 */
+    .core {
+      margin-bottom: 56px;
+    }
+
+    .core .line {
       display: block;
       opacity: 0;
-      animation: fadeUp 1.2s ease forwards;
+      animation: fadeUp 1s ease forwards;
     }
-    .main-text .line:nth-child(1) { animation-delay: 0.8s; }
-    .main-text .line:nth-child(2) { animation-delay: 1.1s; }
-    .main-text .line:nth-child(3) { animation-delay: 1.4s; }
-    .main-text .line:nth-child(4) { animation-delay: 1.7s; }
-    .main-text .line:nth-child(5) { animation-delay: 2.0s; }
-    .main-text .line:nth-child(6) { animation-delay: 2.3s; }
 
-    .main-text .highlight {
-      color: #d0d0d0;
-      font-weight: 400;
+    .line-normal {
+      font-size: clamp(13px, 3.2vw, 17px);
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: #888;
+      line-height: 2.8;
     }
+
+    .line-red {
+      font-size: clamp(28px, 7.5vw, 52px);
+      font-weight: 900;
+      color: #c84040;
+      letter-spacing: 4px;
+      line-height: 1.5;
+      text-shadow: 0 0 30px rgba(200,64,64,0.4);
+    }
+
+    .line-red-small {
+      font-size: clamp(18px, 4.5vw, 28px);
+      font-weight: 700;
+      color: #c84040;
+      letter-spacing: 4px;
+      line-height: 2.4;
+      text-shadow: 0 0 20px rgba(200,64,64,0.3);
+    }
+
+    .line-grey {
+      font-size: clamp(20px, 5vw, 30px);
+      font-weight: 400;
+      color: #888;
+      letter-spacing: 6px;
+      line-height: 2.2;
+    }
+
+    /* 动画时序 */
+    .core .line:nth-child(1) { animation-delay: 1.0s; }
+    .core .line:nth-child(2) { animation-delay: 1.3s; }
+    .core .line:nth-child(3) { animation-delay: 1.6s; }
+    .core .line:nth-child(4) { animation-delay: 1.9s; }
 
     /* 分隔 */
-    .divider {
-      width: 40px;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
-      margin: 0 auto 56px;
+    .gap {
+      height: 48px;
+    }
+
+    /* 底部 */
+    .bottom {
       opacity: 0;
-      animation: fadeIn 1s ease 2.6s forwards;
+      animation: fadeIn 1s ease 2.4s forwards;
     }
 
-    /* 行动区 */
-    .action {
-      opacity: 0;
-      animation: fadeUp 1.2s ease 2.8s forwards;
-    }
-
-    .action p {
-      font-size: clamp(15px, 3.8vw, 19px);
+    .bottom .line {
+      display: block;
+      font-size: clamp(11px, 2.8vw, 14px);
       font-weight: 300;
-      color: #888;
-      letter-spacing: 2px;
-      line-height: 2;
-      margin-bottom: 48px;
-    }
-
-    .action .highlight {
-      color: #a0a0a0;
-      font-weight: 400;
-    }
-
-    /* 按钮 */
-    .btn {
-      display: inline-block;
-      padding: 14px 40px;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 100px;
-      font-size: 14px;
-      letter-spacing: 6px;
-      color: #707070;
-      font-family: "Noto Serif SC", serif;
-      font-weight: 300;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      margin: 0 8px 16px;
-    }
-
-    .btn:hover {
-      border-color: rgba(255,255,255,0.3);
-      color: #b0b0b0;
-      background: rgba(255,255,255,0.03);
-    }
-
-    .btn.active {
-      border-color: rgba(200,180,140,0.4);
-      color: #c0b080;
-    }
-
-    /* 底部滚动提示 */
-    .scroll-hint {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
+      color: #555;
       letter-spacing: 3px;
-      color: #444;
-      opacity: 0;
-      animation: fadeIn 1s ease 3.5s forwards;
+      line-height: 2.4;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(18px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -172,66 +129,32 @@
       to { opacity: 1; }
     }
 
-    /* 选中文字颜色 */
     ::selection {
-      background: rgba(200,180,140,0.2);
-      color: #d0d0d0;
+      background: rgba(200,64,64,0.2);
     }
   </style>
 </head>
 <body>
 
-  <div class="glow glow-1"></div>
-  <div class="glow glow-2"></div>
-  <div class="screen-line"></div>
-
   <div class="container">
 
-    <div class="title">致——说今晚不刷手机的你</div>
+    <div class="open">刷到这个的你</div>
+    <div class="open-question">是不是说过——</div>
 
-    <div class="main-text">
-      <span class="line">你说过，今晚不刷抖音了。</span>
-      <span class="line">不刷视频了。</span>
-      <span class="line">好好学习，好好工作，好好休息。</span>
-      <span class="line"></span>
-      <span class="line">但你还是刷到了我。</span>
-      <span class="line">就像我一样。</span>
+    <div class="core">
+      <span class="line line-red">今晚不刷了</span>
+      <span class="line line-normal">好好看书 &nbsp;好好工作 &nbsp;好好休息</span>
+      <div class="gap"></div>
+      <span class="line line-red">但你还是刷到了我</span>
+      <span class="line line-grey">我们都是这样</span>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="action">
-      <p>如果<span class="highlight">是</span>，关掉手机吧。<br>如果不是，<br>继续往下滑。</p>
-      <div>
-        <span class="btn" id="btn-yes">是，关掉</span>
-        <span class="btn" id="btn-no">继续刷</span>
-      </div>
+    <div class="bottom">
+      <span class="line">如果是，就关掉手机</span>
+      <span class="line">如果不是，就继续往下滑</span>
     </div>
 
   </div>
-
-  <div class="scroll-hint">↓ 继续</div>
-
-  <script>
-    const btnYes = document.getElementById('btn-yes');
-    const btnNo = document.getElementById('btn-no');
-
-    btnYes.addEventListener('click', () => {
-      btnYes.classList.add('active');
-      btnNo.style.opacity = '0.3';
-      btnNo.style.pointerEvents = 'none';
-      document.querySelector('.action p').innerHTML =
-        '谢谢你。<br><span style="color:#707070;font-size:14px;letter-spacing:4px;margin-top:16px;display:block">晚安。</span>';
-    });
-
-    btnNo.addEventListener('click', () => {
-      btnNo.classList.add('active');
-      btnYes.style.opacity = '0.3';
-      btnYes.style.pointerEvents = 'none';
-      document.querySelector('.action p').innerHTML =
-        '没关系。<br>我们都一样。';
-    });
-  </script>
 
 </body>
 </html>
