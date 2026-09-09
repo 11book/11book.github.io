@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>致——说今晚不刷手机的你</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Serif SC", serif;
+      background: #faf8f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      padding: 0 40px;
+      text-align: center;
+    }
+
+    .open {
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: #888;
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.4s forwards;
+    }
+
+    .open-question {
+      font-size: clamp(15px, 4vw, 20px);
+      font-weight: 300;
+      letter-spacing: 3px;
+      color: #555;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.7s forwards;
+    }
+
+    .core {
+      margin-bottom: 52px;
+    }
+
+    .core .line {
+      display: block;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .line-normal {
+      font-size: clamp(13px, 3.2vw, 17px);
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: #888;
+      line-height: 2.8;
+    }
+
+    .line-red {
+      font-size: clamp(30px, 8vw, 56px);
+      font-weight: 900;
+      color: #e63030;
+      letter-spacing: 4px;
+      line-height: 1.5;
+    }
+
+    .line-light {
+      font-size: clamp(16px, 4vw, 22px);
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 6px;
+      line-height: 2.2;
+    }
+
+    .core .line:nth-child(1) { animation-delay: 1.0s; }
+    .core .line:nth-child(2) { animation-delay: 1.3s; }
+    .core .line:nth-child(3) { animation-delay: 1.6s; }
+    .core .line:nth-child(4) { animation-delay: 1.9s; }
+
+    .gap { height: 32px; }
+
+    .bottom {
+      opacity: 0;
+      animation: fadeIn 1s ease 2.4s forwards;
+    }
+
+    .bottom .line {
+      display: block;
+      font-size: clamp(11px, 2.8vw, 14px);
+      font-weight: 300;
+      color: #aaa;
+      letter-spacing: 3px;
+      line-height: 2.4;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    ::selection {
+      background: rgba(230,48,48,0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="open">刷到这个的你</div>
+    <div class="open-question">是不是说过——</div>
+
+    <div class="core">
+      <span class="line line-red">今晚不刷了</span>
+      <span class="line line-normal">好好看书 &nbsp;好好工作 &nbsp;好好休息</span>
+      <div class="gap"></div>
+      <span class="line line-red">但你还是刷到了我</span>
+      <span class="line line-light">我们都是这样</span>
+    </div>
+
+    <div class="bottom">
+      <span class="line">如果是，就关掉手机</span>
+      <span class="line">如果不是，就继续往下滑</span>
+    </div>
+
+  </div>
+
+</body>
+</html>
