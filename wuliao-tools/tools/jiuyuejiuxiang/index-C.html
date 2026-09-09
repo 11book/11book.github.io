@@ -42,8 +42,8 @@
     }
 
     .title {
-      font-size: clamp(18px, 4.5vw, 26px);
-      font-weight: 300;
+      font-size: clamp(16px, 4vw, 24px);
+      font-weight: 200;
       letter-spacing: 12px;
       color: #2a2a2a;
       margin-bottom: 56px;
@@ -52,19 +52,20 @@
     }
 
     .title .hl {
-      color: #1a1a1a;
-      font-weight: 400;
-      text-decoration: underline;
-      text-underline-offset: 6px;
-      text-decoration-thickness: 1.5px;
+      color: #000;
+      font-weight: 700;
+      font-size: 1.5em;
+      letter-spacing: 2px;
+      border-bottom: 3px solid #000;
+      padding-bottom: 2px;
     }
 
     .poem {
-      font-size: clamp(16px, 4vw, 22px);
+      font-size: clamp(15px, 3.8vw, 20px);
       font-weight: 200;
       line-height: 3;
       letter-spacing: 12px;
-      color: #aaa;
+      color: #bbb;
       margin-bottom: 80px;
     }
 
@@ -95,20 +96,24 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .greeting {
-      font-size: clamp(18px, 4.5vw, 26px);
-      font-weight: 300;
+      font-size: clamp(16px, 4vw, 24px);
+      font-weight: 200;
       letter-spacing: 8px;
       color: #2a2a2a;
+      line-height: 2;
       opacity: 0;
       animation: fadeUp 1.2s ease 2.5s forwards;
     }
 
     .greeting .hl {
-      color: #1a1a1a;
-      font-weight: 400;
-      text-decoration: underline;
-      text-underline-offset: 6px;
-      text-decoration-thickness: 1.5px;
+      display: block;
+      color: #000;
+      font-weight: 700;
+      font-size: 1.5em;
+      letter-spacing: 4px;
+      border-bottom: 3px solid #000;
+      padding-bottom: 2px;
+      margin-bottom: 6px;
     }
 
     .bottom-line {
@@ -150,7 +155,7 @@
       <span class="line">遍插茱萸少一人。</span>
     </div>
     <div class="mid-line"></div>
-    <div class="greeting"><span class="hl">山西</span>的朋友，你们好吗？</div>
+    <div class="greeting"><span class="hl">山西</span><br>的朋友，你们好吗？</div>
   </div>
 
   <div class="bottom-line"></div>
