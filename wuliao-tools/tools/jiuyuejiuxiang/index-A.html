@@ -60,14 +60,21 @@
       padding: 0 32px;
     }
 
+    .title {
+      font-size: clamp(20px, 5vw, 30px);
+      font-weight: 400;
+      letter-spacing: 8px;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeIn 1.5s ease 0.3s forwards;
+    }
+    .title .red { color: #d4832a; font-weight: 600; }
     .poem {
       font-size: clamp(18px, 4.5vw, 28px);
       font-weight: 300;
       line-height: 2.6;
       letter-spacing: 8px;
       margin-bottom: 80px;
-      opacity: 0;
-      animation: fadeIn 2s ease 0.5s forwards;
     }
 
     .poem .line { display: block; }
@@ -138,13 +145,14 @@
   <div id="particles"></div>
 
   <div class="container">
+    <div class="title">九月九日忆<span class="red">山东</span>兄弟</div>
     <div class="poem">
       <span class="line">独在异乡为异客，</span>
       <span class="line">每逢佳节倍思亲。</span>
       <span class="line">遥知兄弟登高处，</span>
       <span class="line">遍插茱萸少一人。</span>
     </div>
-    <div class="greeting">山西的朋友，你们好吗？</div>
+    <div class="greeting"><span class="red">山西</span>的朋友，你们好吗？</div>
   </div>
 
   <div class="seal">重阳</div>

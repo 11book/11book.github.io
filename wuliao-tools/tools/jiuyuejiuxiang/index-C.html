@@ -43,6 +43,16 @@
     }
 
     /* 诗 */
+    .title {
+      font-size: clamp(16px, 4vw, 22px);
+      font-weight: 300;
+      letter-spacing: 10px;
+      color: #2a2a2a;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.5s forwards;
+    }
+    .title .red { color: #888; font-weight: 400; }
     .poem {
       font-size: clamp(16px, 4vw, 22px);
       font-weight: 200;
@@ -122,6 +132,7 @@
 
   <div class="container">
     <div class="top-line"></div>
+    <div class="title">九月九日忆<span class="red">山东</span>兄弟</div>
     <div class="poem">
       <span class="line">独在异乡为异客，</span>
       <span class="line">每逢佳节倍思亲。</span>
@@ -129,7 +140,7 @@
       <span class="line">遍插茱萸少一人。</span>
     </div>
     <div class="mid-line"></div>
-    <div class="greeting">山西的朋友，你们好吗？</div>
+    <div class="greeting"><span class="red">山西</span>的朋友，你们好吗？</div>
   </div>
 
   <div class="bottom-line"></div>
