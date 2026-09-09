@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>九月九日忆山东兄弟</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Serif SC", serif;
+      background: #0c0a08;
+      color: #e8d5b0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 水墨山水 */
+    .ink-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .ink-bg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 飘墨动画 */
+    .ink-particle {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: rgba(232,213,176,0.3);
+      border-radius: 50%;
+      animation: drift linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes drift {
+      0% { opacity: 0; transform: translateY(0) translateX(0); }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.3; }
+      100% { opacity: 0; transform: translateY(-60vh) translateX(20px); }
+    }
+
+    /* 主内容 */
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 32px;
+    }
+
+    .poem {
+      font-size: clamp(18px, 4.5vw, 28px);
+      font-weight: 300;
+      line-height: 2.6;
+      letter-spacing: 8px;
+      margin-bottom: 80px;
+      opacity: 0;
+      animation: fadeIn 2s ease 0.5s forwards;
+    }
+
+    .poem .line { display: block; }
+    .poem .line:nth-child(1) { animation: fadeSlide 1.5s ease 0.8s both; }
+    .poem .line:nth-child(2) { animation: fadeSlide 1.5s ease 1.2s both; }
+    .poem .line:nth-child(3) { animation: fadeSlide 1.5s ease 1.6s both; }
+    .poem .line:nth-child(4) { animation: fadeSlide 1.5s ease 2.0s both; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .greeting {
+      font-size: clamp(20px, 5.5vw, 36px);
+      font-weight: 400;
+      letter-spacing: 10px;
+      color: #f0c060;
+      opacity: 0;
+      animation: fadeIn 2s ease 2.8s forwards;
+    }
+
+    /* 印章 */
+    .seal {
+      position: fixed;
+      bottom: 48px;
+      right: 48px;
+      width: 56px;
+      height: 56px;
+      border: 2px solid #8b3a1a;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #8b3a1a;
+      letter-spacing: 2px;
+      transform: rotate(-5deg);
+      opacity: 0;
+      animation: fadeIn 1.5s ease 3.5s forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ink-bg">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      <!-- 远山 -->
+      <path fill="#1a1510" opacity="0.9" d="M0,900 L0,500 Q200,380 400,450 Q600,520 800,400 Q1000,280 1200,380 Q1350,440 1440,400 L1440,900 Z"/>
+      <!-- 中山 -->
+      <path fill="#151210" opacity="0.95" d="M0,900 L0,580 Q300,480 550,540 Q800,600 1050,500 Q1250,400 1440,520 L1440,900 Z"/>
+      <!-- 近山 -->
+      <path fill="#0e0c09" d="M0,900 L0,680 Q400,580 720,640 Q1080,700 1440,620 L1440,900 Z"/>
+      <!-- 月亮 -->
+      <circle cx="1100" cy="140" r="48" fill="#d4c4a0" opacity="0.08"/>
+      <circle cx="1100" cy="140" r="40" fill="#0c0a08" opacity="0.3"/>
+      <!-- 云雾 -->
+      <ellipse cx="200" cy="300" rx="300" ry="60" fill="#1a1510" opacity="0.5"/>
+      <ellipse cx="1200" cy="250" rx="250" ry="50" fill="#1a1510" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <div id="particles"></div>
+
+  <div class="container">
+    <div class="poem">
+      <span class="line">独在异乡为异客，</span>
+      <span class="line">每逢佳节倍思亲。</span>
+      <span class="line">遥知兄弟登高处，</span>
+      <span class="line">遍插茱萸少一人。</span>
+    </div>
+    <div class="greeting">山西的朋友，你们好吗？</div>
+  </div>
+
+  <div class="seal">重阳</div>
+
+  <script>
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'ink-particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = (8 + Math.random() * 12) + 's';
+      p.style.animationDelay = Math.random() * 8 + 's';
+      container.appendChild(p);
+    }
+  </script>
+
+</body>
+</html>

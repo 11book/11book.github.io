@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>九月九日忆山东兄弟</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Serif SC", serif;
+      background: #faf8f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      padding: 0 40px;
+      max-width: 640px;
+    }
+
+    /* 极细装饰线 */
+    .top-line {
+      width: 1px;
+      height: 80px;
+      background: #ccc;
+      margin: 0 auto 64px;
+      opacity: 0;
+      animation: lineGrow 1.5s ease 0.3s forwards;
+    }
+
+    @keyframes lineGrow {
+      from { opacity: 0; transform: scaleY(0); transform-origin: top; }
+      to { opacity: 1; transform: scaleY(1); }
+    }
+
+    /* 诗 */
+    .poem {
+      font-size: clamp(16px, 4vw, 22px);
+      font-weight: 200;
+      line-height: 3;
+      letter-spacing: 12px;
+      color: #2a2a2a;
+      margin-bottom: 80px;
+    }
+
+    .poem .line {
+      display: block;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards;
+    }
+    .poem .line:nth-child(1) { animation-delay: 0.6s; }
+    .poem .line:nth-child(2) { animation-delay: 0.9s; }
+    .poem .line:nth-child(3) { animation-delay: 1.2s; }
+    .poem .line:nth-child(4) { animation-delay: 1.5s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 分隔 */
+    .mid-line {
+      width: 32px;
+      height: 1px;
+      background: #bbb;
+      margin: 0 auto 64px;
+      opacity: 0;
+      animation: fadeIn 1s ease 2s forwards;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 问候 */
+    .greeting {
+      font-size: clamp(18px, 4.5vw, 26px);
+      font-weight: 300;
+      letter-spacing: 8px;
+      color: #1a1a1a;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 2.3s forwards;
+    }
+
+    /* 底部细线 */
+    .bottom-line {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 1px;
+      background: #ddd;
+      opacity: 0;
+      animation: fadeIn 1s ease 3s forwards;
+    }
+
+    /* 日期 */
+    .date {
+      position: fixed;
+      top: 32px;
+      right: 32px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #bbb;
+      font-weight: 200;
+      opacity: 0;
+      animation: fadeIn 1s ease 0.5s forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="date">重陽</div>
+
+  <div class="container">
+    <div class="top-line"></div>
+    <div class="poem">
+      <span class="line">独在异乡为异客，</span>
+      <span class="line">每逢佳节倍思亲。</span>
+      <span class="line">遥知兄弟登高处，</span>
+      <span class="line">遍插茱萸少一人。</span>
+    </div>
+    <div class="mid-line"></div>
+    <div class="greeting">山西的朋友，你们好吗？</div>
+  </div>
+
+  <div class="bottom-line"></div>
+
+</body>
+</html>
