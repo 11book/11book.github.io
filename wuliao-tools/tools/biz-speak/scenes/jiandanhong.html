@@ -93,7 +93,7 @@
 
     .reveal-btn {
       background: transparent;
-      border: 2px solid rgba(255,255,255,0.15);
+      border: 2px solid transparent;
       color: var(--text-dim);
       font-family: "Noto Sans SC", sans-serif;
       font-size: 32px;
@@ -101,13 +101,40 @@
       border-radius: 60px;
       cursor: pointer;
       letter-spacing: 4px;
-      transition: all 0.3s ease;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    /* 跑马灯边框：用渐变描边 + 动画旋转 */
+    .reveal-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 60px;
+      padding: 2px;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(201,168,76,0.6) 20%,
+        rgba(201,168,76,1) 40%,
+        rgba(201,168,76,0.6) 60%,
+        transparent 80%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: marquee 2s linear infinite;
     }
 
     .reveal-btn:hover {
-      border-color: var(--primary);
       color: var(--primary);
-      box-shadow: 0 0 50px rgba(201,168,76,0.2);
+    }
+
+    @keyframes marquee {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
 
     .reveal-btn.hidden {
