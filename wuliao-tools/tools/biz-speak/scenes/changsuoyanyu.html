@@ -39,7 +39,7 @@
       position: relative;
     }
 
-    /* 背景：会议室微光效果 */
+    /* 背景:会议室微光效果 */
     body::before {
       content: '';
       position: absolute;
@@ -170,23 +170,20 @@
       font-weight: 700;
       color: var(--text);
       line-height: 1.6;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
-
-
-    /* 底部语录 */
-    .footer-quote {
-      font-size: 11px;
+    /* 真相语录 */
+    .truth-quote {
+      font-size: 13px;
       color: var(--text-dim);
       font-style: italic;
-      opacity: 0;
-      animation: fadeIn 0.6s ease forwards 0.8s;
-      text-align: center;
-      line-height: 1.6;
-      padding: 0 20px;
-      margin-top: 8px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+      opacity: 0.85;
     }
+
+
 
     /* 动画 */
     @keyframes fadeUp {
@@ -231,12 +228,8 @@
       <div class="truth-text">
         走个过场<br>看看谁站错队<br>敢唱反调
       </div>
-  
+      <div class="truth-quote">"会上让你提,是给你面子;<br>真提了,是你不识相。"</div>
     </div>
-
-  </div>
-
-
 
   <script>
     function reveal() {
