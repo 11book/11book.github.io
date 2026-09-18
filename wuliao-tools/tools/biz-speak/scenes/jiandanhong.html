@@ -91,21 +91,24 @@
       margin: 40px 0;
     }
 
-    /* 按钮 wrapper：套渐变边框 */
+    /* 按钮 wrapper：加粗金色渐变边框 */
     .btn-wrap {
       position: relative;
-      border-radius: 66px;
-      padding: 3px;
+      border-radius: 70px;
+      padding: 4px;
       background: conic-gradient(
         from 0deg,
         transparent 0deg,
-        rgba(201,168,76,0.4) 60deg,
-        rgba(201,168,76,1) 120deg,
-        rgba(201,168,76,0.6) 180deg,
-        rgba(201,168,76,0.4) 240deg,
+        rgba(255,220,100,0.3) 40deg,
+        rgba(255,220,100,1) 90deg,
+        rgba(255,220,100,0.8) 140deg,
+        rgba(255,220,100,0.3) 180deg,
         transparent 360deg
       );
-      animation: borderSpin 3s linear infinite;
+      animation: borderSpin 2.5s linear infinite;
+      box-shadow:
+        0 0 20px rgba(255,220,100,0.15),
+        0 0 40px rgba(255,220,100,0.08);
     }
 
     .reveal-btn {
@@ -114,8 +117,8 @@
       color: var(--text-dim);
       font-family: "Noto Sans SC", sans-serif;
       font-size: 32px;
-      padding: 20px 70px;
-      border-radius: 60px;
+      padding: 18px 68px;
+      border-radius: 64px;
       cursor: pointer;
       letter-spacing: 4px;
       transition: color 0.3s ease;
@@ -124,7 +127,7 @@
     }
 
     .btn-wrap:hover .reveal-btn {
-      color: var(--primary);
+      color: rgba(255,220,100,0.9);
     }
 
     @keyframes borderSpin {
@@ -225,12 +228,17 @@
 
   <script>
     function reveal() {
-      document.getElementById('truth').classList.add('show');
-      document.querySelector('.reveal-btn').classList.add('hidden');
-      let wrap = document.querySelector('.btn-wrap');
-      wrap.style.transition = 'opacity 0.4s ease';
-      wrap.style.opacity = '0';
-      setTimeout(() => wrap.style.display = 'none', 400);
+      let truth = document.getElementById('truth');
+      let btn = document.querySelector('.reveal-btn');
+      if (truth.classList.contains('show')) {
+        // 收回
+        truth.classList.remove('show');
+        btn.textContent = '↓ 揭示真相';
+      } else {
+        // 揭示
+        truth.classList.add('show');
+        btn.textContent = '↑ 收回真相';
+      }
     }
   </script>
 
