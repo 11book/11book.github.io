@@ -91,9 +91,26 @@
       margin: 40px 0;
     }
 
+    /* 按钮 wrapper：套渐变边框 */
+    .btn-wrap {
+      position: relative;
+      border-radius: 66px;
+      padding: 3px;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(201,168,76,0.4) 60deg,
+        rgba(201,168,76,1) 120deg,
+        rgba(201,168,76,0.6) 180deg,
+        rgba(201,168,76,0.4) 240deg,
+        transparent 360deg
+      );
+      animation: borderSpin 3s linear infinite;
+    }
+
     .reveal-btn {
-      background: transparent;
-      border: 3px solid rgba(255,255,255,0.12);
+      background: var(--bg);
+      border: none;
       color: var(--text-dim);
       font-family: "Noto Sans SC", sans-serif;
       font-size: 32px;
@@ -101,41 +118,12 @@
       border-radius: 60px;
       cursor: pointer;
       letter-spacing: 4px;
-      position: relative;
       transition: color 0.3s ease;
-      overflow: hidden;
+      display: block;
+      width: 100%;
     }
 
-    /* 外层：旋转的渐变边框 */
-    .reveal-btn::before {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 60px;
-      background: conic-gradient(
-        from 0deg,
-        transparent 0deg,
-        rgba(201,168,76,0) 60deg,
-        rgba(201,168,76,1) 120deg,
-        rgba(201,168,76,0.8) 180deg,
-        rgba(201,168,76,0) 240deg,
-        transparent 360deg
-      );
-      animation: borderSpin 3s linear infinite;
-      z-index: -1;
-    }
-
-    /* 内层盖住，只留边框发光 */
-    .reveal-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 60px;
-      background: var(--bg);
-      z-index: -1;
-    }
-
-    .reveal-btn:hover {
+    .btn-wrap:hover .reveal-btn {
       color: var(--primary);
     }
 
@@ -224,7 +212,9 @@
     <div class="icon">📋</div>
     <div class="surface-text">我简单补充两句</div>
     <div class="divider"></div>
-    <button class="reveal-btn" onclick="reveal()">↓ 揭示真相</button>
+    <div class="btn-wrap">
+      <button class="reveal-btn" onclick="reveal()">↓ 揭示真相</button>
+    </div>
     <div class="truth-section" id="truth">
       <div class="truth-arrow">👇</div>
       <div class="truth-label">打工人翻译</div>
@@ -237,6 +227,10 @@
     function reveal() {
       document.getElementById('truth').classList.add('show');
       document.querySelector('.reveal-btn').classList.add('hidden');
+      let wrap = document.querySelector('.btn-wrap');
+      wrap.style.transition = 'opacity 0.4s ease';
+      wrap.style.opacity = '0';
+      setTimeout(() => wrap.style.display = 'none', 400);
     }
   </script>
 
