@@ -173,41 +173,7 @@
       margin-bottom: 28px;
     }
 
-    /* 共鸣值 */
-    .resonance {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
 
-    .resonance-label {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .resonance-bar {
-      width: 120px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .resonance-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--danger));
-      width: 0%;
-      animation: fillBar 1s ease forwards 0.3s;
-    }
-
-    .resonance-value {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--primary);
-    }
 
     /* 底部语录 */
     .footer-quote {
@@ -237,9 +203,7 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
     }
-    @keyframes fillBar {
-      to { width: 87%; }
-    }
+
 
     /* 点击后隐藏按钮 */
     .reveal-btn.hidden {
@@ -267,29 +231,17 @@
       <div class="truth-text">
         走个过场<br>看看谁站错队<br>敢唱反调
       </div>
-      <div class="resonance">
-        <span class="resonance-label">共鸣值</span>
-        <div class="resonance-bar">
-          <div class="resonance-fill" id="fill"></div>
-        </div>
-        <span class="resonance-value" id="value">87%</span>
-      </div>
+  
     </div>
 
   </div>
 
-  <div class="footer-quote">
-    "会上让你提，是给你面子；<br>真提了，是你不识相。"
-  </div>
+
 
   <script>
     function reveal() {
       document.getElementById('truth').classList.add('show');
       document.querySelector('.reveal-btn').classList.add('hidden');
-      // 随机共鸣值
-      const v = Math.floor(Math.random() * 20) + 78;
-      document.getElementById('fill').style.width = v + '%';
-      document.getElementById('value').textContent = v + '%';
     }
   </script>
 
