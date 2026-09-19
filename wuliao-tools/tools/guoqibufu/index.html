@@ -3,401 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>国庆节补贴到账倒计时</title>
+  <title>国庆节补贴到账提醒</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --red: #e63946;
-      --gold: #ffd700;
-      --orange: #ff8c00;
-      --dark: #1a1a2e;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Noto Sans SC', sans-serif;
-      background: var(--dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-    }
-
-    /* 烟花粒子容器 */
-    canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 24px;
-      position: relative;
-      z-index: 1;
-      opacity: 0;
-      transform: translateY(40px);
-      animation: fadeUp 0.8s ease forwards;
-    }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 顶部装饰 */
-    .top-badge {
-      background: linear-gradient(135deg, var(--red), var(--orange));
+      background: #0d0d1a;
       color: #fff;
+    }
+
+    /* 第一页：喜庆紧张 */
+    .page1 {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      background: radial-gradient(ellipse at top, #1a0a0a 0%, #0d0d1a 60%);
+    }
+
+    .badge {
       font-size: 12px;
-      font-weight: 700;
+      letter-spacing: 4px;
+      color: #ffd700;
+      border: 1px solid #ffd700;
       padding: 6px 16px;
       border-radius: 20px;
-      letter-spacing: 2px;
-      margin-bottom: 24px;
-      animation: pulse 2s infinite;
+      margin-bottom: 32px;
+      opacity: 0.8;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    /* 主标题 */
-    .main-title {
-      font-size: 32px;
+    .title {
+      font-size: 36px;
       font-weight: 900;
-      color: var(--gold);
+      color: #ffd700;
       text-align: center;
-      letter-spacing: 2px;
-      line-height: 1.3;
+      letter-spacing: 3px;
       margin-bottom: 8px;
     }
 
-    .sub-title {
+    .subtitle {
       font-size: 16px;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .money-box {
+      background: rgba(230, 57, 70, 0.1);
+      border: 2px solid rgba(255, 215, 0, 0.4);
+      border-radius: 16px;
+      padding: 32px 48px;
       text-align: center;
       margin-bottom: 40px;
     }
 
-    /* 倒计时 */
-    .countdown-box {
-      background: rgba(255,255,255,0.05);
-      border: 2px solid var(--gold);
-      border-radius: 20px;
-      padding: 32px 48px;
-      text-align: center;
-      margin-bottom: 32px;
-      position: relative;
-    }
-
-    .countdown-label {
+    .money-label {
       font-size: 13px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.5);
       letter-spacing: 3px;
       margin-bottom: 12px;
     }
 
-    .countdown-number {
-      font-size: 80px;
+    .money-amount {
+      font-size: 56px;
       font-weight: 900;
-      color: var(--gold);
-      line-height: 1;
-      text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+      color: #ffd700;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
     }
 
-    .countdown-unit {
-      font-size: 18px;
-      color: rgba(255,215,0,0.8);
-      margin-top: 4px;
-    }
-
-    /* 小表情 */
-    .emoji-row {
-      font-size: 40px;
-      margin-bottom: 32px;
-      animation: shake 0.5s ease infinite alternate;
-    }
-
-    @keyframes shake {
-      from { transform: rotate(-5deg); }
-      to { transform: rotate(5deg); }
-    }
-
-    /* 提示文字 */
-    .tip-text {
-      background: rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 16px 20px;
-      color: rgba(255,255,255,0.85);
+    .alarm-note {
       font-size: 14px;
-      line-height: 1.8;
+      color: rgba(255,255,255,0.7);
       text-align: center;
-      margin-bottom: 32px;
+      line-height: 2;
+      margin-bottom: 48px;
     }
 
-    .tip-highlight {
-      color: var(--gold);
-      font-weight: 700;
-    }
-
-    /* 揭晓按钮 */
-    .reveal-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--red), var(--orange));
-      color: #fff;
-      border: none;
-      padding: 18px;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 8px 30px rgba(230, 57, 70, 0.4);
-      margin-bottom: 24px;
-    }
-
-    .reveal-btn:active {
-      transform: scale(0.97);
-    }
-
-    .reveal-btn.hidden {
-      background: #555;
-      box-shadow: none;
-      cursor: default;
-      pointer-events: none;
-    }
-
-    /* 箭头 */
-    .arrow {
-      font-size: 24px;
-      color: var(--gold);
-      animation: bounce 1.5s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(8px); }
-    }
-
-    /* ========== 真相页 ========== */
-    .truth-zone {
-      width: 100%;
-      display: none;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    .truth-zone.show {
+    .alarm-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      animation: ring 0.5s ease infinite alternate;
       display: block;
-      animation: fadeUp 0.6s ease forwards;
     }
 
-    .truth-header {
-      background: rgba(255,255,255,0.1);
-      border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 20px;
+    @keyframes ring {
+      from { transform: rotate(-10deg); }
+      to { transform: rotate(10deg); }
     }
 
-    .truth-header-text {
-      font-size: 22px;
+    .scroll-hint {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+      animation: fadeInOut 2s ease infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.6; }
+    }
+
+    /* 分隔线 */
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ffd700, transparent);
+      margin: 0 auto 48px;
+    }
+
+    /* 第二页：周日上班 */
+    .page2 {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      background: #0d0d1a;
+    }
+
+    .big-text {
+      font-size: 72px;
       font-weight: 900;
-      color: #fff;
-      letter-spacing: 3px;
-    }
-
-    .truth-card {
-      background: rgba(255,255,255,0.06);
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 28px 24px;
-      margin-bottom: 20px;
-    }
-
-    .truth-card-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--red);
+      color: #e63946;
+      letter-spacing: 8px;
       text-align: center;
-      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    .sub-text {
+      font-size: 18px;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      margin-top: 24px;
       letter-spacing: 2px;
     }
 
-    .truth-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 16px;
-      font-size: 15px;
-      color: rgba(255,255,255,0.85);
-      line-height: 1.6;
-    }
-
-    .truth-icon {
-      font-size: 20px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .truth-highlight {
-      background: rgba(230, 57, 70, 0.15);
-      border-left: 3px solid var(--red);
-      padding: 12px 16px;
-      border-radius: 0 8px 8px 0;
-      font-size: 15px;
-      color: rgba(255,255,255,0.9);
-      line-height: 1.7;
+    .detail {
+      margin-top: 48px;
+      border: 1px solid rgba(230, 57, 70, 0.3);
+      border-radius: 12px;
+      padding: 24px 32px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      line-height: 2;
     }
   </style>
 </head>
 <body>
-  <canvas id="confetti"></canvas>
 
-  <!-- 表面：倒计时喜庆页 -->
-  <div class="page" id="page1">
-    <div class="top-badge">🎉 国庆专属福利 🎉</div>
+  <!-- 第一页 -->
+  <div class="page1">
+    <div class="badge">💰 国庆节专属福利</div>
+    <div class="title">补贴明天到账</div>
+    <div class="subtitle">请各位同事提前做好查收准备</div>
 
-    <div class="main-title">补贴即将到账</div>
-    <div class="sub-title">明天记得查收哦！</div>
-
-    <div class="countdown-box">
-      <div class="countdown-label">距 补 贴 到 账</div>
-      <div class="countdown-number" id="countdownNum">23:59:59</div>
-      <div class="countdown-unit">倒计时</div>
+    <div class="money-box">
+      <div class="money-label">预 到 账 金 额</div>
+      <div class="money-amount">人均 ¥200</div>
     </div>
 
-    <div class="emoji-row">🎁 🎊 🎉 💰 🎈</div>
-
-    <div class="tip-text">
-      📱 明天（<span class="tip-highlight">9月21日周日</span>）补贴将到账<br>
-      请提前打开手机银行APP查收<br>
-      祝大家国庆节快乐！
+    <span class="alarm-icon">⏰</span>
+    <div class="alarm-note">
+      请设置手机闹钟<br>
+      明天上午9:00准时查收
     </div>
 
-    <div class="arrow">▼</div>
-    <button class="reveal-btn" id="revealBtn" onclick="reveal()">点 我 揭 晓</button>
+    <div class="divider"></div>
+
+    <div class="scroll-hint">↓ 向下滑动</div>
   </div>
 
-  <!-- 真相：周日上班 -->
-  <div class="page truth-zone" id="page2">
-    <div class="truth-header">
-      <div class="truth-header-text">⚠️ 温馨提示 ⚠️</div>
-    </div>
-
-    <div class="truth-card">
-      <div class="truth-card-title">📋 国庆节后工作安排</div>
-
-      <div class="truth-item">
-        <span class="truth-icon">📅</span>
-        <span>明天（9月21日，周日）正常上班，不作调休补偿</span>
-      </div>
-      <div class="truth-item">
-        <span class="truth-icon">⏰</span>
-        <span>请准时到岗，不要迟到</span>
-      </div>
-      <div class="truth-item">
-        <span class="truth-icon">🏠</span>
-        <span>9月28日（周六）也正常上班</span>
-      </div>
-
-      <div class="truth-highlight">
-        💡 补贴？那是工资的一部分，从来没多发过。<br>
-        🎁 国庆福利？放假就是最好的福利。<br>
-        ✨ 感谢理解，共创佳绩！
-      </div>
+  <!-- 第二页 -->
+  <div class="page2">
+    <div class="big-text">周日上班！</div>
+    <div class="sub-text">9月21日（明天）正常上班</div>
+    <div class="detail">
+      9月21日（周日）正常上班<br>
+      9月28日（周六）也正常上班<br>
+      补贴？没多发过，那是工资的一部分
     </div>
   </div>
 
-  <script>
-    // 倒计时：到9月21日0点
-    function updateCountdown() {
-      const target = new Date('2026-09-21T00:00:00').getTime();
-      const now = new Date().getTime();
-      const diff = target - now;
-
-      if (diff <= 0) {
-        document.getElementById('countdownNum').textContent = '00:00:00';
-        return;
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const secs = Math.floor((diff % (1000 * 60)) / 1000);
-      document.getElementById('countdownNum').textContent =
-        String(hours).padStart(2,'0') + ':' +
-        String(mins).padStart(2,'0') + ':' +
-        String(secs).padStart(2,'0');
-    }
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-
-    // 揭示
-    function reveal() {
-      const btn = document.getElementById('revealBtn');
-      btn.classList.add('hidden');
-      btn.textContent = '已揭示';
-      const page2 = document.getElementById('page2');
-      page2.classList.add('show');
-      page2.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // 简陋烟花
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    const colors = ['#e63946','#ffd700','#ff8c00','#ff69b4','#00bfff','#ff6347'];
-
-    for (let i = 0; i < 60; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        size: Math.random() * 4 + 2,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: Math.random() * 0.6 + 0.4
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.alpha;
-        ctx.fill();
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      });
-      ctx.globalAlpha = 1;
-      requestAnimationFrame(draw);
-    }
-    draw();
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-  </script>
 </body>
 </html>
