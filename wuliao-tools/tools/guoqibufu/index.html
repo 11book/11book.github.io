@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>关于2026年国庆节补贴发放的通知</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=SimSun:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red: #cc0000;
+      --red-light: #cc00001a;
+      --gold: #b8860b;
+      --paper: #fdf6e3;
+      --paper-dark: #f5e6c8;
+      --text: #1a1a1a;
+    }
+
+    body {
+      font-family: 'SimSun', 'Noto Serif SC', serif;
+      background: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 红色标题头 */
+    .red-header {
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      text-align: center;
+      padding: 18px 16px 14px;
+      position: relative;
+    }
+
+    .red-header::after {
+      content: '★ ☆ ★';
+      display: block;
+      font-size: 12px;
+      letter-spacing: 6px;
+      margin-top: 6px;
+      opacity: 0.7;
+    }
+
+    /* 公章 */
+    .stamp {
+      width: 70px;
+      height: 70px;
+      border: 3px solid var(--red);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--red);
+      font-size: 10px;
+      font-weight: bold;
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      transform: rotate(15deg);
+      opacity: 0.85;
+    }
+
+    .stamp-inner {
+      width: 54px;
+      height: 54px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* 文件标题 */
+    .doc-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-align: center;
+    }
+
+    /* 文件正文 */
+    .doc-body {
+      width: 100%;
+      background: var(--paper);
+      padding: 28px 24px 32px;
+      flex: 1;
+    }
+
+    .doc-meta {
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 20px;
+      font-family: 'SimSun', serif;
+    }
+
+    .doc-body p {
+      font-size: 14px;
+      line-height: 2;
+      color: var(--text);
+      text-indent: 2em;
+      margin-bottom: 12px;
+    }
+
+    .clause {
+      margin: 16px 0;
+    }
+
+    .clause-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      text-indent: 2em;
+      margin-bottom: 6px;
+    }
+
+    .clause-content {
+      font-size: 14px;
+      line-height: 2;
+      color: var(--text);
+      padding-left: 2em;
+    }
+
+    /* 落款 */
+    .signature {
+      text-align: right;
+      font-size: 13px;
+      color: #555;
+      margin-top: 28px;
+      line-height: 2;
+    }
+
+    .signature-date {
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    /* 提示按钮 */
+    .reveal-btn {
+      width: 100%;
+      max-width: 430px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      cursor: pointer;
+      margin-top: 0;
+      transition: background 0.3s;
+      font-family: 'SimSun', serif;
+    }
+
+    .reveal-btn:hover {
+      background: #aa0000;
+    }
+
+    .reveal-btn.hidden {
+      background: #888;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* 真相区 */
+    .truth-zone {
+      width: 100%;
+      max-width: 430px;
+      background: #fff;
+      border: 3px solid var(--red);
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .truth-zone.show {
+      display: block;
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .truth-header {
+      background: var(--red);
+      color: #fff;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-align: center;
+    }
+
+    .truth-body {
+      padding: 20px 20px 24px;
+    }
+
+    .truth-body p {
+      font-size: 14px;
+      line-height: 2;
+      color: var(--text);
+      text-indent: 2em;
+      margin-bottom: 10px;
+    }
+
+    .truth-body .highlight {
+      background: #fff3cd;
+      border-left: 4px solid var(--gold);
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #856404;
+    }
+
+    /* 箭头 */
+    .arrow {
+      text-align: center;
+      font-size: 28px;
+      color: var(--red);
+      animation: bounce 1.5s infinite;
+      padding: 10px 0;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 红头文件 -->
+    <div class="red-header">
+      <div class="doc-title">通知</div>
+    </div>
+
+    <!-- 文件正文 -->
+    <div class="doc-body">
+      <p class="doc-meta">发文字：〔2026〕人字第09-001号 &nbsp;&nbsp; 等级：普通</p>
+
+      <p><strong>各部门同事：</strong></p>
+
+      <p>经公司领导研究决定，现将2026年国庆节补贴发放事项通知如下：</p>
+
+      <div class="clause">
+        <div class="clause-title">一、补贴标准</div>
+        <div class="clause-content">按公司相关规定执行，具体金额以到账为准。</div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">二、发放时间</div>
+        <div class="clause-content"><span style="color: var(--red); font-weight: 700;">2026年9月20日前</span>到账，请注意查收。</div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">三、发放方式</div>
+        <div class="clause-content">随当月工资一同发放，届时请登录工资卡所属银行APP查询。</div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">四、其他说明</div>
+        <div class="clause-content">如有疑问，请联系人力资源部。预祝大家国庆节快乐！</div>
+      </div>
+
+      <div class="signature">
+        <div>人力资源部</div>
+        <div>2026年9月15日</div>
+      </div>
+    </div>
+
+    <!-- 提示箭头 -->
+    <div class="arrow">▼</div>
+
+    <!-- 揭示按钮 -->
+    <button class="reveal-btn" onclick="reveal()">点我查看真相</button>
+
+    <!-- 真相区 -->
+    <div class="truth-zone" id="truthZone">
+      <div class="truth-header">真 相</div>
+      <div class="truth-body">
+        <p><strong>相关附件：《关于2026年国庆节调休安排的通知》</strong></p>
+
+        <div class="highlight">
+          根据公司生产经营需要，现就2026年国庆节期间工作安排通知如下：
+        </div>
+
+        <p>一、9月21日（周日）正常上班，请各位同事准时到岗。</p>
+        <p>二、9月28日（周六）正常上班，不另作调休补偿。</p>
+        <p>三、节日期间值班安排见各部门内部通知。</p>
+
+        <div class="highlight">
+          祝大家节日快乐，工作顺利！
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function reveal() {
+      const btn = document.querySelector('.reveal-btn');
+      const zone = document.getElementById('truthZone');
+      btn.classList.add('hidden');
+      btn.textContent = '已揭示';
+      zone.classList.add('show');
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+</body>
+</html>
