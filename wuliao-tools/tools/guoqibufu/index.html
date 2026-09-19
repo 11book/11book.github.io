@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>国庆节补贴到账提醒</title>
+  <title>国庆节补贴福利来了</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
@@ -12,180 +12,194 @@
 
     body {
       font-family: 'Noto Sans SC', sans-serif;
-      background: #0d0d1a;
+      background: #0a0a0a;
       color: #fff;
     }
 
-    /* 第一页：喜庆紧张 */
-    .page1 {
+    /* ========== 第一页 ========== */
+    .p1 {
       min-height: 100vh;
+      background: linear-gradient(160deg, #3d0000 0%, #0a0000 50%, #1a0a00 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 40px 24px;
-      background: radial-gradient(ellipse at top, #1a0a0a 0%, #0d0d1a 60%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .badge {
-      font-size: 12px;
-      letter-spacing: 4px;
-      color: #ffd700;
-      border: 1px solid #ffd700;
-      padding: 6px 16px;
+    /* 背景光芒 */
+    .p1::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,200,0,0.08) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* 顶部标签 */
+    .tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #e63946, #ff6b35);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      padding: 6px 18px;
       border-radius: 20px;
       margin-bottom: 32px;
-      opacity: 0.8;
+      animation: pulse 1.5s ease infinite;
     }
 
-    .title {
-      font-size: 36px;
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230,57,70,0.4); }
+      50% { transform: scale(1.03); box-shadow: 0 0 20px 4px rgba(230,57,70,0.3); }
+    }
+
+    /* 主标题 */
+    .main-title {
+      font-size: 46px;
       font-weight: 900;
       color: #ffd700;
-      text-align: center;
-      letter-spacing: 3px;
-      margin-bottom: 8px;
+      letter-spacing: 4px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      text-shadow: 0 0 40px rgba(255,215,0,0.3);
     }
 
-    .subtitle {
-      font-size: 16px;
+    /* 副标题 */
+    .sub-title {
+      font-size: 17px;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 1px;
+      margin-bottom: 56px;
+      line-height: 1.6;
+    }
+
+    /* 福利卡 */
+    .福利卡 {
+      background: rgba(255,215,0,0.08);
+      border: 1.5px solid rgba(255,215,0,0.35);
+      border-radius: 20px;
+      padding: 36px 56px;
+      margin-bottom: 48px;
+    }
+
+    .福利-label {
+      font-size: 12px;
+      letter-spacing: 5px;
+      color: rgba(255,215,0,0.6);
+      margin-bottom: 10px;
+    }
+
+    .福利-钱 {
+      font-size: 52px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 0 30px rgba(255,215,0,0.5);
+    }
+
+    /* 闹钟提示 */
+    .alarm-hint {
+      font-size: 15px;
       color: rgba(255,255,255,0.6);
-      text-align: center;
-      margin-bottom: 48px;
-    }
-
-    .money-box {
-      background: rgba(230, 57, 70, 0.1);
-      border: 2px solid rgba(255, 215, 0, 0.4);
-      border-radius: 16px;
-      padding: 32px 48px;
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .money-label {
-      font-size: 13px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 3px;
-      margin-bottom: 12px;
-    }
-
-    .money-amount {
-      font-size: 56px;
-      font-weight: 900;
-      color: #ffd700;
-      text-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-    }
-
-    .alarm-note {
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-      text-align: center;
       line-height: 2;
-      margin-bottom: 48px;
+      margin-bottom: 56px;
     }
 
-    .alarm-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      animation: ring 0.5s ease infinite alternate;
-      display: block;
+    .alarm-hint strong {
+      color: #ffd700;
+      font-weight: 700;
     }
 
-    @keyframes ring {
-      from { transform: rotate(-10deg); }
-      to { transform: rotate(10deg); }
+    /* 下滑提示 */
+    .scroll-tip {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.25);
+      animation: blink 2s ease infinite;
     }
 
-    .scroll-hint {
-      font-size: 13px;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 2px;
-      animation: fadeInOut 2s ease infinite;
-    }
-
-    @keyframes fadeInOut {
+    @keyframes blink {
       0%, 100% { opacity: 0.2; }
       50% { opacity: 0.6; }
     }
 
-    /* 分隔线 */
-    .divider {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #ffd700, transparent);
-      margin: 0 auto 48px;
-    }
-
-    /* 第二页：周日上班 */
-    .page2 {
+    /* ========== 第二页 ========== */
+    .p2 {
       min-height: 100vh;
+      background: #0a0a0a;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 60px 24px;
-      background: #0d0d1a;
+      text-align: center;
     }
 
-    .big-text {
-      font-size: 72px;
+    .p2-text {
+      font-size: 80px;
       font-weight: 900;
       color: #e63946;
-      letter-spacing: 8px;
-      text-align: center;
-      line-height: 1.1;
+      letter-spacing: 12px;
+      line-height: 1;
     }
 
-    .sub-text {
-      font-size: 18px;
-      color: rgba(255,255,255,0.5);
-      text-align: center;
-      margin-top: 24px;
+    .p2-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,0.4);
       letter-spacing: 2px;
+      margin-top: 20px;
     }
 
-    .detail {
-      margin-top: 48px;
-      border: 1px solid rgba(230, 57, 70, 0.3);
-      border-radius: 12px;
-      padding: 24px 32px;
+    .p2-detail {
+      margin-top: 56px;
+      border-top: 1px solid rgba(230,57,70,0.2);
+      padding-top: 36px;
       font-size: 14px;
-      color: rgba(255,255,255,0.6);
-      line-height: 2;
+      color: rgba(255,255,255,0.35);
+      line-height: 2.2;
+      letter-spacing: 1px;
     }
   </style>
 </head>
 <body>
 
-  <!-- 第一页 -->
-  <div class="page1">
-    <div class="badge">💰 国庆节专属福利</div>
-    <div class="title">补贴明天到账</div>
-    <div class="subtitle">请各位同事提前做好查收准备</div>
+  <!-- 第一页：喜庆福利 -->
+  <div class="p1">
+    <div class="tag">🎉 国庆专属福利 🎉</div>
 
-    <div class="money-box">
-      <div class="money-label">预 到 账 金 额</div>
-      <div class="money-amount">人均 ¥200</div>
+    <div class="main-title">国庆节补贴福利来了</div>
+
+    <div class="sub-title">
+      马上就要到账了<br>
+      定好闹钟及时查收，先到先得！
     </div>
 
-    <span class="alarm-icon">⏰</span>
-    <div class="alarm-note">
-      请设置手机闹钟<br>
-      明天上午9:00准时查收
+    <div class="福利卡">
+      <div class="福利-label">预 到 账 金 额</div>
+      <div class="福利-钱">人均 ¥200</div>
     </div>
 
-    <div class="divider"></div>
+    <div class="alarm-hint">
+      ⏰ 请设好闹钟<br>
+      <strong>明天（9月21日）上午9:00</strong> 准时查收
+    </div>
 
-    <div class="scroll-hint">↓ 向下滑动</div>
+    <div class="scroll-tip">↓ 滑 动 查 看 更 多</div>
   </div>
 
-  <!-- 第二页 -->
-  <div class="page2">
-    <div class="big-text">周日上班！</div>
-    <div class="sub-text">9月21日（明天）正常上班</div>
-    <div class="detail">
-      9月21日（周日）正常上班<br>
+  <!-- 第二页：周日上班 -->
+  <div class="p2">
+    <div class="p2-text">周日上班！</div>
+    <div class="p2-sub">9月21日（明天）正常上班</div>
+    <div class="p2-detail">
       9月28日（周六）也正常上班<br>
       补贴？没多发过，那是工资的一部分
     </div>
