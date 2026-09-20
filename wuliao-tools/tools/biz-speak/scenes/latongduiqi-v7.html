@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>拉通对齐</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0a0d;
+  --text: #f0ece4;
+  --text-dim: #8a8a9a;
+  --gold: #4a90d9;
+  --red: #d94a4a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; overflow:hidden; }
+body {
+  font-family:"Noto Sans SC",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex; flex-direction:column;
+  height:100vh; height:100dvh;
+  position:relative;
+}
+body::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:45%;
+  background:radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.1) 0%, transparent 65%);
+  pointer-events:none; z-index:0;
+}
+.top {
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:16px 28px;
+  position:relative; z-index:1;
+}
+.tag {
+  font-size:11px; letter-spacing:3px;
+  color:var(--gold);
+  border:1px solid rgba(212,168,67,0.3);
+  padding:5px 16px; border-radius:50px;
+  margin-bottom:20px;
+}
+.main-title {
+  font-family:'Noto Serif SC'; font-size:76px; font-weight:900;
+  text-align:center; line-height:1.0; letter-spacing:3px;
+}
+.sub-title {
+  font-size:26px; color:var(--text-dim);
+  text-align:center; margin-top:14px;
+}
+.divider {
+  width:100%; height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0.35; flex-shrink:0; position:relative; z-index:1;
+}
+.bottom {
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:24px 28px 40px;
+  position:relative; z-index:1;
+}
+.truth-label {
+  font-size:28px; font-weight:700; color:var(--red);
+  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.truth-lines { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.truth-line {
+  font-size:36px; font-weight:700; color:var(--text);
+  text-align:center; line-height:1.2;
+}
+.quote {
+  font-size:17px; color:var(--text-dim); font-style:italic;
+  text-align:center; line-height:1.8;
+  margin-top:18px; padding:0 12px;
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="tag">跨部门协作</div>
+  <div class="main-title">拉通对齐</div>
+  <div class="sub-title">开个会把活分均匀</div>
+</div>
+<div class="divider"></div>
+<div class="bottom">
+  <div class="truth-label">💬 潜台词</div>
+  <div class="truth-lines">
+    <div class="truth-line">活分下去了</div>
+    <div class="truth-line">锅也分下去了</div>
+    <div class="truth-line">扯皮正式开始</div>
+  </div>
+  <div class="quote">「拉通一时，甩锅一世。」</div>
+</div>
+</body>
+</html>
