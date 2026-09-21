@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心灵疗愈 · PixiJS动画版</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#08080f;
+    display:flex; flex-direction:column;
+    height:100vh; height:100dvh;
+    overflow:hidden;
+    font-family:"Noto Sans SC",sans-serif;
+    color:#f0ece4;
+  }
+
+  /* 顶部HUD */
+  .hud {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 24px;
+    background:rgba(255,255,255,0.02);
+    border-bottom:1px solid rgba(212,168,67,0.15);
+    z-index:20; flex-shrink:0;
+  }
+  .hud-title {
+    font-family:'Noto Serif SC'; font-size:20px; font-weight:900;
+    color:#d4a843; letter-spacing:4px;
+    text-shadow:0 0 30px rgba(212,168,67,0.6);
+  }
+  .hud-badge {
+    font-size:10px; letter-spacing:2px;
+    color:#d4a843; border:1px solid rgba(212,168,67,0.3);
+    padding:3px 10px; border-radius:20px; opacity:0.8;
+  }
+  .hud-time {
+    font-size:12px; color:#8a8a9a; letter-spacing:1px;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* Canvas舞台 */
+  #game-canvas {
+    flex:1; display:block;
+  }
+
+  /* 底部信息面板 */
+  .panel {
+    padding:10px 24px 16px;
+    background:linear-gradient(to top, rgba(8,8,15,0.98), rgba(8,8,15,0.85));
+    border-top:1px solid rgba(255,255,255,0.05);
+    flex-shrink:0;
+  }
+  .phase-row {
+    display:flex; align-items:center; gap:10px; margin-bottom:8px;
+  }
+  .phase-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:#333; transition:all 0.3s;
+  }
+  .phase-dot.active { background:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.6); }
+  .phase-label {
+    font-size:11px; color:#555; letter-spacing:1px; transition:all 0.3s;
+  }
+  .phase-label.active { color:#d4a843; }
+  .progress-track {
+    height:3px; background:rgba(255,255,255,0.07);
+    border-radius:2px; overflow:hidden; margin-top:6px;
+  }
+  .progress-fill {
+    height:100%; width:0%;
+    background:linear-gradient(90deg,#d4a843,#e85454);
+    border-radius:2px; transition:width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+  <div class="hud">
+    <div class="hud-title">心灵疗愈</div>
+    <div class="hud-badge">职场黑话</div>
+    <div class="hud-time" id="timeDisplay">00:00 / 20s</div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+
+  <div class="panel">
+    <div class="phase-row" id="phaseRow">
+      <div class="phase-dot active" id="dot0"></div>
+      <span class="phase-label active" id="label0">登场</span>
+      <div style="flex:1"></div>
+      <div class="phase-dot" id="dot1"></div>
+      <span class="phase-label" id="label1">说教</span>
+      <div style="flex:1"></div>
+      <div class="phase-dot" id="dot2"></div>
+      <span class="phase-label" id="label2">跑路</span>
+      <div style="flex:1"></div>
+      <div class="phase-dot" id="dot3"></div>
+      <span class="phase-label" id="label3">收工</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.mjs"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as PIXI from 'pixi.js';
+
+    const TOTAL = 20000;
+    const PH = TOTAL / 4;
+
+    // ===== PIXI 应用初始化 =====
+    const canvas = document.getElementById('game-canvas');
+    const app = new PIXI.Application();
+    await app.init({
+      canvas,
+      width: canvas.clientWidth || 400,
+      height: canvas.clientHeight || 500,
+      backgroundColor: 0x08080f,
+      antialias: true,
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true,
+    });
+
+    // ===== 加载雪碧图 =====
+    const sheet = await PIXI.Assets.load('https://pixijs.com/assets/spritesheet/0123456789.json');
+
+    // ===== 创建火焰动画（代表"疗愈"温暖） =====
+    const fireAnim = new PIXI.AnimatedSprite(sheet.animations['0123456789']);
+    fireAnim.animationSpeed = 0.8;
+    fireAnim.anchor.set(0.5);
+    fireAnim.scale.set(3);
+    fireAnim.x = app.screen.width / 2;
+    fireAnim.y = app.screen.height / 2 + 20;
+    fireAnim.alpha = 0;
+    app.stage.addChild(fireAnim);
+
+    // ===== 粒子光点 =====
+    const particles = [];
+    for (let i = 0; i < 30; i++) {
+      const p = new PIXI.Graphics();
+      p.circle(0, 0, Math.random() * 3 + 1);
+      p.fill({ color: 0xd4a843, alpha: 0.6 });
+      p.x = Math.random() * app.screen.width;
+      p.y = Math.random() * app.screen.height;
+      p.vx = (Math.random() - 0.5) * 0.5;
+      p.vy = -Math.random() * 1.5 - 0.5;
+      p.life = Math.random();
+      app.stage.addChild(p);
+      particles.push(p);
+    }
+
+    // ===== 标题文字 =====
+    const titleStyle = new PIXI.TextStyle({
+      fontFamily: 'serif',
+      fontSize: 36,
+      fontWeight: '900',
+      fill: 0xd4a843,
+      letterSpacing: 6,
+      dropShadow: { color: 0xd4a843, alpha: 0.5, blur: 20, distance: 0 },
+    });
+    const title = new PIXI.Text({ text: '心灵疗愈', style: titleStyle });
+    title.anchor.set(0.5);
+    title.x = app.screen.width / 2;
+    title.y = 50;
+    title.alpha = 0;
+    app.stage.addChild(title);
+
+    // ===== 气泡文字 =====
+    const bubbleStyle = new PIXI.TextStyle({
+      fontFamily: 'sans-serif',
+      fontSize: 16,
+      fontWeight: 'bold',
+      fill: 0x1a1a2e,
+    });
+    const bubbleBg = new PIXI.Graphics();
+    app.stage.addChild(bubbleBg);
+
+    function drawBubble(g, text, x, y, visible) {
+      g.clear();
+      if (!visible) return;
+      const padding = 14;
+      const w = text.width + padding * 2;
+      const h = text.height + padding * 2;
+      g.roundRect(x - w/2, y - h/2, w, h, 12);
+      g.fill({ color: 0xffffff, alpha: 0.97 });
+      g.stroke({ color: 0xd4a843, width: 2, alpha: 0.3 });
+      text.x = x;
+      text.y = y;
+      text.pivot.set(text.width/2, text.height/2);
+    }
+
+    const bubbleText = new PIXI.Text({ text: '大家辛苦了~', style: bubbleStyle });
+    bubbleText.alpha = 0;
+    app.stage.addChild(bubbleText);
+    bubbleBg.alpha = 0;
+
+    // ===== 潜台词 =====
+    const truthStyle = new PIXI.TextStyle({
+      fontFamily: 'sans-serif',
+      fontSize: 22,
+      fontWeight: 'bold',
+      fill: 0xf0ece4,
+      align: 'center',
+    });
+    const truthLabelStyle = new PIXI.TextStyle({
+      fontFamily: 'sans-serif',
+      fontSize: 14,
+      fontWeight: 'bold',
+      fill: 0xe85454,
+    });
+    const truthLabel = new PIXI.Text({ text: '💬 潜台词', style: truthLabelStyle });
+    truthLabel.anchor.set(0.5);
+    truthLabel.x = app.screen.width / 2;
+    truthLabel.y = app.screen.height - 120;
+    truthLabel.alpha = 0;
+    app.stage.addChild(truthLabel);
+
+    const line1 = new PIXI.Text({ text: '饼先画着', style: truthStyle });
+    const line2 = new PIXI.Text({ text: '苦还得继续吃', style: truthStyle });
+    const line3 = new PIXI.Text({ text: '治愈只是传说', style: truthStyle });
+    [line1, line2, line3].forEach((t, i) => {
+      t.anchor.set(0.5);
+      t.x = app.screen.width / 2;
+      t.y = app.screen.height - 90 + i * 30;
+      t.alpha = 0;
+      app.stage.addChild(t);
+    });
+
+    const quoteStyle = new PIXI.TextStyle({
+      fontFamily: 'sans-serif',
+      fontSize: 13,
+      fontStyle: 'italic',
+      fill: 0x8a8a9a,
+      align: 'center',
+    });
+    const quote = new PIXI.Text({ text: '"疗愈是假的，透支是真的。"', style: quoteStyle });
+    quote.anchor.set(0.5);
+    quote.x = app.screen.width / 2;
+    quote.y = app.screen.height - 20;
+    quote.alpha = 0;
+    app.stage.addChild(quote);
+
+    // ===== 场景阶段标签 =====
+    const tagStyle = new PIXI.TextStyle({
+      fontFamily: 'sans-serif',
+      fontSize: 11,
+      fill: 0xd4a843,
+      letterSpacing: 3,
+    });
+    const phaseTag = new PIXI.Text({ text: '领导登场', style: tagStyle });
+    phaseTag.anchor.set(0.5);
+    phaseTag.x = app.screen.width / 2;
+    phaseTag.y = 14;
+    phaseTag.alpha = 0;
+    app.stage.addChild(phaseTag);
+
+    // ===== DOM元素引用 =====
+    const progressFill = document.getElementById('progressFill');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const dots = [0,1,2,3].map(i => ({ dot: document.getElementById('dot'+i), label: document.getElementById('label'+i) }));
+
+    function setPhaseUI(active) {
+      dots.forEach((d, i) => {
+        d.dot.classList.toggle('active', i <= active);
+        d.label.classList.toggle('active', i <= active);
+      });
+    }
+
+    // ===== 闪光效果 =====
+    let flashAlpha = 0;
+    const flashOverlay = new PIXI.Graphics();
+    flashOverlay.rect(0, 0, app.screen.width, app.screen.height);
+    flashOverlay.fill({ color: 0xffddaa, alpha: 0 });
+    app.stage.addChildAt(flashOverlay, 0);
+
+    let lastPhase = -1;
+
+    // ===== 主循环 =====
+    app.ticker.add((ticker) => {
+      const elapsed = (Date.now() % TOTAL);
+      const progress = (elapsed / TOTAL * 100).toFixed(1);
+      progressFill.style.width = progress + '%';
+
+      const sec = Math.floor(elapsed / 1000);
+      const mm = String(Math.floor(sec / 60)).padStart(2,'0');
+      const ss = String(sec % 60).padStart(2,'0');
+      timeDisplay.textContent = `${mm}:${ss} / 20s`;
+
+      // 粒子动画
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha = Math.sin(p.life * Math.PI) * 0.7;
+        p.life -= 0.003;
+        if (p.life <= 0 || p.y < -10) {
+          p.life = 1;
+          p.x = Math.random() * app.screen.width;
+          p.y = app.screen.height + 10;
+        }
+      });
+
+      // 闪光淡出
+      if (flashAlpha > 0) {
+        flashAlpha -= 0.03;
+        flashOverlay.alpha = Math.max(0, flashAlpha);
+      }
+
+      if (elapsed < PH) {
+        // ===== 阶段0：登场 (0-5s) =====
+        const p = elapsed / PH;
+        fireAnim.alpha = p * 0.6;
+        fireAnim.play();
+        title.alpha = Math.min(1, p * 2);
+        phaseTag.alpha = p > 0.3 ? 0.7 : 0;
+        phaseTag.text = p > 0.3 ? '领导登场' : '开会啦~';
+        bubbleBg.alpha = p > 0.5 ? Math.min(1, (p - 0.5) * 3) : 0;
+        bubbleText.alpha = p > 0.5 ? Math.min(1, (p - 0.5) * 3) : 0;
+        drawBubble(bubbleBg, bubbleText, app.screen.width / 2, app.screen.height / 2 - 60, p > 0.5);
+        setPhaseUI(0);
+        if (lastPhase !== 0) { lastPhase = 0; flashAlpha = 0; }
+
+      } else if (elapsed < PH * 2) {
+        // ===== 阶段1：说教 (5-10s) =====
+        const p = (elapsed - PH) / PH;
+        fireAnim.alpha = 0.7;
+        fireAnim.animationSpeed = 0.5 + p * 0.5;
+        title.alpha = 1;
+        phaseTag.alpha = 0.7;
+        phaseTag.text = '「心灵疗愈」';
+        bubbleBg.alpha = 1;
+        bubbleText.alpha = 1;
+        drawBubble(bubbleBg, bubbleText, app.screen.width / 2, app.screen.height / 2 - 60, true);
+        truthLabel.alpha = p > 0.2 ? Math.min(1, (p-0.2) * 2) : 0;
+        line1.alpha = p > 0.3 ? Math.min(1, (p-0.3)*3) : 0;
+        line2.alpha = p > 0.5 ? Math.min(1, (p-0.5)*3) : 0;
+        line3.alpha = p > 0.7 ? Math.min(1, (p-0.7)*4) : 0;
+        setPhaseUI(1);
+        if (lastPhase !== 1) {
+          lastPhase = 1;
+          flashAlpha = 0.25;
+        }
+
+      } else if (elapsed < PH * 3) {
+        // ===== 阶段2：跑路 (10-15s) =====
+        const p = (elapsed - PH*2) / PH;
+        fireAnim.alpha = 0.5 - p * 0.3;
+        fireAnim.animationSpeed = 2.0;
+        title.alpha = 1 - p * 0.5;
+        phaseTag.alpha = 0.7;
+        phaseTag.text = '又要加班了！';
+        bubbleBg.alpha = Math.max(0, 1 - p * 4);
+        bubbleText.alpha = Math.max(0, 1 - p * 4);
+        truthLabel.alpha = 1;
+        line1.alpha = 1; line2.alpha = 1; line3.alpha = 1;
+        quote.alpha = p > 0.5 ? Math.min(1, (p-0.5)*2) : 0;
+        setPhaseUI(2);
+        if (lastPhase !== 2) { lastPhase = 2; flashAlpha = 0; }
+
+      } else {
+        // ===== 阶段3：收工 (15-20s) =====
+        const p = (elapsed - PH*3) / PH;
+        fireAnim.alpha = Math.max(0.1, 0.2 - p * 0.15);
+        fireAnim.animationSpeed = 0.3;
+        fireAnim.play();
+        title.alpha = 0.5;
+        phaseTag.alpha = 0.7;
+        phaseTag.text = '领导：完美收工~';
+        bubbleText.text = '辛苦了！';
+        bubbleBg.alpha = 0.6;
+        bubbleText.alpha = 0.6;
+        drawBubble(bubbleBg, bubbleText, app.screen.width / 2, app.screen.height / 2 - 60, true);
+        truthLabel.alpha = 1;
+        line1.alpha = 1; line2.alpha = 1; line3.alpha = 1;
+        quote.alpha = 1;
+        setPhaseUI(3);
+        if (lastPhase !== 3) { lastPhase = 3; flashAlpha = 0.3; }
+      }
+    });
+
+    app.start();
+  </script>
+</body>
+</html>
