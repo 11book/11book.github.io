@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sprite动画 Demo</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0d0d12;
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; min-height:100vh;
+    font-family:"Noto Sans SC",sans-serif;
+    color:#f0ece4; gap:20px;
+  }
+
+  .info {
+    font-size:13px; color:#8a8a9a; text-align:center; letter-spacing:1px;
+  }
+
+  /* ===== 舞台 ===== */
+  .stage {
+    display:flex; align-items:flex-end; gap:30px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px; padding:30px 50px;
+    position:relative;
+  }
+
+  /* ===== 角色基础 ===== */
+  .char {
+    overflow:hidden;          /* 超出部分隐藏，只显示当前帧 */
+    background-repeat:no-repeat;
+    background-color:transparent;
+    image-rendering:-webkit-optimize-contrast;
+    /* 初始停在第1帧 */
+    background-position:0 0;
+    flex-shrink:0;
+  }
+
+  /* ===== 领导 ===== */
+  .boss-sprite {
+    width:200px; height:200px;     /* 每个角色显示尺寸 */
+    background-image:url('boss-sprite.png');
+    background-size:1600px 200px;  /* 雪碧图实际尺寸 */
+  }
+  /* ===== 打工狗 ===== */
+  .dog-sprite {
+    width:200px; height:200px;
+    background-image:url('dog-sprite.png');
+    background-size:1600px 200px;
+  }
+
+  /* ===== 动画序列（用steps实现逐帧跳变） ===== */
+
+  /* 8帧动画，时间越短越快 */
+  @keyframes sprite8 {
+    from { background-position:0 0; }
+    to   { background-position:-1600px 0; }
+  }
+
+  /* 慢速循环（每秒1帧，8秒一循环） */
+  .anim-slow {
+    animation: sprite8 8s steps(8) infinite;
+  }
+
+  /* 中速（每秒2帧，4秒一循环） */
+  .anim-med {
+    animation: sprite8 4s steps(8) infinite;
+  }
+
+  /* 快速（每秒4帧，2秒一循环） */
+  .anim-fast {
+    animation: sprite8 2s steps(8) infinite;
+  }
+
+  /* 暂停 */
+  .anim-pause {
+    animation-play-state: paused;
+  }
+
+  /* 阶段控制 */
+  .controls {
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+  }
+  .ctrl-label {
+    font-size:12px; color:#d4a843; letter-spacing:2px;
+  }
+  .btn-row {
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  }
+  button {
+    background:rgba(212,168,67,0.15);
+    border:1px solid rgba(212,168,67,0.4);
+    color:#d4a843;
+    padding:8px 18px; border-radius:8px;
+    font-size:14px; cursor:pointer;
+    transition:all 0.2s;
+    font-family:"Noto Sans SC",sans-serif;
+  }
+  button:hover {
+    background:rgba(212,168,67,0.3);
+  }
+  button.active {
+    background:rgba(212,168,67,0.4);
+    box-shadow:0 0 12px rgba(212,168,67,0.3);
+  }
+
+  /* 场景标签 */
+  .scene-tags {
+    display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+    max-width:500px;
+  }
+  .tag {
+    font-size:11px; color:#8a8a9a; letter-spacing:1px;
+    padding:4px 10px; border:1px solid rgba(255,255,255,0.1);
+    border-radius:20px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="info">💡 雪碧图 + CSS steps() 逐帧动画 — 对比不同速度</div>
+
+  <div class="stage">
+    <!-- 领导：8帧雪碧图 -->
+    <div class="char boss-sprite anim-slow" id="boss"></div>
+    <!-- 打工狗：8帧雪碧图 -->
+    <div class="char dog-sprite anim-slow" id="dog"></div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl-label">动画速度</div>
+    <div class="btn-row">
+      <button class="active" id="btnSlow" onclick="setSpeed('slow',this)">慢速 8s/循环</button>
+      <button id="btnMed" onclick="setSpeed('med',this)">中速 4s/循环</button>
+      <button id="btnFast" onclick="setSpeed('fast',this)">快速 2s/循环</button>
+      <button id="btnPause" onclick="togglePause(this)">暂停</button>
+    </div>
+
+    <div class="ctrl-label" style="margin-top:8px">说明</div>
+    <div class="scene-tags">
+      <span class="tag">领导帧1=竖食指（说教）</span>
+      <span class="tag">领导帧3=过渡</span>
+      <span class="tag">领导帧5=奔跑</span>
+      <span class="tag">领导帧7=竖拇指</span>
+      <span class="tag">狗帧1=疲惫站</span>
+      <span class="tag">狗帧3=垮塌</span>
+      <span class="tag">狗帧5=奔跑</span>
+      <span class="tag">狗帧7=握拳</span>
+    </div>
+  </div>
+
+<script>
+  const boss = document.getElementById('boss');
+  const dog = document.getElementById('dog');
+  const btnPause = document.getElementById('btnPause');
+
+  function setSpeed(speed, btn) {
+    // 移除所有速度类
+    ['anim-slow','anim-med','anim-fast'].forEach(c => {
+      boss.classList.remove(c);
+      dog.classList.remove(c);
+    });
+    // 添加新速度
+    const cls = speed === 'slow' ? 'anim-slow' : speed === 'med' ? 'anim-med' : 'anim-fast';
+    boss.classList.add(cls);
+    dog.classList.add(cls);
+
+    // 更新按钮高亮
+    document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    btnPause.classList.remove('active');
+    btnPause.textContent = '暂停';
+  }
+
+  function togglePause(btn) {
+    const isPaused = boss.style.animationPlayState === 'paused';
+    if (isPaused) {
+      boss.style.animationPlayState = 'running';
+      dog.style.animationPlayState = 'running';
+      btn.textContent = '暂停';
+      btn.classList.remove('active');
+    } else {
+      boss.style.animationPlayState = 'paused';
+      dog.style.animationPlayState = 'paused';
+      btn.textContent = '继续▶';
+      btn.classList.add('active');
+    }
+  }
+</script>
+</body>
+</html>
