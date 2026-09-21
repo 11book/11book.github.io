@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心灵疗愈 · 动画版</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; }
+  body {
+    background:#08080f;
+    display:flex; flex-direction:column;
+    font-family:"Noto Sans SC",sans-serif;
+    color:#f0ece4;
+  }
+
+  /* ===== HUD ===== */
+  .hud {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 20px;
+    background:rgba(255,255,255,0.02);
+    border-bottom:1px solid rgba(212,168,67,0.2);
+    flex-shrink:0; position:relative; z-index:10;
+  }
+  .hud-title {
+    font-family:Georgia,serif; font-size:20px; font-weight:900;
+    color:#d4a843; letter-spacing:4px;
+    text-shadow:0 0 20px rgba(212,168,67,0.5);
+  }
+  .hud-badge {
+    font-size:10px; color:#d4a843; letter-spacing:2px;
+    border:1px solid rgba(212,168,67,0.3);
+    padding:3px 10px; border-radius:20px; opacity:0.8;
+  }
+  .hud-time { font-size:12px; color:#8a8a9a; }
+
+  /* ===== 舞台 ===== */
+  .stage {
+    flex:1; position:relative; overflow:hidden;
+    background:radial-gradient(ellipse 80% 50% at 50% 0%, #0d0d18 0%, #08080f 60%);
+  }
+  .ground {
+    position:absolute; bottom:70px; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(212,168,67,0.25), transparent);
+  }
+
+  /* ===== 角色通用 ===== */
+  .char {
+    position:absolute; bottom:71px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .char-shadow {
+    width:60px; height:8px;
+    background:radial-gradient(ellipse, rgba(0,0,0,0.45) 0%, transparent 70%);
+    border-radius:50%; margin-top:-4px;
+  }
+
+  /* ===== 老板角色（CSS绘制） ===== */
+  .boss {
+    right:70px; width:140px; height:170px;
+  }
+  .boss-head {
+    width:60px; height:60px;
+    background:radial-gradient(circle at 40% 35%, #f5deb3, #deb87a);
+    border-radius:50%;
+    position:relative;
+    box-shadow:0 2px 8px rgba(0,0,0,0.3);
+  }
+  /* 光头反光 */
+  .boss-head::before {
+    content:''; position:absolute;
+    top:8px; left:12px; width:20px; height:10px;
+    background:rgba(255,255,255,0.25);
+    border-radius:50%; transform:rotate(-20deg);
+  }
+  /* 墨镜 */
+  .boss-glasses {
+    position:absolute; top:18px; left:8px; right:8px; height:16px;
+    display:flex; gap:4px;
+  }
+  .boss-glasses::before, .boss-glasses::after {
+    content:''; flex:1; height:16px;
+    background:#1a1a1a; border-radius:4px;
+  }
+  /* 嘴巴 */
+  .boss-mouth {
+    position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+    width:20px; height:6px;
+    border-bottom:3px solid #8b6914;
+    border-radius:0 0 10px 10px;
+  }
+  /* 身体 */
+  .boss-body {
+    width:80px; height:90px;
+    background:linear-gradient(180deg, #f0f0f0, #d8d8d8);
+    border-radius:12px 12px 8px 8px;
+    margin-top:-8px;
+    position:relative;
+    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  }
+  /* 领带 */
+  .boss-tie {
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:14px; height:35px;
+    background:linear-gradient(180deg, #cc3333, #aa2222);
+    clip-path:polygon(30% 0%, 70% 0%, 100% 15%, 60% 100%, 40% 100%, 0% 15%);
+  }
+  /* 保温杯 */
+  .boss-cup {
+    position:absolute; right:-15px; bottom:15px;
+    width:22px; height:32px;
+    background:linear-gradient(180deg, #888, #666);
+    border-radius:4px 4px 6px 6px;
+    box-shadow:inset -4px 0 6px rgba(0,0,0,0.3);
+  }
+  .boss-cup::before {
+    content:''; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:16px; height:6px; background:#555; border-radius:3px 3px 0 0;
+  }
+  /* 手臂 */
+  .boss-arm {
+    position:absolute; bottom:20px; width:18px; height:50px;
+    background:linear-gradient(180deg, #d8d8d8, #ccc);
+    border-radius:10px;
+    transform-origin:top center;
+  }
+  .boss-arm.left { left:-8px; transform:rotate(15deg); }
+  .boss-arm.right { right:-8px; transform:rotate(-15deg); }
+
+  /* Boss动画状态 */
+  .boss.idle .boss-arm.right { animation: armWave 2s ease-in-out infinite; }
+  .boss.running .boss-arm.right { animation: armRun 0.4s ease-in-out infinite; }
+  .boss.running .boss-arm.left { animation: armRun 0.4s ease-in-out infinite 0.2s; }
+  .boss.thumbs .boss-arm.right { transform:rotate(-60deg) translateY(-10px); }
+
+  @keyframes armWave {
+    0%,100% { transform:rotate(15deg); }
+    50% { transform:rotate(-5deg); }
+  }
+  @keyframes armRun {
+    0%,100% { transform:rotate(-20deg); }
+    50% { transform:rotate(20deg); }
+  }
+
+  /* 老板竖食指的动画 */
+  .boss-point .boss-arm.right { animation: armPoint 0.8s ease-in-out infinite; }
+  @keyframes armPoint {
+    0%,100% { transform:rotate(-30deg) translateY(0); }
+    50% { transform:rotate(-30deg) translateY(-8px); }
+  }
+
+  /* 老板说教弹跳 */
+  .boss.speaking { animation: bossBounce 1.2s ease-in-out infinite; }
+  @keyframes bossBounce {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-6px); }
+  }
+
+  /* ===== 打工狗角色（CSS绘制） ===== */
+  .dog {
+    left:70px; width:130px; height:160px;
+  }
+  .dog-head {
+    width:70px; height:65px;
+    background:radial-gradient(circle at 45% 40%, #c4956a, #8b6040);
+    border-radius:50% 50% 45% 45%;
+    position:relative;
+    box-shadow:0 2px 8px rgba(0,0,0,0.25);
+  }
+  /* 狗耳朵 */
+  .dog-ear {
+    position:absolute; top:-8px; width:22px; height:30px;
+    background:radial-gradient(circle at 50% 60%, #b07850, #7a5030);
+    border-radius:50% 50% 40% 40%;
+  }
+  .dog-ear.left { left:-6px; transform:rotate(-15deg); }
+  .dog-ear.right { right:-6px; transform:rotate(15deg); }
+  /* 眼睛 */
+  .dog-eyes {
+    position:absolute; top:18px; left:50%; transform:translateX(-50%);
+    display:flex; gap:18px;
+  }
+  .dog-eye {
+    width:16px; height:16px;
+    background:#1a1a1a; border-radius:50%;
+    position:relative;
+  }
+  .dog-eye::after {
+    content:''; position:absolute; top:3px; right:3px;
+    width:5px; height:5px; background:white; border-radius:50%;
+  }
+  /* 疲惫眼神 */
+  .dog.tired .dog-eye {
+    height:8px; border-radius:0 0 50% 50%;
+    background:#555;
+  }
+  .dog.tired .dog-eye::after { display:none; }
+  /* 嘴巴 */
+  .dog-mouth {
+    position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+    width:14px; height:7px;
+    border-bottom:3px solid #6b4020;
+    border-radius:0 0 10px 10px;
+  }
+  /* 身体 */
+  .dog-body {
+    width:55px; height:75px;
+    background:linear-gradient(180deg, #c4956a, #a07848);
+    border-radius:20px 20px 12px 12px;
+    margin-top:-10px;
+    position:relative;
+  }
+  /* 工牌 */
+  .dog-badge {
+    position:absolute; top:8px; right:-18px;
+    width:20px; height:26px;
+    background:#f5f5f5; border-radius:4px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.2);
+  }
+  .dog-badge::before {
+    content:''; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:14px; height:6px; background:#ccc; border-radius:3px 3px 0 0;
+  }
+  /* 背包 */
+  .dog-bag {
+    position:absolute; top:10px; left:-12px;
+    width:28px; height:40px;
+    background:linear-gradient(180deg, #8b6914, #6b4f10);
+    border-radius:8px 8px 6px 6px;
+  }
+
+  /* 狗动画 */
+  .dog.running { animation: dogRun 0.6s ease-in-out infinite; }
+  .dog.collapse {
+    animation: dogCollapse 0.8s ease-in-out infinite;
+    transform-origin:bottom center;
+  }
+  @keyframes dogRun {
+    0%,100% { transform:translateY(0) rotate(0deg); }
+    25% { transform:translateY(-8px) rotate(-3deg); }
+    75% { transform:translateY(-4px) rotate(2deg); }
+  }
+  @keyframes dogCollapse {
+    0%,100% { transform:rotate(0deg) translateY(0); }
+    30% { transform:rotate(-10deg) translateY(5px); }
+    60% { transform:rotate(6deg) translateY(2px); }
+    80% { transform:rotate(-5deg) translateY(8px); }
+  }
+
+  /* ===== 气泡 ===== */
+  .bubble {
+    position:absolute;
+    background:rgba(255,255,255,0.97);
+    border-radius:14px; padding:10px 18px;
+    font-size:16px; font-weight:700; color:#1a1a2e;
+    box-shadow:0 4px 24px rgba(0,0,0,0.35), 0 0 0 2px rgba(212,168,67,0.15);
+    opacity:0; transform:scale(0.7) translateY(10px);
+    transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    z-index:20; white-space:nowrap;
+  }
+  .bubble.show { opacity:1; transform:scale(1) translateY(0); }
+  .bubble::after {
+    content:''; position:absolute; bottom:-9px; left:22px;
+    border:9px solid transparent; border-top-color:rgba(255,255,255,0.97); border-bottom:0;
+  }
+  .bubble-boss { top:30px; right:0; }
+
+  /* ===== 潜台词 ===== */
+  .truth-panel {
+    position:absolute; bottom:76px; left:50%; transform:translateX(-50%);
+    text-align:center; opacity:0; transition:opacity 0.5s;
+  }
+  .truth-panel.show { opacity:1; }
+  .truth-label { font-size:16px; font-weight:700; color:#e85454; margin-bottom:6px; }
+  .truth-line { font-size:20px; font-weight:700; color:#f0ece4; opacity:0; transform:translateY(6px); transition:all 0.3s ease; text-shadow:0 2px 8px rgba(0,0,0,0.8); }
+  .truth-line.show { opacity:1; transform:translateY(0); }
+  .quote { font-size:13px; color:#8a8a9a; font-style:italic; margin-top:6px; text-shadow:0 2px 8px rgba(0,0,0,0.8); }
+
+  /* ===== 场景标签 ===== */
+  .scene-tag {
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:3px; color:#d4a843;
+    opacity:0; transition:opacity 0.4s;
+  }
+  .scene-tag.show { opacity:0.65; }
+
+  /* ===== 闪光 ===== */
+  .flash { position:absolute; inset:0; background:rgba(255,220,150,0.12); opacity:0; pointer-events:none; z-index:30; }
+  .flash.go { animation:flashAnim 0.3s ease; }
+  @keyframes flashAnim { 0%{opacity:1} 100%{opacity:0} }
+
+  /* ===== 底部时间线 ===== */
+  .timeline { padding:0 20px 14px; background:rgba(0,0,0,0.3); flex-shrink:0; }
+  .timeline-track { height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; }
+  .timeline-fill { height:100%; width:0%; background:linear-gradient(90deg,#d4a843,#e85454); border-radius:2px; transition:width 0.1s linear; }
+  .timeline-dots { display:flex; justify-content:space-between; margin-top:6px; }
+  .timeline-dot { font-size:10px; color:#8a8a9a; opacity:0.5; transition:all 0.3s; }
+  .timeline-dot.active { color:#d4a843; opacity:1; }
+</style>
+</head>
+<body>
+
+  <div class="hud">
+    <div class="hud-title">心灵疗愈</div>
+    <div class="hud-badge">职场黑话</div>
+    <div class="hud-time" id="hudTime">00:00 / 20s</div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="flash" id="flash"></div>
+    <div class="scene-tag" id="sceneTag">领导登场</div>
+    <div class="ground"></div>
+
+    <!-- 老板 -->
+    <div class="char boss" id="boss">
+      <div class="boss-head">
+        <div class="boss-glasses"></div>
+        <div class="boss-mouth"></div>
+      </div>
+      <div class="boss-body">
+        <div class="boss-tie"></div>
+        <div class="boss-arm left"></div>
+        <div class="boss-arm right"></div>
+        <div class="boss-cup"></div>
+      </div>
+      <div class="char-shadow"></div>
+      <div class="bubble bubble-boss" id="bubbleBoss">大家辛苦了~</div>
+    </div>
+
+    <!-- 打工狗 -->
+    <div class="char dog" id="dog">
+      <div class="dog-head">
+        <div class="dog-ear left"></div>
+        <div class="dog-ear right"></div>
+        <div class="dog-eyes">
+          <div class="dog-eye"></div>
+          <div class="dog-eye"></div>
+        </div>
+        <div class="dog-mouth"></div>
+      </div>
+      <div class="dog-body">
+        <div class="dog-badge"></div>
+        <div class="dog-bag"></div>
+      </div>
+      <div class="char-shadow"></div>
+    </div>
+
+    <!-- 潜台词 -->
+    <div class="truth-panel" id="truthPanel">
+      <div class="truth-label">💬 潜台词</div>
+      <div class="truth-line" id="tl1">饼先画着</div>
+      <div class="truth-line" id="tl2">苦还得继续吃</div>
+      <div class="truth-line" id="tl3">治愈只是传说</div>
+      <div class="quote" id="quoteText">"疗愈是假的，透支是真的。"</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-track">
+      <div class="timeline-fill" id="timelineFill"></div>
+    </div>
+    <div class="timeline-dots">
+      <span class="timeline-dot active" id="dot0">登场</span>
+      <span class="timeline-dot" id="dot1">说教</span>
+      <span class="timeline-dot" id="dot2">跑路</span>
+      <span class="timeline-dot" id="dot3">收工</span>
+    </div>
+  </div>
+
+<script>
+(function() {
+  const TOTAL = 20000;
+  const PH = TOTAL / 4;
+
+  const boss = document.getElementById('boss');
+  const dog = document.getElementById('dog');
+  const bubbleBoss = document.getElementById('bubbleBoss');
+  const sceneTag = document.getElementById('sceneTag');
+  const truthPanel = document.getElementById('truthPanel');
+  const tl1 = document.getElementById('tl1');
+  const tl2 = document.getElementById('tl2');
+  const tl3 = document.getElementById('tl3');
+  const quoteText = document.getElementById('quoteText');
+  const timelineFill = document.getElementById('timelineFill');
+  const hudTime = document.getElementById('hudTime');
+  const flash = document.getElementById('flash');
+  const dots = [0,1,2,3].map(i => document.getElementById('dot'+i));
+
+  function reset() {
+    boss.className = 'char boss';
+    dog.className = 'char dog';
+    bubbleBoss.className = 'bubble bubble-boss';
+    bubbleBoss.textContent = '大家辛苦了~';
+    sceneTag.className = 'scene-tag';
+    truthPanel.className = 'truth-panel';
+    tl1.className = 'truth-line';
+    tl2.className = 'truth-line';
+    tl3.className = 'truth-line';
+    quoteText.style.opacity = '0';
+    dots.forEach(d => d.classList.remove('active'));
+  }
+
+  function flashScreen() {
+    flash.classList.remove('go');
+    void flash.offsetWidth;
+    flash.classList.add('go');
+  }
+
+  function setTime(sec) {
+    const s = Math.floor(sec);
+    const mm = String(Math.floor(s/60)).padStart(2,'0');
+    const ss = String(s%60).padStart(2,'0');
+    hudTime.textContent = `${mm}:${ss} / 20s`;
+  }
+
+  let lastPhase = -1;
+  let startTime = null;
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    const cycle = (ts - startTime) % TOTAL;
+    const progress = (cycle / TOTAL * 100).toFixed(1);
+    timelineFill.style.width = progress + '%';
+    setTime(cycle);
+
+    reset();
+
+    if (cycle < PH) {
+      // 阶段0：登场
+      const p = cycle / PH;
+      sceneTag.textContent = p > 0.3 ? '领导登场' : '开会啦~';
+      sceneTag.classList.add('show');
+      boss.classList.add('speaking');
+      dog.classList.add('tired');
+      if (p > 0.4) bubbleBoss.classList.add('show');
+      if (p > 0.6) { truthPanel.classList.add('show'); tl1.classList.add('show'); }
+      dots[0].classList.add('active');
+
+    } else if (cycle < PH * 2) {
+      // 阶段1：说教
+      const p = (cycle - PH) / PH;
+      boss.classList.add('speaking');
+      boss.classList.add('idle');
+      dog.classList.add('tired');
+      sceneTag.textContent = '「心灵疗愈」';
+      sceneTag.classList.add('show');
+      bubbleBoss.classList.add('show');
+      truthPanel.classList.add('show');
+      dots[0].classList.add('active'); dots[1].classList.add('active');
+      if (p > 0.25) tl1.classList.add('show');
+      if (p > 0.45) tl2.classList.add('show');
+      if (p > 0.65) tl3.classList.add('show');
+      if (p > 0.72 && lastPhase !== 1) { flashScreen(); }
+
+    } else if (cycle < PH * 3) {
+      // 阶段2：跑路
+      const p = (cycle - PH*2) / PH;
+      boss.classList.add('running');
+      boss.classList.add('point');
+      dog.classList.remove('tired');
+      dog.classList.add('running');
+      sceneTag.textContent = '又要加班了！';
+      sceneTag.classList.add('show');
+      bubbleBoss.classList.remove('show');
+      truthPanel.classList.add('show');
+      tl1.classList.add('show'); tl2.classList.add('show'); tl3.classList.add('show');
+      dots[0].classList.add('active'); dots[1].classList.add('active'); dots[2].classList.add('active');
+      if (p > 0.55) quoteText.style.opacity = '1';
+
+    } else {
+      // 阶段3：收工
+      const p = (cycle - PH*3) / PH;
+      boss.classList.add('speaking');
+      boss.classList.add('thumbs');
+      dog.classList.remove('running');
+      dog.classList.add('collapse');
+      sceneTag.textContent = '领导：完美收工~';
+      sceneTag.classList.add('show');
+      bubbleBoss.textContent = '辛苦了！';
+      bubbleBoss.classList.add('show');
+      truthPanel.classList.add('show');
+      tl1.classList.add('show'); tl2.classList.add('show'); tl3.classList.add('show');
+      quoteText.style.opacity = '1';
+      dots.forEach(d => d.classList.add('active'));
+      if (p > 0.88 && lastPhase !== 3) { flashScreen(); }
+    }
+
+    lastPhase = cycle < PH ? 0 : cycle < PH*2 ? 1 : cycle < PH*3 ? 2 : 3;
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
