@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心灵疗愈 · 动画版</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; }
+  body {
+    font-family:"Noto Sans SC",sans-serif;
+    background:#0d0d12;
+    color:#f0ece4;
+    display:flex; flex-direction:column;
+    height:100vh; height:100dvh;
+  }
+
+  body::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:40%;
+    background:radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.1) 0%, transparent 65%);
+    pointer-events:none; z-index:0;
+  }
+
+  /* 顶部 */
+  .top {
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    padding:4px 28px 8px;
+    position:relative; z-index:1;
+  }
+  .tag {
+    font-size:11px; letter-spacing:3px; color:#d4a843;
+    border:1px solid rgba(212,168,67,0.3); padding:5px 16px; border-radius:50px; margin-bottom:14px;
+    opacity:0; animation:fadeIn 0.5s ease forwards 0.3s;
+  }
+  .main-title {
+    font-family:'Noto Serif SC'; font-size:50px; font-weight:900;
+    text-align:center; line-height:1.15; letter-spacing:3px;
+    min-width:0; overflow-wrap:break-word;
+    opacity:0; animation:slideUp 0.6s ease forwards 0.6s;
+  }
+  .sub-title {
+    font-size:22px; color:#8a8a9a; text-align:center; margin-top:10px;
+    opacity:0; animation:slideUp 0.6s ease forwards 0.9s;
+  }
+
+  .divider {
+    width:100%; height:3px; flex-shrink:0;
+    background:linear-gradient(90deg,transparent,#d4a843,transparent);
+    opacity:0.35; position:relative; z-index:1;
+    opacity:0; animation:fadeIn 0.5s ease forwards 1.2s;
+  }
+
+  /* 底部舞台 */
+  .bottom {
+    flex:1.6;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding:6px 28px 4px;
+    position:relative; z-index:1;
+  }
+
+  .stage {
+    width:100%; max-width:440px; height:230px;
+    position:relative; display:flex; align-items:flex-end; justify-content:center;
+  }
+
+  /* 角色 */
+  .char {
+    position:absolute; bottom:0;
+    background-size:contain; background-repeat:no-repeat;
+    background-position:bottom center;
+    transform-origin:bottom center;
+    image-rendering:-webkit-optimize-contrast;
+  }
+
+  /* 领导在右侧，打工狗在左侧 */
+  .boss {
+    right:20px; width:155px; height:210px;
+    opacity:0;
+    filter: drop-shadow(0 0 20px rgba(212,168,67,0.2));
+    transition: background-image 0.15s steps(1);
+  }
+  .dog {
+    left:20px; width:135px; height:190px;
+    opacity:0;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
+    transition: background-image 0.15s steps(1);
+  }
+
+  /* 阶段1：出现 */
+  .boss.phase-appear {
+    animation: bossAppear 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  .dog.phase-appear {
+    animation: dogAppear 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.3s forwards;
+  }
+
+  /* 阶段2：说教（领导上下浮动，狗轻微摇晃） */
+  .boss.phase-speak {
+    animation: bossSpeak 2s ease-in-out infinite;
+  }
+  .dog.phase-speak {
+    animation: dogTired 2.5s ease-in-out infinite;
+  }
+
+  /* 阶段3：奔跑/崩溃 */
+  .boss.phase-run {
+    animation: bossRun 1s ease-in-out infinite;
+  }
+  .dog.phase-run {
+    animation: dogCollapse 1.2s ease-in-out infinite;
+  }
+
+  /* 阶段4：完成/无语 */
+  .boss.phase-done {
+    animation: bossThumbsUp 1.5s ease-in-out infinite;
+  }
+  .dog.phase-done {
+    animation: dogSpeechless 1.8s ease-in-out infinite;
+  }
+
+  /* 关键帧 */
+  @keyframes bossAppear {
+    0% { opacity:0; transform:translateX(50px) scale(0.7); }
+    100% { opacity:1; transform:translateX(0) scale(1); }
+  }
+  @keyframes dogAppear {
+    0% { opacity:0; transform:translateX(-50px) scale(0.7); }
+    100% { opacity:1; transform:translateX(0) scale(1); }
+  }
+  @keyframes bossSpeak {
+    0%,100% { transform:scale(1) translateY(0); }
+    30% { transform:scale(1.06) translateY(-5px); }
+    60% { transform:scale(1) translateY(-2px); }
+  }
+  @keyframes dogTired {
+    0%,100% { transform:rotate(0deg) translateY(0); }
+    25% { transform:rotate(-3deg) translateY(3px); }
+    75% { transform:rotate(2deg) translateY(1px); }
+  }
+  @keyframes bossRun {
+    0% { transform:translateX(0) scale(1); }
+    25% { transform:translateX(-8px) scale(1.06); }
+    50% { transform:translateX(-15px) scale(1.08); }
+    75% { transform:translateX(-8px) scale(1.04); }
+    100% { transform:translateX(0) scale(1); }
+  }
+  @keyframes dogCollapse {
+    0% { transform:translateY(0) rotate(0deg); }
+    30% { transform:translateY(6px) rotate(-6deg); }
+    60% { transform:translateY(3px) rotate(-3deg); }
+    80% { transform:translateY(10px) rotate(-8deg); }
+    100% { transform:translateY(0) rotate(0deg); }
+  }
+  @keyframes bossThumbsUp {
+    0%,100% { transform:scale(1) rotate(0deg); }
+    40% { transform:scale(1.1) rotate(4deg); }
+    70% { transform:scale(1.05) rotate(-2deg); }
+  }
+  @keyframes dogSpeechless {
+    0%,100% { transform:rotate(0deg) translateY(0); }
+    20% { transform:rotate(-5deg) translateY(2px); }
+    50% { transform:rotate(3deg); }
+    80% { transform:rotate(-4deg) translateY(4px); }
+  }
+  @keyframes slideUp {
+    0% { opacity:0; transform:translateY(20px); }
+    100% { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeIn {
+    0% { opacity:0; } 100% { opacity:1; }
+  }
+
+  /* 场景字幕 */
+  .scene-label {
+    position:absolute; top:6px; right:8px;
+    font-size:11px; color:#d4a843; letter-spacing:2px;
+    opacity:0; transition:opacity 0.4s ease;
+  }
+  .scene-label.show { opacity:1; }
+
+  /* 潜台词 */
+  .truth-label {
+    font-size:24px; font-weight:700; color:#e85454;
+    display:flex; align-items:center; gap:8px; margin-bottom:10px;
+    opacity:0; transition:opacity 0.4s ease;
+  }
+  .truth-label.show { opacity:1; }
+  .truth-lines { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .truth-line {
+    font-size:28px; font-weight:700; color:#f0ece4; text-align:center; line-height:1.2;
+    opacity:0; transform:translateY(8px); transition:all 0.4s ease;
+  }
+  .truth-line.show { opacity:1; transform:translateY(0); }
+  .quote {
+    font-size:15px; color:#8a8a9a; font-style:italic;
+    text-align:center; line-height:1.7; margin-top:10px;
+    opacity:0; transition:opacity 0.5s ease;
+  }
+  .quote.show { opacity:1; }
+
+  /* 进度条 */
+  .progress-track {
+    position:absolute; bottom:-2px; left:0; right:0; height:2px; background:rgba(255,255,255,0.08);
+  }
+  .progress-fill {
+    height:100%; background:linear-gradient(90deg,#d4a843,#e85454);
+    width:0%; transition:width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="tag">开会现场</div>
+    <div class="main-title">心灵疗愈</div>
+    <div class="sub-title">大家这段时间辛苦了</div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="bottom">
+    <div class="stage" id="stage">
+      <div class="char boss" id="boss"></div>
+      <div class="char dog" id="dog"></div>
+      <div class="scene-label" id="sceneLabel">领导登场</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="truth-label" id="truthLabel">💬 潜台词</div>
+    <div class="truth-lines">
+      <div class="truth-line" id="l1">饼先画着</div>
+      <div class="truth-line" id="l2">苦还得继续吃</div>
+      <div class="truth-line" id="l3">治愈只是传说</div>
+    </div>
+    <div class="quote" id="quote">"疗愈是假的，透支是真的。"</div>
+  </div>
+
+<script>
+(function() {
+  const boss = document.getElementById('boss');
+  const dog = document.getElementById('dog');
+  const sceneLabel = document.getElementById('sceneLabel');
+  const progressFill = document.getElementById('progressFill');
+  const truthLabel = document.getElementById('truthLabel');
+  const l1 = document.getElementById('l1');
+  const l2 = document.getElementById('l2');
+  const l3 = document.getElementById('l3');
+  const quote = document.getElementById('quote');
+
+  // 角色帧（已抠图处理）
+  const BOSS_FRAMES = [
+    'boss_key_1.png',  // 竖食指
+    'boss_key_3.png',  // 过渡
+    'boss_key_5.png',  // 奔跑/紧迫
+    'boss_key_7.png',  // 竖拇指
+  ];
+  const DOG_FRAMES = [
+    'dog_sticker_clean.png',  // 疲惫站立
+    'dog_key_3.png',           // 垮塌
+    'dog_key_5.png',           // 崩溃奔跑
+    'dog_key_7.png',           // 奔跑愤怒
+  ];
+
+  // 设置角色帧
+  function setBossFrame(idx) {
+    boss.style.backgroundImage = "url('" + BOSS_FRAMES[idx % BOSS_FRAMES.length] + "')";
+  }
+  function setDogFrame(idx) {
+    dog.style.backgroundImage = "url('" + DOG_FRAMES[idx % DOG_FRAMES.length] + "')";
+  }
+
+  // 重置角色样式
+  function resetChars() {
+    boss.className = 'char boss';
+    dog.className = 'char dog';
+    sceneLabel.className = 'scene-label';
+    truthLabel.className = 'truth-label';
+    l1.className = 'truth-line'; l2.className = 'truth-line'; l3.className = 'truth-line';
+    quote.className = 'quote';
+  }
+
+  // 时间轴
+  const TOTAL = 16000; // 16秒一循环
+  const PH = TOTAL / 4;
+
+  let startTime = null;
+  let lastPhase = -1;
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    const cycle = elapsed % TOTAL;
+    const progress = (cycle / TOTAL * 100).toFixed(1);
+    progressFill.style.width = progress + '%';
+
+    resetChars();
+
+    if (cycle < PH) {
+      // ===== 阶段0：登场 (0-4s) =====
+      const p = cycle / PH;
+      setBossFrame(0); setDogFrame(0);
+      boss.classList.add('phase-appear');
+      dog.classList.add('phase-appear');
+      sceneLabel.textContent = p > 0.3 ? '心灵疗愈Time~' : '领导登场';
+      sceneLabel.classList.add('show');
+
+    } else if (cycle < PH * 2) {
+      // ===== 阶段1：说教 (4-8s) =====
+      const p = (cycle - PH) / PH;
+      setBossFrame(0); setDogFrame(0);
+      boss.classList.add('phase-speak');
+      dog.classList.add('phase-speak');
+      sceneLabel.textContent = '「大家辛苦了」';
+      sceneLabel.classList.add('show');
+      if (p > 0.5) { truthLabel.classList.add('show'); l1.classList.add('show'); }
+      if (p > 0.75) { l2.classList.add('show'); }
+
+    } else if (cycle < PH * 3) {
+      // ===== 阶段2：紧迫奔跑 (8-12s) =====
+      const p = (cycle - PH*2) / PH;
+      setBossFrame(2); setDogFrame(2);
+      boss.classList.add('phase-run');
+      dog.classList.add('phase-run');
+      sceneLabel.textContent = '又要加班了！';
+      sceneLabel.classList.add('show');
+      truthLabel.classList.add('show');
+      l1.classList.add('show'); l2.classList.add('show');
+      if (p > 0.6) l3.classList.add('show');
+
+    } else {
+      // ===== 阶段3：完成/无语 (12-16s) =====
+      const p = (cycle - PH*3) / PH;
+      setBossFrame(3); setDogFrame(3);
+      boss.classList.add('phase-done');
+      dog.classList.add('phase-done');
+      sceneLabel.textContent = '领导：完美收工~';
+      sceneLabel.classList.add('show');
+      truthLabel.classList.add('show');
+      l1.classList.add('show'); l2.classList.add('show'); l3.classList.add('show');
+      if (p > 0.5) quote.classList.add('show');
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  // 预加载图片后启动
+  let loaded = 0;
+  const total = BOSS_FRAMES.length + DOG_FRAMES.length;
+  function checkAllLoaded() {
+    loaded++;
+    if (loaded >= total) requestAnimationFrame(animate);
+  }
+  BOSS_FRAMES.concat(DOG_FRAMES).forEach(src => {
+    const img = new Image();
+    img.onload = checkAllLoaded;
+    img.onerror = checkAllLoaded;
+    img.src = src;
+  });
+  setTimeout(() => requestAnimationFrame(animate), 800);
+})();
+</script>
+</body>
+</html>
