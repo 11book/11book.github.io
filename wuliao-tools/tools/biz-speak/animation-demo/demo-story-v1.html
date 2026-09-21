@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心灵疗愈 · 沙雕动画版</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0d0d12;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    height:100vh; height:100dvh;
+    overflow:hidden;
+    font-family:"Noto Sans SC",sans-serif;
+    color:#f0ece4;
+  }
+
+  /* 顶部标题区 */
+  .header {
+    position:absolute; top:0; left:0; right:0;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 20px 10px;
+    z-index:10;
+  }
+  .header-tag {
+    font-size:10px; letter-spacing:3px; color:#d4a843;
+    border:1px solid rgba(212,168,67,0.35);
+    padding:4px 14px; border-radius:50px;
+    margin-bottom:10px;
+    animation:fadeIn 0.4s ease 0.2s both;
+  }
+  .header-title {
+    font-family:'Noto Serif SC'; font-size:36px; font-weight:900;
+    text-align:center; letter-spacing:4px;
+    text-shadow:0 0 30px rgba(212,168,67,0.4);
+    animation:fadeIn 0.5s ease 0.5s both;
+  }
+
+  /* 场景区 */
+  .scene {
+    position:absolute; top:0; bottom:0; left:0; right:0;
+    display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:80px;
+  }
+
+  /* 领导 */
+  .boss-wrap {
+    position:absolute;
+    bottom:80px; right:60px;
+    width:180px; height:220px;
+    overflow:visible;
+    transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .boss-sprite {
+    width:180px; height:180px;
+    overflow:hidden;
+    background-repeat:no-repeat;
+    background-color:transparent;
+    background-image:url('boss-sprite.png');
+    background-size:1440px 180px;
+    image-rendering:-webkit-optimize-contrast;
+    background-position:0 0;
+    /* steps(8) 逐帧动画，1.6秒播完8帧 */
+    animation: bossWalk steps(8) 1.6s steps(8) infinite;
+  }
+  /* 领导补间位移动画 */
+  .boss-run {
+    animation: bossWalk steps(8) 0.8s steps(8) infinite,
+               bossSlide 0.6s ease-in-out forwards;
+  }
+  .boss-idle {
+    animation: bossWalk steps(8) 1.6s steps(8) infinite;
+  }
+  .boss-point {
+    animation: bossWalk steps(8) 2s steps(8) infinite;
+  }
+  .boss-thumbs {
+    animation: bossWalk steps(8) 2s steps(8) infinite;
+  }
+
+  /* 打工狗 */
+  .dog-wrap {
+    position:absolute;
+    bottom:80px; left:60px;
+    width:150px; height:190px;
+    overflow:visible;
+  }
+  .dog-sprite {
+    width:150px; height:150px;
+    overflow:hidden;
+    background-repeat:no-repeat;
+    background-color:transparent;
+    background-image:url('dog-sprite.png');
+    background-size:1200px 150px;
+    image-rendering:-webkit-optimize-contrast;
+    background-position:0 0;
+    animation: dogWalk steps(8) 1.6s steps(8) infinite;
+  }
+  .dog-idle { animation: dogWalk steps(8) 2s steps(8) infinite; }
+  .dog-run  { animation: dogWalk steps(8) 0.8s steps(8) infinite; }
+  .dog-collapse { animation: dogWalk steps(8) 2s steps(8) infinite; }
+
+  /* 领导位移：说教时向左走几步 */
+  .boss-left { transform:translateX(-60px); }
+  .boss-right { transform:translateX(0); }
+
+  /* 狗位移：崩溃时向右倒 */
+  .dog-tilt { transform:rotate(15deg) translateX(20px); }
+
+  /* 气泡 */
+  .bubble {
+    position:absolute;
+    background:rgba(255,255,255,0.95);
+    border-radius:12px; padding:10px 16px;
+    font-size:18px; font-weight:700; color:#1a1a2e;
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);
+    opacity:0; transform:scale(0.8);
+    transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    white-space:nowrap;
+    z-index:20;
+  }
+  .bubble.show { opacity:1; transform:scale(1); }
+  .bubble::after {
+    content:''; position:absolute;
+    bottom:-8px; left:20px;
+    border:8px solid transparent;
+    border-top-color:rgba(255,255,255,0.95);
+    border-bottom:0;
+  }
+  .bubble-top {
+    top:60px; right:20px;
+  }
+  .bubble-top::after { left:20px; right:auto; }
+
+  /* 潜台词区 */
+  .footer {
+    position:absolute; bottom:0; left:0; right:0;
+    display:flex; flex-direction:column; align-items:center;
+    padding:8px 20px 16px;
+    background:linear-gradient(to top, rgba(13,13,18,0.95), transparent);
+  }
+  .truth-label {
+    font-size:20px; font-weight:700; color:#e85454;
+    display:flex; align-items:center; gap:8px; margin-bottom:8px;
+    opacity:0; transition:opacity 0.4s ease;
+  }
+  .truth-label.show { opacity:1; }
+  .truth-lines { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .truth-line {
+    font-size:24px; font-weight:700; color:#f0ece4;
+    text-align:center; line-height:1.2;
+    opacity:0; transform:translateY(8px);
+    transition:all 0.35s ease;
+  }
+  .truth-line.show { opacity:1; transform:translateY(0); }
+  .quote {
+    font-size:14px; color:#8a8a9a; font-style:italic;
+    text-align:center; margin-top:8px;
+    opacity:0; transition:opacity 0.5s ease;
+  }
+  .quote.show { opacity:1; }
+
+  /* 进度条 */
+  .progress-track {
+    position:absolute; bottom:0; left:0; right:0; height:3px;
+    background:rgba(255,255,255,0.08);
+  }
+  .progress-fill {
+    height:100%;
+    background:linear-gradient(90deg,#d4a843,#e85454);
+    width:0%; transition:width 0.1s linear;
+  }
+
+  /* 场景标签 */
+  .phase-tag {
+    position:absolute; top:75px; left:50%; transform:translateX(-50%);
+    font-size:11px; color:#d4a843; letter-spacing:2px;
+    opacity:0; transition:opacity 0.4s ease;
+  }
+  .phase-tag.show { opacity:0.7; }
+
+  /* 关键帧 */
+  @keyframes bossWalk {
+    from { background-position:0 0; }
+    to   { background-position:-1440px 0; }
+  }
+  @keyframes dogWalk {
+    from { background-position:0 0; }
+    to   { background-position:-1200px 0; }
+  }
+  @keyframes bossSlide {
+    0%  { transform:translateX(0); }
+    100%{ transform:translateX(-60px); }
+  }
+  @keyframes fadeIn {
+    from { opacity:0; } to { opacity:1; }
+  }
+
+  /* 闪光特效 */
+  .flash {
+    position:absolute; inset:0;
+    background:rgba(255,255,255,0.1);
+    opacity:0; pointer-events:none;
+  }
+  .flash.go { animation: flashAnim 0.3s ease; }
+  @keyframes flashAnim {
+    0% { opacity:0.5; }
+    100% { opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="flash" id="flash"></div>
+
+  <div class="header">
+    <div class="header-tag">开会现场</div>
+    <div class="header-title">心灵疗愈</div>
+  </div>
+
+  <div class="phase-tag" id="phaseTag">领导登场</div>
+
+  <div class="scene">
+    <!-- 领导 -->
+    <div class="boss-wrap" id="bossWrap">
+      <div class="boss-sprite boss-idle" id="bossSprite"></div>
+      <div class="bubble bubble-top" id="bubbleTop">大家辛苦了~</div>
+    </div>
+
+    <!-- 打工狗 -->
+    <div class="dog-wrap" id="dogWrap">
+      <div class="dog-sprite dog-idle" id="dogSprite"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="truth-label" id="truthLabel">💬 潜台词</div>
+    <div class="truth-lines">
+      <div class="truth-line" id="l1">饼先画着</div>
+      <div class="truth-line" id="l2">苦还得继续吃</div>
+      <div class="truth-line" id="l3">治愈只是传说</div>
+    </div>
+    <div class="quote" id="quote">"疗愈是假的，透支是真的。"</div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+<script>
+(function() {
+  const TOTAL = 18000; // 18秒一循环
+  const PH = TOTAL / 4;
+
+  const bossSprite = document.getElementById('bossSprite');
+  const bossWrap = document.getElementById('bossWrap');
+  const dogSprite = document.getElementById('dogSprite');
+  const dogWrap = document.getElementById('dogWrap');
+  const phaseTag = document.getElementById('phaseTag');
+  const bubbleTop = document.getElementById('bubbleTop');
+  const truthLabel = document.getElementById('truthLabel');
+  const l1 = document.getElementById('l1');
+  const l2 = document.getElementById('l2');
+  const l3 = document.getElementById('l3');
+  const quote = document.getElementById('quote');
+  const progressFill = document.getElementById('progressFill');
+  const flash = document.getElementById('flash');
+
+  function reset() {
+    bossSprite.className = 'boss-sprite';
+    bossWrap.className = 'boss-wrap';
+    dogSprite.className = 'dog-sprite';
+    dogWrap.className = 'dog-wrap';
+    phaseTag.className = 'phase-tag';
+    bubbleTop.className = 'bubble bubble-top';
+    truthLabel.className = 'truth-label';
+    l1.className = 'truth-line'; l2.className = 'truth-line'; l3.className = 'truth-line';
+    quote.className = 'quote';
+  }
+  function delay(fn, t) { return new Promise(r => setTimeout(() => { fn(); r(); }, t)); }
+
+  let startTime = null;
+  let lastPhase = -1;
+
+  async function runPhase(phase, bossCls, dogCls, tag, bubble, tLabel, lines, q) {
+    reset();
+    bossSprite.classList.add(bossCls);
+    dogSprite.classList.add(dogCls);
+    phaseTag.textContent = tag;
+    phaseTag.classList.add('show');
+
+    if (bubble) {
+      await delay(() => { bubbleTop.textContent = bubble; bubbleTop.classList.add('show'); }, 300);
+    }
+
+    if (tLabel) truthLabel.classList.add('show');
+    if (lines.l1) await delay(() => l1.classList.add('show'), 200);
+    if (lines.l2) await delay(() => l2.classList.add('show'), 500);
+    if (lines.l3) await delay(() => l3.classList.add('show'), 800);
+    if (q) await delay(() => quote.classList.add('show'), 1000);
+  }
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    const cycle = (ts - startTime) % TOTAL;
+    progressFill.style.width = (cycle / TOTAL * 100).toFixed(1) + '%';
+
+    if (cycle < PH) {
+      // ===== 阶段1：登场说教 (0-4.5s) =====
+      const p = cycle / PH;
+      reset();
+      bossSprite.classList.add('boss-idle');
+      dogSprite.classList.add('dog-idle');
+      phaseTag.textContent = p > 0.3 ? '领导登场' : '开会啦~';
+      phaseTag.classList.add('show');
+      if (p > 0.4) { bubbleTop.textContent = '大家辛苦了~'; bubbleTop.classList.add('show'); }
+      if (p > 0.7) { truthLabel.classList.add('show'); l1.classList.add('show'); }
+
+    } else if (cycle < PH * 2) {
+      // ===== 阶段2：说教+领导位移 (4.5-9s) =====
+      const p = (cycle - PH) / PH;
+      reset();
+      bossSprite.classList.add('boss-point');
+      bossWrap.classList.add('boss-left');  // 领导向左走几步
+      dogSprite.classList.add('dog-idle');
+      phaseTag.textContent = '「心灵疗愈」';
+      phaseTag.classList.add('show');
+      bubbleTop.textContent = '大家辛苦了~';
+      bubbleTop.classList.add('show');
+      if (p > 0.3) { truthLabel.classList.add('show'); l1.classList.add('show'); }
+      if (p > 0.55) l2.classList.add('show');
+      if (p > 0.75) l3.classList.add('show');
+      // 闪一下
+      if (p > 0.8 && lastPhase !== 1) {
+        flash.classList.remove('go');
+        void flash.offsetWidth;
+        flash.classList.add('go');
+      }
+      lastPhase = 1;
+
+    } else if (cycle < PH * 3) {
+      // ===== 阶段3：领导跑走 (9-13.5s) =====
+      const p = (cycle - PH*2) / PH;
+      reset();
+      bossSprite.classList.add('boss-run');
+      bossWrap.classList.add('boss-left');
+      dogSprite.classList.add('dog-run');
+      dogWrap.classList.add('dog-tilt');
+      phaseTag.textContent = '又要加班了！';
+      phaseTag.classList.add('show');
+      bubbleTop.classList.remove('show');
+      truthLabel.classList.add('show');
+      l1.classList.add('show'); l2.classList.add('show'); l3.classList.add('show');
+      if (p > 0.7) quote.classList.add('show');
+
+    } else {
+      // ===== 阶段4：领导点赞收工 (13.5-18s) =====
+      const p = (cycle - PH*3) / PH;
+      reset();
+      bossSprite.classList.add('boss-thumbs');
+      bossWrap.classList.add('boss-left');
+      dogSprite.classList.add('dog-collapse');
+      dogWrap.classList.add('dog-tilt');
+      phaseTag.textContent = '领导：完美收工~';
+      phaseTag.classList.add('show');
+      bubbleTop.textContent = '辛苦了！';
+      bubbleTop.classList.add('show');
+      truthLabel.classList.add('show');
+      l1.classList.add('show'); l2.classList.add('show'); l3.classList.add('show');
+      if (p > 0.3) quote.classList.add('show');
+      // 结尾再闪一下
+      if (p > 0.95) {
+        flash.classList.remove('go');
+        void flash.offsetWidth;
+        flash.classList.add('go');
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
