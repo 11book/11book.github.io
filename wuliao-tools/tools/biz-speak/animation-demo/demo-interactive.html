@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心灵疗愈 · 互动版</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#08080f; display:flex; flex-direction:column; height:100vh; font-family:"Noto Sans SC",sans-serif; color:#f0ece4; overflow:hidden; }
+
+.hud { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(212,168,67,0.18); flex-shrink:0; }
+.hud-title { font-family:Georgia,serif; font-size:18px; font-weight:900; color:#d4a843; letter-spacing:4px; text-shadow:0 0 16px rgba(212,168,67,0.4); }
+.hud-badge { font-size:10px; color:#d4a843; letter-spacing:2px; border:1px solid rgba(212,168,67,0.3); padding:3px 10px; border-radius:20px; }
+.hud-step { font-size:11px; color:#555; }
+
+.stage { flex:1; position:relative; overflow:hidden; background:radial-gradient(ellipse 80% 40% at 50% 0%, #0d0d18 0%, #08080f 65%); }
+.ground { position:absolute; bottom:68px; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(212,168,67,0.18),transparent); }
+
+.char { position:absolute; bottom:69px; display:flex; flex-direction:column; align-items:center; }
+.shadow { width:48px; height:7px; background:radial-gradient(ellipse,rgba(0,0,0,0.4) 0%,transparent 70%); border-radius:50%; margin-top:-3px; }
+
+/* 老板 */
+.boss { right:55px; }
+.b-head { width:54px; height:54px; background:radial-gradient(circle at 40% 35%, #f5deb3,#deb87a); border-radius:50%; position:relative; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+.b-head::before { content:''; position:absolute; top:7px; left:9px; width:17px; height:8px; background:rgba(255,255,255,0.22); border-radius:50%; transform:rotate(-20deg); }
+.b-glasses { position:absolute; top:16px; left:6px; right:6px; height:14px; display:flex; gap:3px; }
+.b-glasses::before, .b-glasses::after { content:''; flex:1; height:14px; background:#1a1a1a; border-radius:3px; }
+.b-mouth { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:16px; border-bottom:3px solid #8b6914; border-radius:0 0 10px 10px; }
+.b-body { width:72px; height:80px; background:linear-gradient(180deg,#f0f0f0,#d8d8d8); border-radius:10px 10px 8px 8px; margin-top:-7px; position:relative; }
+.b-tie { position:absolute; top:0; left:50%; transform:translateX(-50%); width:11px; height:30px; background:linear-gradient(180deg,#cc3333,#aa2222); clip-path:polygon(30% 0%,70% 0%,100% 15%,60% 100%,40% 100%,0% 15%); }
+.arm { position:absolute; bottom:16px; width:15px; height:42px; background:linear-gradient(180deg,#d8d8d8,#ccc); border-radius:8px; transform-origin:top center; }
+.arm-l { left:-6px; transform:rotate(15deg); }
+.arm-r { right:-6px; transform:rotate(-15deg); }
+.b-cup { position:absolute; right:-12px; bottom:10px; width:18px; height:28px; background:linear-gradient(180deg,#888,#666); border-radius:4px 4px 6px 6px; }
+.b-cup::before { content:''; position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:13px; height:5px; background:#555; border-radius:3px 3px 0 0; }
+
+/* 打工狗 */
+.dog { left:55px; }
+.d-head { width:60px; height:56px; background:radial-gradient(circle at 45% 40%, #c4956a,#8b6040); border-radius:50% 50% 40% 40%; position:relative; box-shadow:0 2px 8px rgba(0,0,0,0.25); }
+.d-ear { position:absolute; top:-6px; width:18px; height:26px; background:radial-gradient(circle at 50% 60%, #b07850,#7a5030); border-radius:50% 50% 40% 40%; }
+.d-ear.l { left:-4px; transform:rotate(-15deg); }
+.d-ear.r { right:-4px; transform:rotate(15deg); }
+.d-eyes { position:absolute; top:14px; left:50%; transform:translateX(-50%); display:flex; gap:14px; }
+.d-eye { width:13px; height:13px; background:#1a1a1a; border-radius:50%; position:relative; }
+.d-eye::after { content:''; position:absolute; top:2px; right:2px; width:4px; height:4px; background:white; border-radius:50%; }
+.d-mouth { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); width:11px; border-bottom:3px solid #6b4020; border-radius:0 0 10px 10px; }
+.d-body { width:48px; height:66px; background:linear-gradient(180deg,#c4956a,#a07848); border-radius:16px 16px 10px 10px; margin-top:-8px; position:relative; }
+.d-badge { position:absolute; top:6px; right:-14px; width:16px; height:22px; background:#f5f5f5; border-radius:4px; }
+.d-badge::before { content:''; position:absolute; top:-4px; left:50%; transform:translateX(-50%); width:11px; height:4px; background:#ccc; border-radius:2px 2px 0 0; }
+.d-bag { position:absolute; top:7px; left:-9px; width:22px; height:32px; background:linear-gradient(180deg,#8b6914,#6b4f10); border-radius:6px 6px 5px 5px; }
+
+/* 气泡 */
+.bubble { position:absolute; background:rgba(255,255,255,0.97); border-radius:13px; padding:9px 15px; font-size:14px; font-weight:700; color:#1a1a2e; box-shadow:0 4px 20px rgba(0,0,0,0.35),0 0 0 2px rgba(212,168,67,0.12); z-index:20; white-space:nowrap; opacity:0; transform:scale(0.7); transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+.bubble::after { content:''; position:absolute; bottom:-8px; left:18px; border:8px solid transparent; border-top-color:rgba(255,255,255,0.97); border-bottom:0; }
+.bubble.show { opacity:1; transform:scale(1); }
+.bubble-boss { top:28px; right:0; }
+
+/* 场景文字 */
+.scene-text { position:absolute; bottom:74px; left:50%; transform:translateX(-50%); text-align:center; opacity:0; transition:opacity 0.5s; }
+.scene-text.show { opacity:1; }
+.scene-line { font-size:18px; font-weight:700; color:#f0ece4; opacity:0; transform:translateY(8px); transition:all 0.3s ease; text-shadow:0 2px 8px rgba(0,0,0,0.8); }
+.scene-line.show { opacity:1; transform:translateY(0); }
+.scene-quote { font-size:13px; color:#8a8a9a; font-style:italic; margin-top:5px; }
+.scene-tag { position:absolute; top:14px; left:50%; transform:translateX(-50%); font-size:11px; color:#d4a843; letter-spacing:3px; opacity:0; transition:opacity 0.4s; }
+.scene-tag.show { opacity:0.6; }
+
+/* 选项 */
+.choices { position:absolute; bottom:76px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; gap:8px; align-items:center; z-index:30; opacity:0; transition:opacity 0.4s; }
+.choices.show { opacity:1; }
+.choice-btn { background:rgba(212,168,67,0.1); border:1px solid rgba(212,168,67,0.45); color:#d4a843; padding:9px 24px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.22s; font-family:"Noto Sans SC",sans-serif; min-width:190px; text-align:center; }
+.choice-btn:hover { background:rgba(212,168,67,0.25); box-shadow:0 0 14px rgba(212,168,67,0.2); transform:scale(1.03); }
+.choice-btn:active { transform:scale(0.96); }
+
+/* 闪光 */
+.flash { position:absolute; inset:0; background:rgba(255,220,150,0.12); opacity:0; pointer-events:none; z-index:30; }
+.flash.go { animation:flashFlash 0.35s ease; }
+@keyframes flashFlash { 0%{opacity:1} 100%{opacity:0} }
+
+/* 底部 */
+.panel { padding:8px 20px 12px; background:rgba(0,0,0,0.3); flex-shrink:0; }
+.progress-track { height:3px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#d4a843,#e85454); transition:width 0.6s ease; }
+.hint { font-size:10px; color:#444; text-align:center; margin-top:5px; letter-spacing:0.5px; }
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-title">心灵疗愈</div>
+  <div class="hud-badge">职场黑话</div>
+  <div class="hud-step" id="stepLabel">场景 1/4</div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="flash" id="flashEl"></div>
+  <div class="scene-tag" id="sceneTag"></div>
+  <div class="ground"></div>
+
+  <div class="char boss" id="boss">
+    <div class="b-head"><div class="b-glasses"></div><div class="b-mouth"></div></div>
+    <div class="b-body"><div class="b-tie"></div><div class="arm arm-l"></div><div class="arm arm-r" id="armR"></div><div class="b-cup"></div></div>
+    <div class="shadow"></div>
+    <div class="bubble bubble-boss" id="bubbleEl">大家辛苦了~</div>
+  </div>
+
+  <div class="char dog" id="dogEl">
+    <div class="d-head"><div class="d-ear l"></div><div class="d-ear r"></div><div class="d-eyes"><div class="d-eye"></div><div class="d-eye"></div></div><div class="d-mouth"></div></div>
+    <div class="d-body"><div class="d-badge"></div><div class="d-bag"></div></div>
+    <div class="shadow"></div>
+  </div>
+
+  <div class="scene-text" id="sceneText">
+    <div class="scene-line" id="sl1"></div>
+    <div class="scene-line" id="sl2"></div>
+    <div class="scene-line" id="sl3"></div>
+    <div class="scene-quote" id="sq"></div>
+  </div>
+
+  <div class="choices" id="choicesEl">
+    <button class="choice-btn" id="btnA"></button>
+    <button class="choice-btn" id="btnB"></button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="progress-track"><div class="progress-fill" id="progressEl"></div></div>
+  <div class="hint">点击选项继续，或等待自动推进</div>
+</div>
+
+<script>
+// ==== 剧情数据 ====
+const STORY = [
+  {
+    tag: '领导登场',
+    bubble: '大家辛苦了~',
+    lines: ['饼先画着'],
+    quote: '',
+    bossState: 'idle',
+    dogState: 'tired',
+    choices: [
+      { text: 'A. 鼓掌支持', next: 1 },
+      { text: 'B. 内心翻白眼', next: 1 }
+    ],
+    autoNext: 5000
+  },
+  {
+    tag: '说教中',
+    bubble: '我们来心灵疗愈！',
+    lines: ['苦还得继续吃'],
+    quote: '',
+    bossState: 'speaking',
+    dogState: 'tired',
+    choices: [
+      { text: 'A. 认真点头', next: 2 },
+      { text: 'B. 偷偷玩手机', next: 2 }
+    ],
+    autoNext: 6000
+  },
+  {
+    tag: '紧急任务',
+    bubble: '赶项目！今晚加班！',
+    lines: ['治愈只是传说'],
+    quote: '"疗愈是假的，透支是真的。"',
+    bossState: 'run',
+    dogState: 'run',
+    choices: [
+      { text: 'A. 硬着头皮干', next: 3 },
+      { text: 'B. 悄悄打开招聘软件', next: 3 }
+    ],
+    autoNext: 0
+  },
+  {
+    tag: '完美收工',
+    bubble: '辛苦了！完成得很好~',
+    lines: ['任务完成', '身心俱疲'],
+    quote: '"明天继续加油哦~"',
+    bossState: 'thumbs',
+    dogState: 'collapse',
+    choices: [
+      { text: '重新开始', next: 0 }
+    ],
+    autoNext: 0
+  }
+];
+
+// ==== DOM ====
+const $ = id => document.getElementById(id);
+const boss = $('boss');
+const dogEl = $('dogEl');
+const armR = $('armR');
+const bubbleEl = $('bubbleEl');
+const sceneTag = $('sceneTag');
+const sceneText = $('sceneText');
+const sl1 = $('sl1'), sl2 = $('sl2'), sl3 = $('sl3');
+const sq = $('sq');
+const choicesEl = $('choicesEl');
+const btnA = $('btnA'), btnB = $('btnB');
+const progressEl = $('progressEl');
+const stepLabel = $('stepLabel');
+const flashEl = $('flashEl');
+
+// ==== RAF动画 ====
+let armRaf = null, dogRaf = null, autoTimer = null;
+let armAngle = 0, dogBounce = 0;
+
+function animateBossIdle(ts) {
+  if (!armRaf) return;
+  armAngle += 0.03;
+  armR.style.transform = `rotate(${-15 + Math.sin(armAngle) * 6}deg)`;
+  armRaf = requestAnimationFrame(animateBossIdle);
+}
+function animateBossSpeak(ts) {
+  if (!armRaf) return;
+  armAngle += 0.07;
+  const bob = Math.sin(armAngle) * 4;
+  boss.style.transform = `translateY(${bob}px)`;
+  armR.style.transform = `rotate(${-60 + Math.sin(armAngle * 1.5) * 8}deg)`;
+  armRaf = requestAnimationFrame(animateBossSpeak);
+}
+function animateBossRun(ts) {
+  if (!armRaf) return;
+  armAngle += 0.12;
+  const slide = Math.sin(armAngle) * 25;
+  boss.style.transform = `translateX(${slide}px)`;
+  armR.style.transform = `rotate(${-90 + Math.sin(armAngle * 2) * 20}deg)`;
+  armRaf = requestAnimationFrame(animateBossRun);
+}
+function animateBossThumbs(ts) {
+  if (!armRaf) return;
+  armAngle += 0.04;
+  armR.style.transform = `rotate(-75deg) translateY(-8px)`;
+  boss.style.transform = `scale(${1 + Math.sin(armAngle) * 0.04})`;
+  armRaf = requestAnimationFrame(animateBossThumbs);
+}
+function animateDogTired(ts) {
+  if (!dogRaf) return;
+  dogBounce += 0.025;
+  dogEl.style.transform = `translateY(${Math.sin(dogBounce) * 2}px)`;
+  dogRaf = requestAnimationFrame(animateDogTired);
+}
+function animateDogRun(ts) {
+  if (!dogRaf) return;
+  dogBounce += 0.1;
+  const bounce = Math.abs(Math.sin(dogBounce)) * -8;
+  const tilt = Math.sin(dogBounce * 0.7) * 4;
+  dogEl.style.transform = `translateY(${bounce}px) rotate(${tilt}deg)`;
+  dogRaf = requestAnimationFrame(animateDogRun);
+}
+function animateDogCollapse(ts) {
+  if (!dogRaf) return;
+  dogBounce += 0.06;
+  const tilt = Math.sin(dogBounce * 0.5) * 10;
+  const x = Math.sin(dogBounce * 0.3) * 8;
+  dogEl.style.transform = `rotate(${-tilt}deg) translateX(${x}px)`;
+  dogRaf = requestAnimationFrame(animateDogCollapse);
+}
+
+function stopAnimations() {
+  if (armRaf) { cancelAnimationFrame(armRaf); armRaf = null; }
+  if (dogRaf) { cancelAnimationFrame(dogRaf); dogRaf = null; }
+  boss.style.transform = '';
+  dogEl.style.transform = '';
+  armR.style.transform = '';
+  armAngle = 0; dogBounce = 0;
+}
+
+function setBossState(state) {
+  if (armRaf) { cancelAnimationFrame(armRaf); armRaf = null; }
+  switch(state) {
+    case 'idle': armRaf = requestAnimationFrame(animateBossIdle); break;
+    case 'speaking': armRaf = requestAnimationFrame(animateBossSpeak); break;
+    case 'run': armRaf = requestAnimationFrame(animateBossRun); break;
+    case 'thumbs': armRaf = requestAnimationFrame(animateBossThumbs); break;
+  }
+}
+function setDogState(state) {
+  if (dogRaf) { cancelAnimationFrame(dogRaf); dogRaf = null; }
+  switch(state) {
+    case 'tired': dogRaf = requestAnimationFrame(animateDogTired); break;
+    case 'run': dogRaf = requestAnimationFrame(animateDogRun); break;
+    case 'collapse': dogRaf = requestAnimationFrame(animateDogCollapse); break;
+  }
+}
+
+// ==== 场景切换 ====
+let current = 0;
+let transitioning = false;
+
+function fadeOut(cb) {
+  [bubbleEl, sceneText, sceneTag].forEach(el => {
+    el.style.transition = 'opacity 0.25s';
+    el.style.opacity = '0';
+  });
+  setTimeout(() => { if (cb) cb(); }, 280);
+}
+
+function fadeIn() {
+  bubbleEl.style.opacity = '';
+  bubbleEl.style.transition = 'opacity 0.3s';
+  sceneTag.style.opacity = '';
+  sceneTag.style.transition = 'opacity 0.3s';
+}
+
+function flashScreen() {
+  flashEl.classList.remove('go');
+  void flashEl.offsetWidth;
+  flashEl.classList.add('go');
+}
+
+function typewriter(el, text, speed, cb) {
+  el.textContent = '';
+  el.classList.remove('show');
+  let i = 0;
+  const fn = () => {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      setTimeout(fn, speed || 55);
+    } else {
+      el.classList.add('show');
+      if (cb) cb();
+    }
+  };
+  fn();
+}
+
+function showScene(idx) {
+  if (transitioning) return;
+  transitioning = true;
+  clearTimeout(autoTimer);
+
+  const scene = STORY[idx];
+  stepLabel.textContent = `场景 ${idx + 1}/${STORY.length}`;
+
+  // 进度
+  progressEl.style.width = `${((idx + 1) / STORY.length * 100)}%`;
+
+  fadeOut(() => {
+    stopAnimations();
+    bubbleEl.classList.remove('show');
+    [sl1, sl2, sl3, sq].forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    choicesEl.classList.remove('show');
+
+    setBossState(scene.bossState);
+    setDogState(scene.dogState);
+
+    flashScreen();
+
+    setTimeout(() => {
+      bubbleEl.textContent = scene.bubble;
+      sceneTag.textContent = scene.tag;
+      sceneTag.classList.add('show');
+      bubbleEl.classList.add('show');
+      fadeIn();
+
+      let delay = 600;
+      scene.lines.forEach((line, i) => {
+        const el = [sl1, sl2, sl3][i];
+        setTimeout(() => typewriter(el, line, 60), delay);
+        delay += line.length * 60 + 400;
+      });
+
+      if (scene.quote) {
+        setTimeout(() => { sq.textContent = scene.quote; sq.classList.add('show'); }, delay + 200);
+      }
+
+      setTimeout(() => {
+        sceneText.classList.add('show');
+        transitioning = false;
+        if (scene.choices && scene.choices.length > 0) {
+          showChoices(scene.choices);
+        }
+        if (scene.autoNext) {
+          autoTimer = setTimeout(() => {
+            if (choicesEl.classList.contains('show')) goTo(0);
+          }, scene.autoNext);
+        }
+      }, delay + 300);
+    }, 100);
+  });
+}
+
+function showChoices(opts) {
+  btnA.textContent = opts[0] ? opts[0].text : '';
+  btnB.textContent = opts[1] ? opts[1].text : (opts[0] ? '' : '');
+  btnA.style.display = opts[0] ? 'block' : 'none';
+  btnB.style.display = opts[1] ? 'block' : 'none';
+  choicesEl.classList.add('show');
+  choicesEl.style.opacity = '0';
+  setTimeout(() => { choicesEl.style.opacity = '1'; }, 10);
+}
+
+function hideChoices(cb) {
+  choicesEl.style.opacity = '0';
+  setTimeout(() => {
+    choicesEl.classList.remove('show');
+    if (cb) cb();
+  }, 300);
+}
+
+function goTo(idx) {
+  hideChoices(() => showScene(idx));
+}
+
+btnA.addEventListener('click', () => {
+  const scene = STORY[current];
+  const next = scene.choices[0] ? scene.choices[0].next : current;
+  current = next;
+  goTo(current);
+});
+btnB.addEventListener('click', () => {
+  const scene = STORY[current];
+  const next = scene.choices[1] ? scene.choices[1].next : current;
+  current = next;
+  goTo(current);
+});
+
+// ==== 启动 ====
+showScene(0);
+</script>
+</body>
+</html>
