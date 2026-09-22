@@ -7,11 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d08;
+    --bg: #0f0a12;
     --text: #f0ece4;
     --text-dim: #8a8a9a;
-    --gold: #f5c518;
-    --red: #ff4444;
+    --gold: #9b59b6;
+    --red: #e74c3c;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; }
@@ -24,11 +24,11 @@
   }
   body::before {
     content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(245,197,24,0.1) 0%, transparent 65%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(155,89,182,0.1) 0%, transparent 65%);
     pointer-events:none; z-index:0;
   }
   .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(245,197,24,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
+  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(155,89,182,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
   .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
   .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
   .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
@@ -41,19 +41,19 @@
 </head>
 <body>
   <div class="top">
-    <div class="tag">管理黑话</div>
+    <div class="tag">话术陷阱</div>
     <div class="main-title">降本增效</div>
-    <div class="sub-title">优化运营效率</div>
+    <div class="sub-title">提升人效</div>
   </div>
   <div class="divider"></div>
   <div class="bottom">
     <div class="truth-label">💬 潜台词</div>
     <div class="truth-lines">
-      <div class="truth-line">裁员</div>
-      <div class="truth-line">加活</div>
-      <div class="truth-line">不涨工资</div>
+      <div class="truth-line">减人</div>
+      <div class="truth-line">加班</div>
+      <div class="truth-line">干得多拿得少</div>
     </div>
-    <div class="quote">"降本增效=少花钱，多干活，最好不花钱也干活。"</div>
+    <div class="quote">"降本增效这四个字，就是让一个人干三个人的活。"</div>
   </div>
 </body>
 </html>
