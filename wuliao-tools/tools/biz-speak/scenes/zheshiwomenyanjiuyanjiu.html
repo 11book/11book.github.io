@@ -7,11 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0a12;
+    --bg: #0d1520;
     --text: #f0ece4;
-    --text-dim: #8a8a9a;
-    --gold: #2e8b7a;
-    --red: #e07020;
+    --text-dim: #8090b0;
+    --gold: #3498db;
+    --red: #e74c3c;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; }
@@ -24,11 +24,11 @@
   }
   body::before {
     content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(46,139,122,0.1) 0%, transparent 65%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(52,152,219,0.1) 0%, transparent 65%);
     pointer-events:none; z-index:0;
   }
   .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(46,139,122,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
+  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(52,152,219,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
   .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
   .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
   .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
@@ -41,19 +41,17 @@
 </head>
 <body>
   <div class="top">
-    <div class="tag">话术陷阱</div>
+    <div class="tag">求人办事</div>
     <div class="main-title">这事我们研究研究</div>
-    <div class="sub-title">讨论中</div>
+    <div class="sub-title">有进展通知你</div>
   </div>
   <div class="divider"></div>
   <div class="bottom">
     <div class="truth-label">💬 潜台词</div>
     <div class="truth-lines">
-      <div class="truth-line">研究完就没了</div>
-      <div class="truth-line">永远在研究</div>
-      <div class="truth-line">不给你结论</div>
+      <div class="truth-line">没戏</div><div class="truth-line">别等了</div><div class="truth-line">该表示表示了</div>
     </div>
-    <div class="quote">"研究研究，就是不想直接拒绝的客气话。"</div>
+    <div class="quote">"研究研究=烟酒烟酒，不懂事就没下文。"</div>
   </div>
 </body>
 </html>

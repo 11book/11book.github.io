@@ -7,11 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0a12;
+    --bg: #1a1400;
     --text: #f0ece4;
-    --text-dim: #8a8a9a;
-    --gold: #4a90d9;
-    --red: #d94a4a;
+    --text-dim: #b0a070;
+    --gold: #f0c040;
+    --red: #ff6b35;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; }
@@ -24,11 +24,11 @@
   }
   body::before {
     content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(74,144,217,0.1) 0%, transparent 65%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(240,192,64,0.1) 0%, transparent 65%);
     pointer-events:none; z-index:0;
   }
   .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(74,144,217,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
+  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(240,192,64,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
   .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
   .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
   .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
@@ -41,19 +41,17 @@
 </head>
 <body>
   <div class="top">
-    <div class="tag">话术陷阱</div>
+    <div class="tag">敲打话术</div>
     <div class="main-title">最近下班都很准时啊</div>
-    <div class="sub-title">关注你作息</div>
+    <div class="sub-title">工作都做完了吗</div>
   </div>
   <div class="divider"></div>
   <div class="bottom">
     <div class="truth-label">💬 潜台词</div>
     <div class="truth-lines">
-      <div class="truth-line">暗示你加班少</div>
-      <div class="truth-line">给你施压</div>
-      <div class="truth-line">不让你准时下班</div>
+      <div class="truth-line">你最近是不是太闲了</div><div class="truth-line">活是不是不够多</div><div class="truth-line">再准时走就要给你加活了</div>
     </div>
-    <div class="quote">"问你准时下班的人，往往是让你别准时下班的人。"</div>
+    <div class="quote">"领导夸你准时，绝对不是夸你效率高。"</div>
   </div>
 </body>
 </html>
