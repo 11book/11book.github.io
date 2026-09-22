@@ -9,9 +9,9 @@
   :root {
     --bg: #0f0a12;
     --text: #f0ece4;
-    --text-dim: #8a8a9a;
-    --gold: #d4a843;
-    --red: #e85454;
+    --text-dim: #b0a070;
+    --gold: #f0c040;
+    --red: #ff6b35;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; }
@@ -24,11 +24,11 @@
   }
   body::before {
     content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.1) 0%, transparent 65%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(240,192,64,0.1) 0%, transparent 65%);
     pointer-events:none; z-index:0;
   }
   .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(212,168,67,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
+  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(240,192,64,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
   .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
   .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
   .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
@@ -41,19 +41,18 @@
 </head>
 <body>
   <div class="top">
-    <div class="tag">拒绝话术</div>
+    <div class="tag">拖延</div>
     <div class="main-title">再看吧</div>
-    <div class="sub-title">不一定有时间</div>
+    <div class="sub-title">不着急决定</div>
   </div>
   <div class="divider"></div>
   <div class="bottom">
     <div class="truth-label">💬 潜台词</div>
     <div class="truth-lines">
-      <div class="truth-line">不想去</div>
-      <div class="truth-line">别约了</div>
-      <div class="truth-line">到时候再说</div>
+      <div class="truth-line">不想直接拒绝</div>
+      <div class="truth-line">就用再看吧来拖</div>
     </div>
-    <div class="quote">"再看吧=不想去。"</div>
+    <div class="quote">"再看吧=基本没戏+别再问我。"</div>
   </div>
 </body>
 </html>
