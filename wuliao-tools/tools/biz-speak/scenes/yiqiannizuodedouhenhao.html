@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0a12;
+    --bg: #0a1a0f;
     --text: #f0ece4;
-    --text-dim: #8a8a9a;
-    --gold: #c9a84c;
+    --text-dim: #8a9a8a;
+    --gold: #4caf50;
     --red: #e63946;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -24,11 +24,11 @@
   }
   body::before {
     content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.1) 0%, transparent 65%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(76,175,80,0.1) 0%, transparent 65%);
     pointer-events:none; z-index:0;
   }
   .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(201,168,76,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
+  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(76,175,80,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
   .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
   .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
   .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
@@ -39,7 +39,7 @@
   .quote { font-size:17px; color:var(--text-dim); font-style:italic; text-align:center; line-height:1.8; margin-top:18px; padding:0 12px; }
 </style>
 </head>
-<body>
+<body class="theme-2">
   <div class="top">
     <div class="tag">心理施压</div>
     <div class="main-title">以前你做得都很好</div>
@@ -49,9 +49,7 @@
   <div class="bottom">
     <div class="truth-label">💬 潜台词</div>
     <div class="truth-lines">
-      <div class="truth-line">用过去的好压现在的你</div>
-      <div class="truth-line">让你产生自我怀疑</div>
-      <div class="truth-line">不用骂你你就会自责</div>
+      <div class="truth-line">用过去的好压现在的你</div><div class="truth-line">让你产生自我怀疑</div><div class="truth-line">不用骂你你就会自责</div>
     </div>
     <div class="quote">"先捧后杀，比直接骂人杀伤力大十倍。"</div>
   </div>
