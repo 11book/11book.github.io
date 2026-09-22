@@ -7,11 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d08;
+    --bg: #0f0a12;
     --text: #f0ece4;
     --text-dim: #8a8a9a;
-    --gold: #f5c518;
-    --red: #ff4444;
+    --gold: #4caf50;
+    --red: #ff5722;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; }
@@ -24,11 +24,11 @@
   }
   body::before {
     content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(245,197,24,0.1) 0%, transparent 65%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(76,175,80,0.1) 0%, transparent 65%);
     pointer-events:none; z-index:0;
   }
   .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(245,197,24,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
+  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(76,175,80,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
   .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
   .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
   .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
@@ -41,19 +41,19 @@
 </head>
 <body>
   <div class="top">
-    <div class="tag">责任黑话</div>
+    <div class="tag">话术陷阱</div>
     <div class="main-title">你这边兜个底</div>
-    <div class="sub-title">做好风险预案</div>
+    <div class="sub-title">保障落地</div>
   </div>
   <div class="divider"></div>
   <div class="bottom">
     <div class="truth-label">💬 潜台词</div>
     <div class="truth-lines">
-      <div class="truth-line">出事了你扛着</div>
-      <div class="truth-line">我不管过程</div>
-      <div class="truth-line">结果不好就是你没兜住</div>
+      <div class="truth-line">让你背锅</div>
+      <div class="truth-line">出了事你负责</div>
+      <div class="truth-line">他摘桃子</div>
     </div>
-    <div class="quote">"让你兜底的人，早就想好了让你背锅。"</div>
+    <div class="quote">"让你兜底的人，往往是想让你背锅的人。"</div>
   </div>
 </body>
 </html>
