@@ -1,59 +1,228 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>我个人是这么觉得的</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0f0a12;
-    --text: #f0ece4;
-    --text-dim: #8a8a9a;
-    --gold: #2e8b7a;
-    --red: #e07020;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width:100%; height:100%; overflow:hidden; }
-  body {
-    font-family:"Noto Sans SC",sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    display:flex; flex-direction:column;
-    height:100vh; height:100dvh;
-  }
-  body::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:45%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(46,139,122,0.1) 0%, transparent 65%);
-    pointer-events:none; z-index:0;
-  }
-  .top { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:4px 28px 8px; position:relative; z-index:1; }
-  .tag { font-size:11px; letter-spacing:3px; color:var(--gold); border:1px solid rgba(46,139,122,0.3); padding:5px 16px; border-radius:50px; margin-bottom:20px; }
-  .main-title { font-family:'Noto Serif SC'; font-size:68px; font-weight:900; text-align:center; line-height:1.15; letter-spacing:3px; min-width:0; overflow-wrap:break-word; max-width:92%; }
-  .sub-title { font-size:26px; color:var(--text-dim); text-align:center; margin-top:14px; }
-  .divider { width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.35; flex-shrink:0; position:relative; z-index:1; }
-  .bottom { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:8px 28px 4px; position:relative; z-index:1; }
-  .truth-label { font-size:28px; font-weight:700; color:var(--red); display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-  .truth-lines { display:flex; flex-direction:column; align-items:center; gap:10px; }
-  .truth-line { font-size:36px; font-weight:700; color:var(--text); text-align:center; line-height:1.2; }
-  .quote { font-size:17px; color:var(--text-dim); font-style:italic; text-align:center; line-height:1.8; margin-top:18px; padding:0 12px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我个人是这么觉得的</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background decorations */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      opacity: 0.15;
+    }
+    body::after {
+      content: '';
+      position: absolute;
+      bottom: -150px;
+      left: -150px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      opacity: 0.1;
+    }
+
+    /* theme-1: 深红 + 藏青 */
+    .theme-1 { background: linear-gradient(135deg, #1a0a0a 0%, #0d1b2a 100%); }
+    .theme-1 body::before { background: #e63946; }
+    .theme-1 body::after { background: #e63946; }
+    .theme-1 .card { border-color: rgba(230, 57, 70, 0.3); }
+    .theme-1 .tag { background: rgba(230, 57, 70, 0.2); color: #e63946; }
+    .theme-1 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-1 .quote { color: #e63946; border-color: rgba(230, 57, 70, 0.3); }
+    .theme-1 .quote-icon { color: #e63946; }
+    .theme-1 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-1 .main-title { color: #ffffff; }
+
+    /* theme-2: 深紫 + 粉 */
+    .theme-2 { background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%); }
+    .theme-2 body::before { background: #f72585; }
+    .theme-2 body::after { background: #f72585; }
+    .theme-2 .card { border-color: rgba(247, 37, 133, 0.3); }
+    .theme-2 .tag { background: rgba(247, 37, 133, 0.2); color: #f72585; }
+    .theme-2 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-2 .quote { color: #f72585; border-color: rgba(247, 37, 133, 0.3); }
+    .theme-2 .quote-icon { color: #f72585; }
+    .theme-2 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-2 .main-title { color: #ffffff; }
+
+    /* theme-3: 深蓝 + 青 */
+    .theme-3 { background: linear-gradient(135deg, #0a0f1a 0%, #0d2137 100%); }
+    .theme-3 body::before { background: #00b4d8; }
+    .theme-3 body::after { background: #00b4d8; }
+    .theme-3 .card { border-color: rgba(0, 180, 216, 0.3); }
+    .theme-3 .tag { background: rgba(0, 180, 216, 0.2); color: #00b4d8; }
+    .theme-3 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-3 .quote { color: #00b4d8; border-color: rgba(0, 180, 216, 0.3); }
+    .theme-3 .quote-icon { color: #00b4d8; }
+    .theme-3 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-3 .main-title { color: #ffffff; }
+
+    /* theme-4: 深绿 + 浅绿 */
+    .theme-4 { background: linear-gradient(135deg, #0a1a0a 0%, #1a2e1a 100%); }
+    .theme-4 body::before { background: #52b788; }
+    .theme-4 body::after { background: #52b788; }
+    .theme-4 .card { border-color: rgba(82, 183, 136, 0.3); }
+    .theme-4 .tag { background: rgba(82, 183, 136, 0.2); color: #52b788; }
+    .theme-4 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-4 .quote { color: #52b788; border-color: rgba(82, 183, 136, 0.3); }
+    .theme-4 .quote-icon { color: #52b788; }
+    .theme-4 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-4 .main-title { color: #ffffff; }
+
+    /* theme-5: 深橙 + 金 */
+    .theme-5 { background: linear-gradient(135deg, #1a0f00 0%, #2e1a00 100%); }
+    .theme-5 body::before { background: #fb8500; }
+    .theme-5 body::after { background: #fb8500; }
+    .theme-5 .card { border-color: rgba(251, 133, 0, 0.3); }
+    .theme-5 .tag { background: rgba(251, 133, 0, 0.2); color: #fb8500; }
+    .theme-5 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-5 .quote { color: #fb8500; border-color: rgba(251, 133, 0, 0.3); }
+    .theme-5 .quote-icon { color: #fb8500; }
+    .theme-5 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-5 .main-title { color: #ffffff; }
+
+    /* theme-6: 深粉 + 玫红 */
+    .theme-6 { background: linear-gradient(135deg, #1a0510 0%, #2e0a1a 100%); }
+    .theme-6 body::before { background: #ff5c8a; }
+    .theme-6 body::after { background: #ff5c8a; }
+    .theme-6 .card { border-color: rgba(255, 92, 138, 0.3); }
+    .theme-6 .tag { background: rgba(255, 92, 138, 0.2); color: #ff5c8a; }
+    .theme-6 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-6 .quote { color: #ff5c8a; border-color: rgba(255, 92, 138, 0.3); }
+    .theme-6 .quote-icon { color: #ff5c8a; }
+    .theme-6 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-6 .main-title { color: #ffffff; }
+
+    /* theme-7: 深靛 + 紫 */
+    .theme-7 { background: linear-gradient(135deg, #0d0a1a 0%, #1a0d2e 100%); }
+    .theme-7 body::before { background: #9d4edd; }
+    .theme-7 body::after { background: #9d4edd; }
+    .theme-7 .card { border-color: rgba(157, 78, 221, 0.3); }
+    .theme-7 .tag { background: rgba(157, 78, 221, 0.2); color: #9d4edd; }
+    .theme-7 .subtitle { color: rgba(255,255,255,0.6); }
+    .theme-7 .quote { color: #9d4edd; border-color: rgba(157, 78, 221, 0.3); }
+    .theme-7 .quote-icon { color: #9d4edd; }
+    .theme-7 .subtext { color: rgba(255,255,255,0.5); }
+    .theme-7 .main-title { color: #ffffff; }
+
+    .card {
+      border: 1px solid;
+      border-radius: 24px;
+      padding: 60px 50px;
+      max-width: 720px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .main-title {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      font-size: 22px;
+      font-weight: 400;
+      margin-bottom: 40px;
+    }
+
+    .divider {
+      width: 60px;
+      height: 3px;
+      margin: 0 auto 40px;
+      border-radius: 2px;
+      opacity: 0.4;
+    }
+    .theme-1 .divider { background: #e63946; }
+    .theme-2 .divider { background: #f72585; }
+    .theme-3 .divider { background: #00b4d8; }
+    .theme-4 .divider { background: #52b788; }
+    .theme-5 .divider { background: #fb8500; }
+    .theme-6 .divider { background: #ff5c8a; }
+    .theme-7 .divider { background: #9d4edd; }
+
+    .quote-box {
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 30px 36px;
+      margin-bottom: 36px;
+      position: relative;
+    }
+
+    .quote-icon {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+
+    .quote {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .subtext {
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .footer-note {
+      margin-top: 40px;
+      font-size: 13px;
+      opacity: 0.3;
+      letter-spacing: 3px;
+    }
+  </style>
 </head>
-<body>
-  <div class="top">
+<body class="theme-1">
+  <div class="card">
     <div class="tag">沟通分寸</div>
-    <div class="main-title">我个人是这么觉得的</div>
-    <div class="sub-title">仅供参考，你们自己定</div>
-  </div>
-  <div class="divider"></div>
-  <div class="bottom">
-    <div class="truth-label">💬 潜台词</div>
-    <div class="truth-lines">
-      <div class="truth-line">话我说到了</div>
-      <div class="truth-line">出事别赖我</div>
-      <div class="truth-line">你们自己决策自己担</div>
+    <h1 class="main-title">我个人是这么觉得的</h1>
+    <p class="subtitle">仅供参考，你们自己定</p>
+    <div class="divider"></div>
+    <div class="quote-box">
+      <div class="quote-icon">❝</div>
+      <p class="quote">话说七分满，留着三分好甩锅。</p>
     </div>
-    <div class="quote">"话说七分满，留着三分好甩锅。"</div>
+    <p class="subtext">话我说到了 / 出事别赖我 / 你们自己决策自己担</p>
+    <div class="footer-note">BUSINESS SPEAK · 职场黑话解读</div>
   </div>
 </body>
 </html>
