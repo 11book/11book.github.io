@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>十一自驾去哪儿？· 评论区汇总</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .header {
+    text-align: center;
+    padding: 20px 0 16px;
+  }
+  .header .tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    color: #fff;
+    font-size: 12px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: #888;
+  }
+  .total-bar {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+  }
+  .total-bar .num { font-size: 24px; font-weight: bold; color: #ff8e53; }
+  .total-bar .label { font-size: 11px; color: #888; margin-top: 2px; }
+  .section-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    margin: 18px 0 10px;
+    padding-left: 10px;
+    border-left: 3px solid #ff8e53;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .card .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .card .rank {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .card .rank.n2 { background: linear-gradient(135deg, #a0a0a0, #c0c0c0); }
+  .card .rank.n3 { background: linear-gradient(135deg, #cd7f32, #e6a860); }
+  .card .dest {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+  }
+  .card .dest span {
+    font-size: 12px;
+    color: #ff8e53;
+    font-weight: normal;
+    margin-left: 6px;
+  }
+  .card .desc {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.7;
+    padding-left: 32px;
+  }
+  .card .tags {
+    padding-left: 32px;
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .card .tag-item {
+    font-size: 11px;
+    background: #1f2b4a;
+    color: #8ab4f8;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .tips-card {
+    background: #1f2b4a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .tips-card h3 {
+    font-size: 14px;
+    color: #ff8e53;
+    margin-bottom: 8px;
+  }
+  .tips-card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .tips-card li {
+    font-size: 13px;
+    color: #ccc;
+    padding: 4px 0;
+    border-bottom: 1px solid #2a3a5e;
+    display: flex;
+    align-items: flex-start;
+  }
+  .tips-card li:last-child { border-bottom: none; }
+  .tips-card li::before {
+    content: "●";
+    color: #ff8e53;
+    margin-right: 8px;
+    font-size: 8px;
+    margin-top: 4px;
+  }
+  .companion {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .companion h3 {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .companion .item {
+    font-size: 13px;
+    color: #bbb;
+    padding: 5px 0;
+    border-bottom: 1px solid #1f2b4a;
+  }
+  .companion .item:last-child { border-bottom: none; }
+  .companion .item .date {
+    color: #ff8e53;
+    font-size: 12px;
+  }
+  .footer {
+    text-align: center;
+    padding: 20px 0 10px;
+    font-size: 11px;
+    color: #555;
+  }
+  .quote-card {
+    background: #1f2b4a;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 6px 0;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+  .quote-card .author {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+  }
+  @media (max-width: 480px) {
+    body { padding: 12px; }
+    .header h1 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="tag">📍 评论区热点</div>
+  <h1>十一自驾去哪儿？</h1>
+  <div class="subtitle">基于抖音评论区的 179 条真实声音整理</div>
+</div>
+
+<div class="total-bar">
+  <div>
+    <div class="num">6</div>
+    <div class="label">热门目的地</div>
+  </div>
+  <div>
+    <div class="num">10+</div>
+    <div class="label">找搭子结伴</div>
+  </div>
+  <div>
+    <div class="num">179</div>
+    <div class="label">评论总数</div>
+  </div>
+</div>
+
+<!-- 热门目的地 -->
+<div class="section-title">🔥 热门目的地 TOP</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="rank">1</div>
+    <div class="dest">南太行 <span>约 25 次提及</span></div>
+  </div>
+  <div class="desc">云台山、宝泉、八里沟、万仙山、八泉峡、陵川…太行山系最热目的地，山水兼得，风景震撼。</div>
+  <div class="tags">
+    <span class="tag-item">河南·山西</span>
+    <span class="tag-item">自驾</span>
+    <span class="tag-item">山水</span>
+    <span class="tag-item">⚠️ 国庆必堵</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="rank n2">2</div>
+    <div class="dest">皖南徽州 <span>约 15 次提及</span></div>
+  </div>
+  <div class="desc">黄山、婺源、宏村、呈坎、阳产土楼、徽州天路。秋色古村结合，文化与自然兼顾，高速不堵。</div>
+  <div class="tags">
+    <span class="tag-item">安徽</span>
+    <span class="tag-item">古村</span>
+    <span class="tag-item">秋色</span>
+    <span class="tag-item">5天绕一圈</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="rank n3">3</div>
+    <div class="dest">山西·河南古建线 <span>约 15 次提及</span></div>
+  </div>
+  <div class="desc">洛阳（龙门石窟、少林寺、老君山）、大同（云冈石窟、悬空寺、应县木塔、雁门关）一路向西，吃住便宜。</div>
+  <div class="tags">
+    <span class="tag-item">古建</span>
+    <span class="tag-item">人文</span>
+    <span class="tag-item">性价比高</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="rank">4</div>
+    <div class="dest">内蒙草原 <span>约 10 次提及</span></div>
+  </div>
+  <div class="desc">乌兰布统、达达线、热阿线，去年去过的都说美。但⚠️十一草已黄，晚上最低温可达零度，需带冬装。</div>
+  <div class="tags">
+    <span class="tag-item">内蒙</span>
+    <span class="tag-item">草原</span>
+    <span class="tag-item">⚠️ 已冷</span>
+    <span class="tag-item">自驾专线</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="rank n2">5</div>
+    <div class="dest">山东沿海 <span>约 10 次提及</span></div>
+  </div>
+  <div class="desc">烟台、威海、荣成那香海、长岛、大黑山岛。日照、海阳…山东高速国庆相对好开，堵车风险最低。</div>
+  <div class="tags">
+    <span class="tag-item">山东</span>
+    <span class="tag-item">海岛</span>
+    <span class="tag-item">人少</span>
+    <span class="tag-item">稳妥之选</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="rank n3">6</div>
+    <div class="dest">大兴安岭 / 东北 <span>约 8 次提及</span></div>
+  </div>
+  <div class="desc">呼伦贝尔、阿尔山，秋景绝美。然而山东出发 1200km+，5天假期纯赶路，不推荐。</div>
+  <div class="tags">
+    <span class="tag-item">东北</span>
+    <span class="tag-item">秋景</span>
+    <span class="tag-item">⚠️ 太远</span>
+  </div>
+</div>
+
+<!-- 实用Tips -->
+<div class="section-title">💡 实用 Tips</div>
+
+<div class="tips-card">
+  <h3>🚗 自驾建议</h3>
+  <ul>
+    <li>超过 3 小时车程孩子会累，提前规划中途休息点</li>
+    <li>新能源车提前查好充电站，假期租车翻 3 倍</li>
+    <li>坐高铁到目的地再租车，比自驾舒服</li>
+    <li>太行山"16拐"国庆必堵，别去凑热闹</li>
+  </ul>
+</div>
+
+<div class="tips-card">
+  <h3>🧳 装备提醒</h3>
+  <ul>
+    <li>去内蒙/大兴安岭带加绒冲锋衣，夜里低至 8 度</li>
+    <li>蔚县麻田岭、空中草原：景色好但部分路段可能封路</li>
+    <li>逛景区建议住附近，早上早出发，错峰游玩</li>
+  </ul>
+</div>
+
+<!-- 找搭子 -->
+<div class="section-title">🤝 正在找搭子</div>
+
+<div class="companion">
+  <div class="item"><span class="date">9.30 晚出发</span> 张家界，6号回，2人1车，在找搭子</div>
+  <div class="item"><span class="date">9.27 出发</span> 蔚县空中草原，10.1回，2人1车，可露营</div>
+  <div class="item"><span class="date">计划中</span> 济南→南太行，正在约伴</div>
+  <div class="item"><span class="date">计划中</span> 日照出发，征集同行路线</div>
+</div>
+
+<!-- 经典吐槽 -->
+<div class="section-title">😂 经典吐槽</div>
+
+<div class="quote-card">
+  "哪都想去，杭州、宣城…感觉哪都是人，今天看了看10.1票都候补了，这是让我老实呆着不能出门[捂脸]"
+  <div class="author">—— 白羊座小曦</div>
+</div>
+<div class="quote-card">
+  "出门就是看尾灯，看人头。太难了，8车道都是龙都得盘着。"
+  <div class="author">—— 博硕搅拌站控制系统</div>
+</div>
+<div class="quote-card">
+  "说是想去的都是去不了的[笑哭]"
+  <div class="author">—— 张大宝</div>
+</div>
+<div class="quote-card">
+  "近处没啥玩的，远处怕堵又出不去[捂脸]"
+  <div class="author">—— 万万没想到</div>
+</div>
+
+<div class="footer">
+  数据来源：抖音评论区 · 整理 by AI<br>
+  仅供参考 · 出行前请核实最新路况
+</div>
+
+</body>
+</html>
