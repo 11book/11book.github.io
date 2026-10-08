@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>免作业券 v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #E8F4FD;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px 50px;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    /* =============================================
+       A4 纸张：210mm × 297mm
+       布局：8列 × 3行 = 24张券
+       边距：左右各5mm，上下各5mm
+       每格：宽 (210-10)/8 = 25mm，高 (297-10)/3 ≈ 95.67mm
+       取整：25mm × 95mm
+    ============================================= */
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      background: #FFFFFF;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      position: relative;
+    }
+
+    /* 裁剪参考线 */
+    .cut-h1, .cut-h2 {
+      position: absolute; left: 0; right: 0;
+      border-top: 1px dashed #C0C0C0;
+      pointer-events: none; z-index: 10;
+    }
+    .cut-h1 { top: 99mm; }
+    .cut-h2 { top: 198mm; }
+
+    .cut-v1, .cut-v2, .cut-v3, .cut-v4, .cut-v5, .cut-v6, .cut-v7 {
+      position: absolute; top: 0; bottom: 0;
+      border-left: 1px dashed #C0C0C0;
+      pointer-events: none; z-index: 10;
+    }
+    .cut-v1 { left: 25mm; } .cut-v2 { left: 50mm; } .cut-v3 { left: 75mm; }
+    .cut-v4 { left: 100mm; } .cut-v5 { left: 125mm; } .cut-v6 { left: 150mm; } .cut-v7 { left: 175mm; }
+
+    /* =============================================
+       单张免作业券
+       每格 25mm × 95mm（窄长竖条形）
+       内部结构：顶部标题区 + 左下信息 + 右下信息
+    ============================================= */
+    .coupon {
+      position: relative;
+      background: #FFFCF5;
+      break-inside: avoid;
+      display: flex;
+      flex-direction: column;
+      padding: 3mm 2.5mm 2mm;
+      overflow: hidden;
+    }
+
+    /* ========== 标题区（顶部） ========== */
+    .card-title {
+      text-align: center;
+      padding: 2mm 1mm 0;
+    }
+
+    .card-title h1 {
+      font-family: "Noto Serif SC", "STSong", "SimSun", serif;
+      font-size: 11pt;
+      font-weight: 900;
+      color: #1a1a1a;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    /* ========== 说明文字（标题下方） ========== */
+    .card-desc {
+      text-align: center;
+      padding: 0.5mm 1mm 0;
+    }
+
+    .card-desc span {
+      font-size: 5.5pt;
+      color: #E8505B;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    /* ========== 分隔线 ========== */
+    .card-divider {
+      height: 1px;
+      background: #E0E0E0;
+      margin: 1.5mm 2mm 0;
+    }
+
+    /* ========== 内容区（左右两列） ========== */
+    .card-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;   /* 左右各50% */
+      gap: 0;
+      padding: 1.5mm 1.5mm 0;
+      align-items: start;
+    }
+
+    /* 左列 / 右列 */
+    .col-left, .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+    }
+
+    .col-right {
+      padding-left: 1mm;
+      border-left: 1px solid #E8E8E8;
+    }
+
+    /* 信息行 */
+    .info-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.8mm;
+      font-size: 6pt;
+      color: #444;
+      line-height: 1;
+    }
+
+    .info-label {
+      font-weight: 700;
+      color: #333;
+      white-space: nowrap;
+      font-size: 6pt;
+    }
+
+    .info-line {
+      flex: 1;
+      border-bottom: 1px solid #888;
+      height: 5mm;
+      display: flex;
+      align-items: center;
+      min-width: 3mm;
+    }
+
+    .info-fixed {
+      font-weight: 700;
+      color: #1a1a1a;
+      font-size: 6pt;
+      word-break: break-all;
+    }
+
+    /* ========== 角花装饰 ========== */
+    .corner-decor {
+      position: absolute;
+      font-size: 5pt;
+      opacity: 0.3;
+      color: #888;
+    }
+    .deco-tl { top: 1.5mm; left: 1.5mm; }
+    .deco-br { bottom: 1.5mm; right: 1.5mm; }
+
+    /* =============================================
+       设置面板
+    ============================================= */
+    .settings-panel {
+      margin-top: 20px;
+      width: 210mm;
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .settings-section {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .settings-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #444;
+      min-width: 48px;
+    }
+
+    .theme-btn {
+      padding: 6px 14px;
+      border: 2px solid #ddd;
+      border-radius: 50px;
+      background: #fff;
+      font-size: 12px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover { border-color: #aaa; }
+
+    .theme-btn.active {
+      font-weight: 700;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
+    }
+
+    .settings-input {
+      padding: 6px 10px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: "Noto Sans SC", sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 80px;
+    }
+
+    .settings-input:focus { border-color: #FF9A3C; }
+
+    /* =============================================
+       导出按钮
+    ============================================= */
+    .export-bar {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .export-btn {
+      padding: 12px 36px;
+      background: linear-gradient(135deg, #FF9A3C, #FFD93D);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 15px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 16px rgba(255,154,60,0.35);
+      transition: all 0.2s;
+    }
+
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,154,60,0.45);
+    }
+
+    .export-btn:disabled {
+      background: #ccc;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* =============================================
+       打印
+    ============================================= */
+    @media print {
+      body { background: white; padding: 0; margin: 0; }
+      .a4-page { width: 210mm; height: 297mm; box-shadow: none; }
+      .export-bar, .settings-panel { display: none !important; }
+      .coupon { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="a4-page" id="a4Page">
+  <div class="cut-h1"></div>
+  <div class="cut-h2"></div>
+  <div class="cut-v1"></div><div class="cut-v2"></div><div class="cut-v3"></div>
+  <div class="cut-v4"></div><div class="cut-v5"></div><div class="cut-v6"></div>
+  <div class="cut-v7"></div>
+
+  <!-- ======================= 24张券，由JS生成 ======================= -->
+</div>
+
+<!-- 设置面板 -->
+<div class="settings-panel">
+  <div class="settings-section">
+    <span class="settings-label">🎨 主题</span>
+    <button class="theme-btn active" data-theme="classic" onclick="setTheme('classic')">⚫ 经典黑白</button>
+    <button class="theme-btn" data-theme="warm" onclick="setTheme('warm')">🧡 暖橙活力</button>
+    <button class="theme-btn" data-theme="nature" onclick="setTheme('nature')">💚 清新绿野</button>
+    <button class="theme-btn" data-theme="sky" onclick="setTheme('sky')">💙 天空蓝调</button>
+  </div>
+  <div class="settings-section">
+    <span class="settings-label">📝 发放人</span>
+    <input class="settings-input" id="inputTeacher" value="郑老师" oninput="updateTeacher(this.value)">
+    <span class="settings-label" style="margin-left:12px">📅 有效期</span>
+    <input class="settings-input" id="inputTerm" value="本学期" oninput="updateTerm(this.value)">
+  </div>
+</div>
+
+<div class="export-bar">
+  <button class="export-btn" id="exportPng">📥 导出 A4 PNG 图片</button>
+  <p class="hint">支持直接打印：文件 → 打印 → 选择「无边距」效果更佳</p>
+</div>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+    // =============================================
+    // 4套主题
+    // =============================================
+    const THEMES = {
+      classic: {
+        '--coupon-bg': '#FFFFFF',
+        '--title-color': '#1a1a1a',
+        '--desc-color': '#CC3333',
+        '--label-color': '#333',
+        '--line-color': '#888',
+        '--fixed-color': '#1a1a1a',
+        '--divider-color': '#CCC',
+        '--col-border': '#E0E0E0',
+        '--deco-color': '#888',
+      },
+      warm: {
+        '--coupon-bg': '#FFF9F0',
+        '--title-color': '#1a1a1a',
+        '--desc-color': '#D44A20',
+        '--label-color': '#5C3317',
+        '--line-color': '#C8834A',
+        '--fixed-color': '#5C3317',
+        '--divider-color': '#E8C090',
+        '--col-border': '#E8C090',
+        '--deco-color': '#C8834A',
+      },
+      nature: {
+        '--coupon-bg': '#F0FFF4',
+        '--title-color': '#1a1a1a',
+        '--desc-color': '#2D7A3A',
+        '--label-color': '#2D7A3A',
+        '--line-color': '#7CB87A',
+        '--fixed-color': '#2D7A3A',
+        '--divider-color': '#B8D8B8',
+        '--col-border': '#D0E8D0',
+        '--deco-color': '#7CB87A',
+      },
+      sky: {
+        '--coupon-bg': '#F0F7FF',
+        '--title-color': '#1a1a1a',
+        '--desc-color': '#1A5FA8',
+        '--label-color': '#1A5FA8',
+        '--line-color': '#6B9FD4',
+        '--fixed-color': '#1A5FA8',
+        '--divider-color': '#B8CFEE',
+        '--col-border': '#D0E0F0',
+        '--deco-color': '#6B9FD4',
+      }
+    };
+
+    let teacher = '郑老师';
+    let term = '本学期';
+
+    // =============================================
+    // 生成24张券HTML
+    // =============================================
+    function renderCoupons() {
+      const a4Page = document.getElementById('a4Page');
+      // 保留裁剪线和设置面板，只生成coupon
+      for (let i = 0; i < 24; i++) {
+        const div = document.createElement('div');
+        div.className = 'coupon';
+        div.innerHTML = `
+          <div class="card-title">
+            <h1>免作业券</h1>
+          </div>
+          <div class="card-desc">
+            <span>本券可免除一次日常作业</span>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-body">
+            <div class="col-left">
+              <div class="info-item">
+                <span class="info-label">使用人：</span>
+                <div class="info-line"></div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">使用日期：</span>
+                <div class="info-line"></div>
+              </div>
+            </div>
+            <div class="col-right">
+              <div class="info-item">
+                <span class="info-label">发放人：</span>
+                <span class="info-fixed teacher-text">${teacher}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">有效期：</span>
+                <span class="info-fixed term-text">${term}</span>
+              </div>
+            </div>
+          </div>
+          <div class="corner-decor deco-tl">✿</div>
+          <div class="corner-decor deco-br">❀</div>
+        `;
+        a4Page.appendChild(div);
+      }
+    }
+
+    // =============================================
+    // 主题切换
+    // =============================================
+    function setTheme(name) {
+      const root = document.documentElement;
+      const t = THEMES[name];
+      for (const [k, v] of Object.entries(t)) root.style.setProperty(k, v);
+      document.querySelectorAll('.theme-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.theme === name);
+      });
+      // 应用标题/说明文字颜色
+      document.querySelectorAll('.card-title h1').forEach(el => {
+        el.style.color = t['--title-color'];
+      });
+      document.querySelectorAll('.card-desc span').forEach(el => {
+        el.style.color = t['--desc-color'];
+      });
+    }
+
+    // =============================================
+    // 更新发放人/有效期
+    // =============================================
+    function updateTeacher(val) {
+      teacher = val || '郑老师';
+      document.querySelectorAll('.teacher-text').forEach(el => el.textContent = teacher);
+    }
+
+    function updateTerm(val) {
+      term = val || '本学期';
+      document.querySelectorAll('.term-text').forEach(el => el.textContent = term);
+    }
+
+    // =============================================
+    // 导出PNG
+    // =============================================
+    document.getElementById('exportPng').addEventListener('click', async function () {
+      const btn = this;
+      const a4Page = document.getElementById('a4Page');
+      btn.disabled = true;
+      btn.textContent = '⏳ 正在生成图片...';
+      try {
+        const canvas = await html2canvas(a4Page, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          windowWidth: Math.round(a4Page.offsetWidth),
+          windowHeight: Math.round(a4Page.offsetHeight)
+        });
+        const link = document.createElement('a');
+        link.download = '免作业券-v2-A4.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+      } catch (e) {
+        alert('生成失败: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📥 导出 A4 PNG 图片';
+      }
+    });
+
+    // 初始化
+    renderCoupons();
+    setTheme('classic');
+  </script>
+</body>
+</html>
