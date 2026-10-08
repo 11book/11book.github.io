@@ -44,14 +44,12 @@
     .cut-h1 { top: 37mm; }   .cut-h2 { top: 74mm; }   .cut-h3 { top: 111mm; }
     .cut-h4 { top: 148mm; }  .cut-h5 { top: 185mm; }  .cut-h6 { top: 222mm; }
     .cut-h7 { top: 259mm; }
-
     .cut-v1 { position: absolute; top: 0; bottom: 0; left: 70mm; border-left: 1px dashed #C0C0C0; pointer-events: none; z-index: 10; }
     .cut-v2 { position: absolute; top: 0; bottom: 0; left: 140mm; border-left: 1px dashed #C0C0C0; pointer-events: none; z-index: 10; }
 
     /* =============================================
        单张免作业券
-       每格 70mm × 37mm（横向扁长）
-       内容紧凑排满
+       每格 70mm × 37mm，内容紧凑排列
     ============================================= */
     .coupon {
       position: relative;
@@ -59,11 +57,10 @@
       break-inside: avoid;
       display: flex;
       flex-direction: column;
-      padding: 2.5mm 3mm 2mm;
-      overflow: hidden;
+      padding: 2mm 2.5mm 1.5mm;
     }
 
-    /* ========== 标题区（顶部居中） ========== */
+    /* ========== 标题（顶部居中） ========== */
     .card-title {
       text-align: center;
       flex-shrink: 0;
@@ -78,7 +75,7 @@
       line-height: 1;
     }
 
-    /* ========== 说明文字（标题下方） ========== */
+    /* ========== 红色说明 ========== */
     .card-desc {
       text-align: center;
       flex-shrink: 0;
@@ -86,55 +83,62 @@
     }
 
     .card-desc span {
-      font-size: 5.5pt;
+      font-size: 5pt;
       color: var(--desc-color);
       font-weight: 500;
-      letter-spacing: 0.2px;
     }
 
     /* ========== 分隔线 ========== */
     .card-divider {
-      height: 1px;
+      height: 0.8px;
       background: var(--divider-color);
       margin: 1mm 2mm 0;
       flex-shrink: 0;
     }
 
-    /* ========== 内容区（两列：左使用人/日期，右发放人/有效期） ========== */
+    /* ========== 内容区：上下两行，每行左右各一信息 ========== */
     .card-body {
       flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      padding: 1mm 1.5mm 0;
-      align-items: start;
-    }
-
-    .col-left, .col-right {
       display: flex;
       flex-direction: column;
-      gap: 1.2mm;
+      justify-content: space-between;
+      padding: 1.2mm 1.5mm 0;
+      gap: 1.5mm;
     }
 
-    .col-right {
-      padding-left: 1mm;
-      border-left: 1px solid var(--col-border);
-    }
-
-    .info-item {
+    .info-row {
       display: flex;
-      align-items: baseline;
-      gap: 0.5mm;
+      align-items: center;
+      gap: 1mm;
       font-size: 6pt;
       color: var(--label-color);
       line-height: 1;
     }
 
+    /* 左列（使用人/日期） */
+    .col-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+      flex: 1;
+    }
+
+    /* 右列（发放人/有效期） */
+    .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+      flex: 1;
+      padding-left: 1mm;
+      border-left: 1px solid var(--col-border);
+    }
+
     .info-label {
       font-weight: 700;
       color: var(--label-color);
-      white-space: nowrap;
       font-size: 6pt;
+      white-space: nowrap;
+      min-width: 12mm;
     }
 
     .info-line {
@@ -143,10 +147,10 @@
       height: 4.5mm;
       display: flex;
       align-items: center;
-      min-width: 2mm;
     }
 
     .info-fixed {
+      flex: 1;
       font-weight: 700;
       color: var(--fixed-color);
       font-size: 6pt;
@@ -156,12 +160,12 @@
     /* 角花 */
     .corner-decor {
       position: absolute;
-      font-size: 5pt;
+      font-size: 4.5pt;
       opacity: 0.3;
       color: var(--deco-color);
     }
-    .deco-tl { top: 1mm; left: 1.5mm; }
-    .deco-br { bottom: 1mm; right: 1.5mm; }
+    .deco-tl { top: 1mm; left: 1mm; }
+    .deco-br { bottom: 1mm; right: 1mm; }
 
     /* =============================================
        设置面板
@@ -372,13 +376,15 @@
         <div class="card-desc"><span>本券可免除一次日常作业</span></div>
         <div class="card-divider"></div>
         <div class="card-body">
-          <div class="col-left">
-            <div class="info-item"><span class="info-label">使用人：</span><div class="info-line"></div></div>
-            <div class="info-item"><span class="info-label">使用日期：</span><div class="info-line"></div></div>
-          </div>
-          <div class="col-right">
-            <div class="info-item"><span class="info-label">发放人：</span><span class="info-fixed teacher-text">${teacher}</span></div>
-            <div class="info-item"><span class="info-label">有效期：</span><span class="info-fixed term-text">${term}</span></div>
+          <div class="info-row">
+            <div class="col-left">
+              <div class="info-row"><span class="info-label">使用人：</span><div class="info-line"></div></div>
+              <div class="info-row"><span class="info-label">使用日期：</span><div class="info-line"></div></div>
+            </div>
+            <div class="col-right">
+              <div class="info-row"><span class="info-label">发放人：</span><span class="info-fixed teacher-text">${teacher}</span></div>
+              <div class="info-row"><span class="info-label">有效期：</span><span class="info-fixed term-text">${term}</span></div>
+            </div>
           </div>
         </div>
         <div class="corner-decor deco-tl">✿</div>
