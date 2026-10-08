@@ -48,103 +48,103 @@
     .cut-v2 { position: absolute; top: 0; bottom: 0; left: 140mm; border-left: 1px dashed #C0C0C0; pointer-events: none; z-index: 10; }
 
     /* =============================================
-       单张免作业券
-       每格 70mm × 37mm，内容紧凑排列
+       单张免作业券（70mm × 37mm）
+       内容：标题+说明 | 2×2信息网格 | 规则
     ============================================= */
     .coupon {
       position: relative;
-      background: var(--coupon-bg);
+      background: #FFFCF5;
       break-inside: avoid;
       display: flex;
       flex-direction: column;
       padding: 2mm 2.5mm 1.5mm;
+      overflow: hidden;
     }
 
-    /* ========== 标题（顶部居中） ========== */
-    .card-title {
+    /* ========== 标题区 ========== */
+    .card-header {
       text-align: center;
       flex-shrink: 0;
     }
 
-    .card-title h1 {
+    .card-header h1 {
       font-family: "Noto Serif SC", "STSong", "SimSun", serif;
       font-size: 11pt;
       font-weight: 900;
-      color: var(--title-color);
+      color: #E8505B;
       letter-spacing: 1.5px;
       line-height: 1;
     }
 
-    /* ========== 红色说明 ========== */
     .card-desc {
       text-align: center;
-      flex-shrink: 0;
       margin-top: 0.3mm;
     }
 
     .card-desc span {
       font-size: 5pt;
-      color: var(--desc-color);
+      color: #CC3333;
       font-weight: 500;
     }
 
     /* ========== 分隔线 ========== */
     .card-divider {
-      height: 0.8px;
-      background: var(--divider-color);
+      height: 1.2px;
+      background: linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent);
       margin: 1mm 2mm 0;
       flex-shrink: 0;
     }
 
-    /* ========== 内容区：上下两行，每行左右各一信息 ========== */
-    .card-body {
+    /* ========== 信息区（2×2网格） ========== */
+    .card-info {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 1.2mm 1.5mm 0;
-      gap: 1.5mm;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 0;
+      padding: 1mm 1mm 0;
+      align-items: start;
     }
 
-    .info-row {
+    .info-cell {
       display: flex;
       align-items: center;
-      gap: 1mm;
-      font-size: 6pt;
-      color: var(--label-color);
+      gap: 0.8mm;
+      font-size: 5.5pt;
+      color: #555;
       line-height: 1;
+      padding: 0 0.5mm;
     }
 
-    /* 左列（使用人/日期） */
-    .col-left {
+    .info-icon {
+      width: 4.5mm;
+      height: 4.5mm;
+      border-radius: 50%;
       display: flex;
-      flex-direction: column;
-      gap: 1.5mm;
-      flex: 1;
+      align-items: center;
+      justify-content: center;
+      font-size: 5pt;
+      flex-shrink: 0;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
     }
 
-    /* 右列（发放人/有效期） */
-    .col-right {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5mm;
-      flex: 1;
-      padding-left: 1mm;
-      border-left: 1px solid var(--col-border);
-    }
+    .icon-person  { background: #FFF0F5; }
+    .icon-date    { background: #FFF8E6; }
+    .icon-teacher { background: #EEF6FF; }
+    .icon-term    { background: #F0FFF4; }
 
     .info-label {
       font-weight: 700;
-      color: var(--label-color);
-      font-size: 6pt;
+      color: #444;
+      font-size: 5.5pt;
       white-space: nowrap;
-      min-width: 12mm;
     }
 
     .info-line {
       flex: 1;
-      border-bottom: 1px solid var(--line-color);
-      height: 4.5mm;
+      border-bottom: 1px dashed #FFD93D;
+      height: 4mm;
       display: flex;
       align-items: center;
     }
@@ -152,9 +152,31 @@
     .info-fixed {
       flex: 1;
       font-weight: 700;
-      color: var(--fixed-color);
-      font-size: 6pt;
+      color: #5B8DBE;
+      font-size: 5.5pt;
       word-break: break-all;
+    }
+
+    /* ========== 规则区 ========== */
+    .card-rules {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5mm;
+      padding: 0.8mm 2mm 0;
+      flex-shrink: 0;
+    }
+
+    .rules-icon {
+      font-size: 5.5pt;
+      color: #FFD93D;
+      flex-shrink: 0;
+    }
+
+    .rules-text {
+      font-size: 5.5pt;
+      color: #888;
+      text-align: center;
     }
 
     /* 角花 */
@@ -162,7 +184,7 @@
       position: absolute;
       font-size: 4.5pt;
       opacity: 0.3;
-      color: var(--deco-color);
+      color: #FFB347;
     }
     .deco-tl { top: 1mm; left: 1mm; }
     .deco-br { bottom: 1mm; right: 1mm; }
@@ -278,7 +300,7 @@
       body { background: white; padding: 0; margin: 0; }
       .a4-page { width: 210mm; height: 297mm; box-shadow: none; }
       .export-bar, .settings-panel { display: none !important; }
-      .coupon { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .coupon, .info-icon { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -296,10 +318,10 @@
 <div class="settings-panel">
   <div class="settings-section">
     <span class="settings-label">🎨 主题</span>
-    <button class="theme-btn active" data-theme="classic" onclick="setTheme('classic')">⚫ 经典黑白</button>
-    <button class="theme-btn" data-theme="warm" onclick="setTheme('warm')">🧡 暖橙活力</button>
+    <button class="theme-btn active" data-theme="rainbow" onclick="setTheme('rainbow')">🌈 彩虹糖果</button>
+    <button class="theme-btn" data-theme="classic" onclick="setTheme('classic')">⚫ 经典学院</button>
     <button class="theme-btn" data-theme="nature" onclick="setTheme('nature')">💚 清新绿野</button>
-    <button class="theme-btn" data-theme="sky" onclick="setTheme('sky')">💙 天空蓝调</button>
+    <button class="theme-btn" data-theme="pink" onclick="setTheme('pink')">🌸 可爱粉嫩</button>
   </div>
   <div class="settings-section">
     <span class="settings-label">📝 发放人</span>
@@ -317,49 +339,69 @@
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
   const THEMES = {
-    classic: {
-      '--coupon-bg': '#FFFFFF',
-      '--title-color': '#1a1a1a',
+    rainbow: {
+      '--coupon-bg': '#FFFCF5',
+      '--title-color': '#E8505B',
       '--desc-color': '#CC3333',
-      '--label-color': '#333',
-      '--line-color': '#888',
-      '--fixed-color': '#1a1a1a',
-      '--divider-color': '#CCC',
-      '--col-border': '#E0E0E0',
-      '--deco-color': '#888',
+      '--divider-color': 'linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent)',
+      '--label-color': '#444',
+      '--line-color': '#FFD93D',
+      '--fixed-color': '#5B8DBE',
+      '--rules-text': '#888',
+      '--rules-icon': '#FFD93D',
+      '--deco-color': '#FFB347',
+      '--icon-person-bg': '#FFF0F5',
+      '--icon-date-bg': '#FFF8E6',
+      '--icon-teacher-bg': '#EEF6FF',
+      '--icon-term-bg': '#F0FFF4',
     },
-    warm: {
-      '--coupon-bg': '#FFF9F0',
-      '--title-color': '#1a1a1a',
-      '--desc-color': '#D44A20',
-      '--label-color': '#5C3317',
-      '--line-color': '#C8834A',
-      '--fixed-color': '#5C3317',
-      '--divider-color': '#E8C090',
-      '--col-border': '#E8C090',
-      '--deco-color': '#C8834A',
+    classic: {
+      '--coupon-bg': '#F8FAFF',
+      '--title-color': '#1B4F8A',
+      '--desc-color': '#1B4F8A',
+      '--divider-color': 'linear-gradient(90deg, transparent, #C9A84C 15%, #C9A84C 85%, transparent)',
+      '--label-color': '#1B4F8A',
+      '--line-color': '#C9A84C',
+      '--fixed-color': '#1B4F8A',
+      '--rules-text': '#556',
+      '--rules-icon': '#C9A84C',
+      '--deco-color': '#1B4F8A',
+      '--icon-person-bg': '#EEF4FF',
+      '--icon-date-bg': '#EEF4FF',
+      '--icon-teacher-bg': '#EEF4FF',
+      '--icon-term-bg': '#EEF4FF',
     },
     nature: {
       '--coupon-bg': '#F0FFF4',
-      '--title-color': '#1a1a1a',
+      '--title-color': '#2D7A3A',
       '--desc-color': '#2D7A3A',
+      '--divider-color': 'linear-gradient(90deg, transparent, #7CB87A 15%, #7CB87A 85%, transparent)',
       '--label-color': '#2D7A3A',
       '--line-color': '#7CB87A',
       '--fixed-color': '#2D7A3A',
-      '--divider-color': '#B8D8B8',
-      '--col-border': '#D0E8D0',
+      '--rules-text': '#6B9B3A',
+      '--rules-icon': '#7CB87A',
       '--deco-color': '#7CB87A',
+      '--icon-person-bg': '#E8F5E8',
+      '--icon-date-bg': '#E8F5E8',
+      '--icon-teacher-bg': '#E8F5E8',
+      '--icon-term-bg': '#E8F5E8',
     },
-    sky: {
-      '--coupon-bg': '#F0F7FF',
-      '--title-color': '#1a1a1a',
-      '--desc-color': '#1A5FA8',
-      '--label-color': '#1A5FA8',
-      '--line-color': '#6B9FD4',
-      '--fixed-color': '#1A5FA8',
-      '--divider-color': '#B8CFEE',
-      '--col-border': '#D0E0F0',
-      '--deco-color': '#6B9FD4',
+    pink: {
+      '--coupon-bg': '#FFF5F8',
+      '--title-color': '#E05580',
+      '--desc-color': '#E05580',
+      '--divider-color': 'linear-gradient(90deg, transparent, #FFB3CC 15%, #FFB3CC 85%, transparent)',
+      '--label-color': '#C04870',
+      '--line-color': '#FFB3CC',
+      '--fixed-color': '#C04870',
+      '--rules-text': '#997',
+      '--rules-icon': '#FF8FAB',
+      '--deco-color': '#FF8FAB',
+      '--icon-person-bg': '#FFE8F0',
+      '--icon-date-bg': '#FFF0F5',
+      '--icon-teacher-bg': '#F5E8FF',
+      '--icon-term-bg': '#E8F5FF',
     }
   };
 
@@ -372,20 +414,35 @@
       const div = document.createElement('div');
       div.className = 'coupon';
       div.innerHTML = `
-        <div class="card-title"><h1>免作业券</h1></div>
+        <div class="card-header"><h1>免作业券</h1></div>
         <div class="card-desc"><span>本券可免除一次日常作业</span></div>
         <div class="card-divider"></div>
-        <div class="card-body">
-          <div class="info-row">
-            <div class="col-left">
-              <div class="info-row"><span class="info-label">使用人：</span><div class="info-line"></div></div>
-              <div class="info-row"><span class="info-label">使用日期：</span><div class="info-line"></div></div>
-            </div>
-            <div class="col-right">
-              <div class="info-row"><span class="info-label">发放人：</span><span class="info-fixed teacher-text">${teacher}</span></div>
-              <div class="info-row"><span class="info-label">有效期：</span><span class="info-fixed term-text">${term}</span></div>
-            </div>
+        <div class="card-info">
+          <div class="info-cell">
+            <div class="info-icon icon-person">🎒</div>
+            <span class="info-label">使用人：</span>
+            <div class="info-line"></div>
           </div>
+          <div class="info-cell">
+            <div class="info-icon icon-teacher">🏫</div>
+            <span class="info-label">发放人：</span>
+            <span class="info-fixed teacher-text">${teacher}</span>
+          </div>
+          <div class="info-cell">
+            <div class="info-icon icon-date">📅</div>
+            <span class="info-label">使用日期：</span>
+            <div class="info-line"></div>
+          </div>
+          <div class="info-cell">
+            <div class="info-icon icon-term">📚</div>
+            <span class="info-label">有效期：</span>
+            <span class="info-fixed term-text">${term}</span>
+          </div>
+        </div>
+        <div class="card-rules">
+          <span class="rules-icon">✦</span>
+          <span class="rules-text">本券可免除一次作业</span>
+          <span class="rules-icon">✦</span>
         </div>
         <div class="corner-decor deco-tl">✿</div>
         <div class="corner-decor deco-br">❀</div>
@@ -400,6 +457,22 @@
     for (const [k, v] of Object.entries(t)) root.style.setProperty(k, v);
     document.querySelectorAll('.theme-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === name);
+    });
+    // 应用标题颜色
+    document.querySelectorAll('.card-header h1').forEach(el => {
+      el.style.color = t['--title-color'];
+    });
+    document.querySelectorAll('.card-desc span').forEach(el => {
+      el.style.color = t['--desc-color'];
+    });
+    document.querySelectorAll('.rules-text').forEach(el => {
+      el.style.color = t['--rules-text'];
+    });
+    document.querySelectorAll('.rules-icon').forEach(el => {
+      el.style.color = t['--rules-icon'];
+    });
+    document.querySelectorAll('.corner-decor').forEach(el => {
+      el.style.color = t['--deco-color'];
     });
   }
 
@@ -440,7 +513,7 @@
   });
 
   renderCoupons();
-  setTheme('classic');
+  setTheme('rainbow');
 </script>
 </body>
 </html>
