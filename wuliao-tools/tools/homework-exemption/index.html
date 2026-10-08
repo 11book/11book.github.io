@@ -349,7 +349,7 @@
   <div class="cut-line-v2"></div>
 
   <!-- 12张券，由JS统一渲染 -->
-  <div id="couponsContainer"></div>
+  
 </div>
 
 <!-- 设置面板 -->
@@ -476,10 +476,11 @@
     // 生成12张券HTML
     // =============================================
     function renderCoupons() {
-      const container = document.getElementById('couponsContainer');
-      let html = '';
+      const a4Page = document.getElementById('a4Page');
       for (let i = 0; i < 12; i++) {
-        html += `
+        const div = document.createElement('div');
+        div.className = 'coupon';
+        div.innerHTML = `
         <div class="coupon">
           <div class="top-bar"></div>
           <div class="card-header">
@@ -517,7 +518,7 @@
           <div class="corner-decor deco-tr">✿</div>
         </div>`;
       }
-      container.innerHTML = html;
+      a4Page.appendChild(div);
     }
 
     // =============================================
