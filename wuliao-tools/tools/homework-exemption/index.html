@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>免作业券</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    /* ========== A4 纸张容器 ========== */
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      background: #fff;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 0;
+    }
+
+    /* ========== 裁剪参考线（打印时显示） ========== */
+    .a4-page::before,
+    .a4-page::after {
+      content: '';
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* 横向虚线（行间分割） */
+    .a4-page::before {
+      top: 99mm;
+      left: 0;
+      right: 0;
+      border-top: 1px dashed #ccc;
+    }
+
+    /* 纵向虚线（列间分割） */
+    .a4-page::after {
+      left: 105mm;
+      top: 0;
+      bottom: 0;
+      border-left: 1px dashed #ccc;
+    }
+
+    /* ========== 单张卡片 ========== */
+    .coupon {
+      background: #FDF8F0;
+      border: 1.5px solid #B8C9D9;
+      border-radius: 12px;
+      margin: 8mm 5mm;
+      padding: 10mm 9mm 7mm;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      break-inside: avoid;
+      position: relative;
+    }
+
+    /* 角装饰（打印时保留） */
+    .coupon::before,
+    .coupon::after {
+      content: '';
+      position: absolute;
+      border: 1.5px dashed #D0DCE8;
+      pointer-events: none;
+    }
+    .coupon::before {
+      top: 3mm; bottom: 3mm; left: 3mm; right: 3mm;
+      border-radius: 9px;
+    }
+    .coupon::after {
+      display: none;
+    }
+
+    /* ========== 标题区 ========== */
+    .coupon-title {
+      text-align: center;
+      padding-bottom: 5mm;
+      border-bottom: 1px dashed #D0DCE8;
+      margin-bottom: 4mm;
+    }
+
+    .coupon-title .stars {
+      font-size: 9pt;
+      color: #E8A838;
+      letter-spacing: 2mm;
+      line-height: 1;
+    }
+
+    .coupon-title h1 {
+      font-family: "Noto Serif SC", "STSong", "SimSun", serif;
+      font-size: 22pt;
+      font-weight: 700;
+      color: #3a3a3a;
+      letter-spacing: 3mm;
+      line-height: 1.3;
+      margin-top: 1mm;
+    }
+
+    /* ========== 内容区 ========== */
+    .coupon-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3.5mm;
+    }
+
+    .field {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      font-size: 10pt;
+      color: #3a3a3a;
+      line-height: 1;
+    }
+
+    .field-label {
+      font-weight: 400;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .field-value {
+      flex: 1;
+      border-bottom: 1px solid #555;
+      height: 7mm;
+      display: flex;
+      align-items: center;
+    }
+
+    .field-fixed {
+      font-weight: 700;
+      color: #3a3a3a;
+    }
+
+    /* ========== 说明区 ========== */
+    .coupon-rules {
+      margin-top: 4mm;
+      padding-top: 3mm;
+      border-top: 1px dashed #D0DCE8;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+    }
+
+    .rule {
+      font-size: 7pt;
+      color: #888;
+      line-height: 1.4;
+      padding-left: 4mm;
+      position: relative;
+    }
+
+    .rule::before {
+      content: counter(rule-counter);
+      counter-increment: rule-counter;
+      position: absolute;
+      left: 0;
+      color: #B8C9D9;
+      font-weight: 700;
+    }
+
+    .coupon-rules {
+      counter-reset: rule-counter;
+    }
+
+    /* ========== 导出按钮 ========== */
+    .export-bar {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .export-btn {
+      padding: 10px 28px;
+      background: #e8a838;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 14px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+
+    .export-btn:hover {
+      background: #d4922e;
+    }
+
+    .export-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* ========== 打印样式 ========== */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+
+      .a4-page {
+        width: 210mm;
+        height: 297mm;
+        background: white;
+        box-shadow: none;
+      }
+
+      .export-bar {
+        display: none !important;
+      }
+
+      /* 打印时裁剪线清晰可见 */
+      .a4-page::before {
+        border-top: 1px dashed #bbb;
+      }
+      .a4-page::after {
+        border-left: 1px dashed #bbb;
+      }
+
+      /* 确保彩色卡片打印出来 */
+      .coupon {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .coupon-title .stars {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="a4-page" id="a4Page">
+
+    <!-- 第1行第1列 -->
+    <div class="coupon">
+      <div class="coupon-title">
+        <div class="stars">✦ ✦ ✦</div>
+        <h1>免作业券</h1>
+      </div>
+      <div class="coupon-body">
+        <div class="field">
+          <span class="field-label">使用人：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">使用日期：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">发放人：</span>
+          <span class="field-fixed">郑老师</span>
+        </div>
+        <div class="field">
+          <span class="field-label">有效期：</span>
+          <span class="field-fixed">本学期</span>
+        </div>
+      </div>
+      <div class="coupon-rules">
+        <div class="rule">本卡可免除一次指定作业</div>
+        <div class="rule">限本人使用，涂改复印无效</div>
+        <div class="rule">最终解释权归发放老师所有</div>
+      </div>
+    </div>
+
+    <!-- 第1行第2列 -->
+    <div class="coupon">
+      <div class="coupon-title">
+        <div class="stars">✦ ✦ ✦</div>
+        <h1>免作业券</h1>
+      </div>
+      <div class="coupon-body">
+        <div class="field">
+          <span class="field-label">使用人：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">使用日期：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">发放人：</span>
+          <span class="field-fixed">郑老师</span>
+        </div>
+        <div class="field">
+          <span class="field-label">有效期：</span>
+          <span class="field-fixed">本学期</span>
+        </div>
+      </div>
+      <div class="coupon-rules">
+        <div class="rule">本卡可免除一次指定作业</div>
+        <div class="rule">限本人使用，涂改复印无效</div>
+        <div class="rule">最终解释权归发放老师所有</div>
+      </div>
+    </div>
+
+    <!-- 第2行第1列 -->
+    <div class="coupon">
+      <div class="coupon-title">
+        <div class="stars">✦ ✦ ✦</div>
+        <h1>免作业券</h1>
+      </div>
+      <div class="coupon-body">
+        <div class="field">
+          <span class="field-label">使用人：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">使用日期：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">发放人：</span>
+          <span class="field-fixed">郑老师</span>
+        </div>
+        <div class="field">
+          <span class="field-label">有效期：</span>
+          <span class="field-fixed">本学期</span>
+        </div>
+      </div>
+      <div class="coupon-rules">
+        <div class="rule">本卡可免除一次指定作业</div>
+        <div class="rule">限本人使用，涂改复印无效</div>
+        <div class="rule">最终解释权归发放老师所有</div>
+      </div>
+    </div>
+
+    <!-- 第2行第2列 -->
+    <div class="coupon">
+      <div class="coupon-title">
+        <div class="stars">✦ ✦ ✦</div>
+        <h1>免作业券</h1>
+      </div>
+      <div class="coupon-body">
+        <div class="field">
+          <span class="field-label">使用人：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">使用日期：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">发放人：</span>
+          <span class="field-fixed">郑老师</span>
+        </div>
+        <div class="field">
+          <span class="field-label">有效期：</span>
+          <span class="field-fixed">本学期</span>
+        </div>
+      </div>
+      <div class="coupon-rules">
+        <div class="rule">本卡可免除一次指定作业</div>
+        <div class="rule">限本人使用，涂改复印无效</div>
+        <div class="rule">最终解释权归发放老师所有</div>
+      </div>
+    </div>
+
+    <!-- 第3行第1列 -->
+    <div class="coupon">
+      <div class="coupon-title">
+        <div class="stars">✦ ✦ ✦</div>
+        <h1>免作业券</h1>
+      </div>
+      <div class="coupon-body">
+        <div class="field">
+          <span class="field-label">使用人：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">使用日期：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">发放人：</span>
+          <span class="field-fixed">郑老师</span>
+        </div>
+        <div class="field">
+          <span class="field-label">有效期：</span>
+          <span class="field-fixed">本学期</span>
+        </div>
+      </div>
+      <div class="coupon-rules">
+        <div class="rule">本卡可免除一次指定作业</div>
+        <div class="rule">限本人使用，涂改复印无效</div>
+        <div class="rule">最终解释权归发放老师所有</div>
+      </div>
+    </div>
+
+    <!-- 第3行第2列 -->
+    <div class="coupon">
+      <div class="coupon-title">
+        <div class="stars">✦ ✦ ✦</div>
+        <h1>免作业券</h1>
+      </div>
+      <div class="coupon-body">
+        <div class="field">
+          <span class="field-label">使用人：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">使用日期：</span>
+          <div class="field-value"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">发放人：</span>
+          <span class="field-fixed">郑老师</span>
+        </div>
+        <div class="field">
+          <span class="field-label">有效期：</span>
+          <span class="field-fixed">本学期</span>
+        </div>
+      </div>
+      <div class="coupon-rules">
+        <div class="rule">本卡可免除一次指定作业</div>
+        <div class="rule">限本人使用，涂改复印无效</div>
+        <div class="rule">最终解释权归发放老师所有</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 导出按钮 -->
+  <div class="export-bar">
+    <button class="export-btn" id="exportPng">📥 导出 A4 PNG 图片</button>
+    <span class="hint">点击后等待几秒，浏览器自动下载 6 张券的整页图片</span>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    document.getElementById('exportPng').addEventListener('click', async function () {
+      const btn = this;
+      const a4Page = document.getElementById('a4Page');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ 正在生成...';
+
+      // A4 at 300dpi = 2480 x 3508 px
+      try {
+        const canvas = await html2canvas(a4Page, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          width: 2480,
+          height: 3508,
+          logging: false
+        });
+
+        const link = document.createElement('a');
+        link.download = '免作业券-A4.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+      } catch (e) {
+        alert('生成失败: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📥 导出 A4 PNG 图片';
+      }
+    });
+  </script>
+</body>
+</html>
