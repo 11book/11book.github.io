@@ -157,7 +157,9 @@
       color: #444;
       font-size: 8pt;
       white-space: nowrap;
-      min-width: 13mm;   /* 标签统一最小宽度，对齐 */
+      width: 17mm;           /* 固定宽度，冒号对齐一列 */
+      text-align: justify;   /* 文字两端对齐，冒号对齐 */
+      text-align-last: justify;
     }
 
     .info-line {
@@ -187,10 +189,13 @@
     .rule {
       display: flex;
       align-items: center;
-      gap: 1.5mm;
+      justify-content: flex-start;  /* 文字靠左 */
       font-size: 6pt;
       color: #888;
-      line-height: 1.35;
+      line-height: 1.8;      /* 加大行间距 */
+    }
+    .rule span {
+      flex: 1;              /* 文字占满整行，左右间距均匀 */
     }
 
     .rule-num {
