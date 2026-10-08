@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>免作业券 - 可爱校园版</title>
+  <title>免作业券 - 校园版</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -19,205 +19,185 @@
       font-family: "Noto Sans SC", sans-serif;
     }
 
-    /* ============================================
-       A4 纸张
-    ============================================ */
+    /* =============================================
+       A4 纸张：精确 210mm × 297mm
+       布局：2列 × 3行，无间隙
+       每格 = 105mm 宽 × 99mm 高
+    ============================================= */
     .a4-page {
       width: 210mm;
       height: 297mm;
       background: #FFFFFF;
-      position: relative;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;   /* 各105mm */
+      grid-template-rows: 1fr 1fr 1fr;  /* 各99mm */
       box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-      overflow: hidden;
+      position: relative;
     }
 
-    /* 纸张顶部彩虹装饰条 */
-    .a4-page::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 6mm;
-      background: linear-gradient(90deg,
-        #FF6B8A 0%, #FF9A3C 16%, #FFD93D 33%,
-        #6BCB77 50%, #4FACFE 66%, #A18CD1 83%, #FF6B8A 100%);
-      z-index: 10;
-    }
-
-    /* 裁剪参考线 */
-    .cut-h1, .cut-h2 {
+    /* 裁剪参考线（仅打印时显示） */
+    .cut-line-h1, .cut-line-h2 {
       position: absolute;
       left: 0; right: 0;
       border-top: 1px dashed #C0C0C0;
       pointer-events: none;
-      z-index: 5;
+      z-index: 10;
     }
-    .cut-h1 { top: 99mm; }
-    .cut-h2 { top: 198mm; }
-
-    .cut-v {
+    .cut-line-h1 { top: 99mm; }
+    .cut-line-h2 { top: 198mm; }
+    .cut-line-v {
       position: absolute;
       top: 0; bottom: 0;
+      left: 105mm;
       border-left: 1px dashed #C0C0C0;
       pointer-events: none;
-      z-index: 5;
-      left: 105mm;
+      z-index: 10;
     }
 
-    /* ============================================
-       单张卡片
-    ============================================ */
+    /* =============================================
+       单张免作业券
+       每格 105mm × 99mm，内部自适应排版
+    ============================================= */
     .coupon {
       position: relative;
       background: #FFFCF5;
-      border: none;
-      border-radius: 0;
       break-inside: avoid;
       display: flex;
       flex-direction: column;
-      padding: 12mm 11mm 9mm;
-      gap: 0;
+      padding: 7mm 8mm 6mm;
+      overflow: hidden;
     }
 
-    /* 卡片顶部：彩虹渐变分隔线 */
-    .card-top-bar {
-      height: 5mm;
-      border-radius: 8px 8px 0 0;
-      background: linear-gradient(135deg, #FF9A3C 0%, #FFD93D 40%, #6BCB77 100%);
-      margin: 8mm 8mm 0;
-      flex-shrink: 0;
+    /* 顶部彩虹条（每列第一个卡片顶部） */
+    .rainbow-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4mm;
+      background: linear-gradient(90deg,
+        #FF6B8A 0%, #FF9A3C 16%, #FFD93D 33%,
+        #6BCB77 50%, #4FACFE 66%, #A18CD1 83%, #FF6B8A 100%);
     }
 
     /* 标题区 */
-    .card-title {
+    .card-header {
       text-align: center;
-      padding: 5mm 8mm 4mm;
-      position: relative;
+      padding-top: 5mm;
+      padding-bottom: 2.5mm;
     }
 
-    .card-title .stars-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      font-size: 10pt;
+    .stars {
+      font-size: 9pt;
       color: #FFB347;
-      margin-bottom: 1mm;
-      letter-spacing: 1px;
+      letter-spacing: 3px;
+      line-height: 1;
     }
 
-    .card-title h1 {
+    .card-header h1 {
       font-family: "Noto Serif SC", "STSong", "SimSun", serif;
-      font-size: 26pt;
+      font-size: 22pt;
       font-weight: 900;
       color: #E8505B;
-      letter-spacing: 4px;
-      line-height: 1.1;
-      text-shadow: 1px 1px 0 rgba(232,80,91,0.15);
-    }
-
-    .card-title .subtitle {
-      font-size: 7pt;
-      color: #B8C9D9;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
+      line-height: 1.15;
       margin-top: 1.5mm;
     }
 
-    /* 装饰分隔线 */
-    .card-divider {
-      margin: 2mm 8mm;
+    /* 标题装饰线 */
+    .title-underline {
       height: 2px;
-      background: linear-gradient(90deg, transparent, #FFD93D 20%, #FFD93D 80%, transparent);
+      margin: 2mm 2mm 0;
+      background: linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent);
       border-radius: 1px;
     }
 
-    /* 内容区 */
-    .card-body {
+    /* =============================================
+       内容信息区（图标 + 标签 + 下划线）
+    ============================================= */
+    .card-info {
       flex: 1;
-      padding: 4mm 8mm 3mm;
       display: flex;
       flex-direction: column;
-      gap: 5mm;
+      justify-content: space-evenly;
+      padding: 2mm 0;
     }
 
     .info-row {
       display: flex;
       align-items: center;
-      gap: 3mm;
-      font-size: 11pt;
-      color: #444;
+      gap: 2.5mm;
+      font-size: 10pt;
+      color: #555;
       line-height: 1;
     }
 
     .info-icon {
-      width: 9mm;
-      height: 9mm;
+      width: 8mm;
+      height: 8mm;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11pt;
+      font-size: 9pt;
       flex-shrink: 0;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
 
-    .icon-person  { background: #FFF0F0; }
-    .icon-date    { background: #FFF8E6; }
-    .icon-teacher { background: #F0FFF4; }
-    .icon-term    { background: #F0F4FF; }
+    .icon-person { background: #FFF0F5; }
+    .icon-date   { background: #FFF8E6; }
+    .icon-teacher{ background: #EEF6FF; }
+    .icon-term   { background: #F0FFF4; }
 
     .info-label {
       font-weight: 700;
-      color: #555;
+      color: #444;
       white-space: nowrap;
-      font-size: 11pt;
+      font-size: 10pt;
     }
 
     .info-line {
       flex: 1;
-      border-bottom: 2px dashed #FFD93D;
-      height: 8mm;
+      border-bottom: 1.5px dashed #FFD93D;
+      height: 7mm;
       display: flex;
       align-items: center;
     }
 
     .info-fixed {
       font-weight: 700;
-      color: #E8505B;
-      font-size: 11pt;
+      color: #5B8DBE;   /* 改用友好蓝色，不再用红色 */
+      font-size: 10pt;
     }
 
-    /* 说明区 */
+    /* =============================================
+       使用说明区
+    ============================================= */
     .card-rules {
-      margin: 3mm 8mm 6mm;
-      padding: 3mm 4mm;
-      background: #FFF9ED;
-      border-radius: 8px;
-      border: 1px dashed #FFE0A0;
       display: flex;
       flex-direction: column;
-      gap: 1.8mm;
+      gap: 1.2mm;
+      padding: 2mm 3mm;
+      background: #FFFBF0;
+      border-radius: 6px;
+      border: 1px dashed #FFE0A0;
     }
 
     .rule {
-      font-size: 7.5pt;
-      color: #888;
-      line-height: 1.5;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 2mm;
+      font-size: 7pt;
+      color: #888;
+      line-height: 1.4;
     }
 
     .rule-num {
-      width: 5mm;
-      height: 5mm;
+      width: 4.5mm;
+      height: 4.5mm;
       border-radius: 50%;
       background: #FFD93D;
       color: #fff;
-      font-size: 6pt;
+      font-size: 5.5pt;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -225,31 +205,32 @@
       flex-shrink: 0;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
-      margin-top: 0.5mm;
     }
 
-    /* 印章装饰 */
+    /* =============================================
+       印章装饰（右下方，淡色）
+    ============================================= */
     .stamp {
       position: absolute;
-      bottom: 10mm;
-      right: 10mm;
-      width: 18mm;
-      height: 18mm;
-      border: 2px solid #E8505B;
+      bottom: 6mm;
+      right: 7mm;
+      width: 16mm;
+      height: 16mm;
+      border: 2px solid #5B8DBE;
       border-radius: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      opacity: 0.25;
+      opacity: 0.2;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
 
     .stamp-inner {
-      border: 1px solid #E8505B;
-      width: 14mm;
-      height: 14mm;
+      border: 1px solid #5B8DBE;
+      width: 12mm;
+      height: 12mm;
       border-radius: 50%;
       display: flex;
       flex-direction: column;
@@ -258,39 +239,38 @@
     }
 
     .stamp-text {
-      font-size: 4pt;
+      font-size: 3.5pt;
       font-weight: 700;
-      color: #E8505B;
-      line-height: 1.2;
+      color: #5B8DBE;
       text-align: center;
+      line-height: 1.3;
     }
 
-    /* 角装饰小花 */
+    /* 角花 */
     .corner-decor {
       position: absolute;
-      font-size: 8pt;
-      opacity: 0.3;
+      font-size: 7pt;
+      opacity: 0.25;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
-    .corner-tl { top: 9mm; left: 10mm; }
-    .corner-tr { top: 9mm; right: 10mm; }
-    .corner-bl { bottom: 9mm; left: 10mm; }
+    .deco-tl { top: 5mm; left: 6mm; }
+    .deco-tr { top: 5mm; right: 6mm; }
+    .deco-bl { bottom: 5mm; left: 6mm; }
 
-    /* ============================================
-       导出按钮区
-    ============================================ */
+    /* =============================================
+       导出按钮
+    ============================================= */
     .export-bar {
       margin-top: 24px;
       display: flex;
-      gap: 12px;
+      flex-direction: column;
       align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
+      gap: 10px;
     }
 
     .export-btn {
-      padding: 12px 32px;
+      padding: 12px 36px;
       background: linear-gradient(135deg, #FF9A3C, #FFD93D);
       color: #fff;
       border: none;
@@ -309,10 +289,6 @@
       box-shadow: 0 6px 20px rgba(255,154,60,0.45);
     }
 
-    .export-btn:active {
-      transform: translateY(0);
-    }
-
     .export-btn:disabled {
       background: #ccc;
       box-shadow: none;
@@ -324,17 +300,14 @@
       font-size: 12px;
       color: #888;
       text-align: center;
+      line-height: 1.6;
     }
 
-    /* ============================================
-       打印样式
-    ============================================ */
+    /* =============================================
+       打印
+    ============================================= */
     @media print {
-      body {
-        background: white;
-        padding: 0;
-        margin: 0;
-      }
+      body { background: white; padding: 0; margin: 0; }
 
       .a4-page {
         width: 210mm;
@@ -344,12 +317,8 @@
 
       .export-bar { display: none !important; }
 
-      .coupon {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
-
-      .card-top-bar, .info-icon, .rule-num, .stamp, .corner-decor {
+      .coupon, .rainbow-bar, .info-icon,
+      .rule-num, .stamp, .corner-decor {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
@@ -358,26 +327,23 @@
 </head>
 <body>
 
-<!-- ============================================
-     A4 整页（2列×3行 = 6张券）
-============================================ -->
+<!-- A4 整页：2列 × 3行 = 6张免作业券 -->
 <div class="a4-page" id="a4Page">
 
   <!-- 裁剪参考线 -->
-  <div class="cut-h1"></div>
-  <div class="cut-h2"></div>
-  <div class="cut-v"></div>
+  <div class="cut-line-h1"></div>
+  <div class="cut-line-h2"></div>
+  <div class="cut-line-v"></div>
 
-  <!-- ====== 第1行 第1列 ====== -->
+  <!-- ==================== 第1行 第1列 ==================== -->
   <div class="coupon">
-    <div class="card-top-bar"></div>
-    <div class="card-title">
-      <div class="stars-row">🌟 🌟 🌟</div>
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
       <h1>免作业券</h1>
-      <div class="subtitle">HOMEWORK EXEMPTION</div>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-body">
+    <div class="title-underline"></div>
+    <div class="card-info">
       <div class="info-row">
         <div class="info-icon icon-person">🎒</div>
         <span class="info-label">使用人：</span>
@@ -405,21 +371,20 @@
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
     <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
-    <div class="corner-decor corner-tl">✿</div>
-    <div class="corner-decor corner-tr">✿</div>
-    <div class="corner-decor corner-bl">❀</div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+    <div class="corner-decor deco-bl">❀</div>
   </div>
 
-  <!-- ====== 第1行 第2列 ====== -->
+  <!-- ==================== 第1行 第2列 ==================== -->
   <div class="coupon">
-    <div class="card-top-bar"></div>
-    <div class="card-title">
-      <div class="stars-row">🌟 🌟 🌟</div>
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
       <h1>免作业券</h1>
-      <div class="subtitle">HOMEWORK EXEMPTION</div>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-body">
+    <div class="title-underline"></div>
+    <div class="card-info">
       <div class="info-row">
         <div class="info-icon icon-person">🎒</div>
         <span class="info-label">使用人：</span>
@@ -447,21 +412,20 @@
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
     <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
-    <div class="corner-decor corner-tl">✿</div>
-    <div class="corner-decor corner-tr">✿</div>
-    <div class="corner-decor corner-bl">❀</div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+    <div class="corner-decor deco-bl">❀</div>
   </div>
 
-  <!-- ====== 第2行 第1列 ====== -->
+  <!-- ==================== 第2行 第1列 ==================== -->
   <div class="coupon">
-    <div class="card-top-bar"></div>
-    <div class="card-title">
-      <div class="stars-row">🌟 🌟 🌟</div>
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
       <h1>免作业券</h1>
-      <div class="subtitle">HOMEWORK EXEMPTION</div>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-body">
+    <div class="title-underline"></div>
+    <div class="card-info">
       <div class="info-row">
         <div class="info-icon icon-person">🎒</div>
         <span class="info-label">使用人：</span>
@@ -489,21 +453,20 @@
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
     <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
-    <div class="corner-decor corner-tl">✿</div>
-    <div class="corner-decor corner-tr">✿</div>
-    <div class="corner-decor corner-bl">❀</div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+    <div class="corner-decor deco-bl">❀</div>
   </div>
 
-  <!-- ====== 第2行 第2列 ====== -->
+  <!-- ==================== 第2行 第2列 ==================== -->
   <div class="coupon">
-    <div class="card-top-bar"></div>
-    <div class="card-title">
-      <div class="stars-row">🌟 🌟 🌟</div>
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
       <h1>免作业券</h1>
-      <div class="subtitle">HOMEWORK EXEMPTION</div>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-body">
+    <div class="title-underline"></div>
+    <div class="card-info">
       <div class="info-row">
         <div class="info-icon icon-person">🎒</div>
         <span class="info-label">使用人：</span>
@@ -531,21 +494,20 @@
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
     <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
-    <div class="corner-decor corner-tl">✿</div>
-    <div class="corner-decor corner-tr">✿</div>
-    <div class="corner-decor corner-bl">❀</div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+    <div class="corner-decor deco-bl">❀</div>
   </div>
 
-  <!-- ====== 第3行 第1列 ====== -->
+  <!-- ==================== 第3行 第1列 ==================== -->
   <div class="coupon">
-    <div class="card-top-bar"></div>
-    <div class="card-title">
-      <div class="stars-row">🌟 🌟 🌟</div>
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
       <h1>免作业券</h1>
-      <div class="subtitle">HOMEWORK EXEMPTION</div>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-body">
+    <div class="title-underline"></div>
+    <div class="card-info">
       <div class="info-row">
         <div class="info-icon icon-person">🎒</div>
         <span class="info-label">使用人：</span>
@@ -573,21 +535,20 @@
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
     <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
-    <div class="corner-decor corner-tl">✿</div>
-    <div class="corner-decor corner-tr">✿</div>
-    <div class="corner-decor corner-bl">❀</div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+    <div class="corner-decor deco-bl">❀</div>
   </div>
 
-  <!-- ====== 第3行 第2列 ====== -->
+  <!-- ==================== 第3行 第2列 ==================== -->
   <div class="coupon">
-    <div class="card-top-bar"></div>
-    <div class="card-title">
-      <div class="stars-row">🌟 🌟 🌟</div>
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
       <h1>免作业券</h1>
-      <div class="subtitle">HOMEWORK EXEMPTION</div>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-body">
+    <div class="title-underline"></div>
+    <div class="card-info">
       <div class="info-row">
         <div class="info-icon icon-person">🎒</div>
         <span class="info-label">使用人：</span>
@@ -615,14 +576,13 @@
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
     <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
-    <div class="corner-decor corner-tl">✿</div>
-    <div class="corner-decor corner-tr">✿</div>
-    <div class="corner-decor corner-bl">❀</div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+    <div class="corner-decor deco-bl">❀</div>
   </div>
 
 </div><!-- end .a4-page -->
 
-<!-- 导出按钮 -->
 <div class="export-bar">
   <button class="export-btn" id="exportPng">📥 导出 A4 PNG 图片</button>
   <p class="hint">点击后等待几秒，浏览器自动下载整页高清图片<br>支持直接打印：文件 → 打印 → 选择「无边距」效果更佳</p>
@@ -635,7 +595,6 @@
     const a4Page = document.getElementById('a4Page');
     btn.disabled = true;
     btn.textContent = '⏳ 正在生成图片...';
-
     try {
       const canvas = await html2canvas(a4Page, {
         scale: 3,
@@ -646,7 +605,7 @@
         logging: false
       });
       const link = document.createElement('a');
-      link.download = '免作业券-可爱校园版-A4.png';
+      link.download = '免作业券-A4.png';
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
     } catch (e) {
