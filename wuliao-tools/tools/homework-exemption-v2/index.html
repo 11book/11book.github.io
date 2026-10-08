@@ -83,12 +83,12 @@
     /* 标题下说明文字 */
     .card-desc {
       text-align: center;
-      margin-top: 1mm;
+      margin-top: 2mm;
       flex-shrink: 0;
     }
 
     .card-desc span {
-      font-size: 7pt;
+      font-size: 8pt;
       color: #CC3333;
       font-weight: 500;
       letter-spacing: 0.3px;
@@ -109,16 +109,16 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 0;
-      padding: 1mm 1.5mm 0;
+      padding: 0.8mm 1mm 0;
     }
 
     /* 每个格子：图标 + 标签 + 内容 */
     .info-cell {
       display: flex;
       align-items: center;
-      gap: 0.8mm;
-      padding: 0 0.8mm;
-      font-size: 5.5pt;
+      gap: 0.5mm;
+      padding: 0 0.5mm;
+      font-size: 5pt;
       color: #555;
       line-height: 1;
       border-right: 1px solid var(--cell-border);
@@ -137,13 +137,13 @@
     }
 
     .info-icon {
-      width: 5mm;
-      height: 5mm;
+      width: 4mm;
+      height: 4mm;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 5.5pt;
+      font-size: 4.5pt;
       flex-shrink: 0;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
@@ -157,7 +157,7 @@
     .info-label {
       font-weight: 700;
       color: var(--label-color);
-      font-size: 5.5pt;
+      font-size: 5pt;
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -165,7 +165,7 @@
     .info-line {
       flex: 1;
       border-bottom: 1px dashed var(--line-color);
-      height: 4.5mm;
+      height: 3.5mm;
       display: flex;
       align-items: center;
     }
@@ -174,7 +174,7 @@
       flex: 1;
       font-weight: 700;
       color: var(--fixed-color);
-      font-size: 5.5pt;
+      font-size: 5pt;
       word-break: break-all;
     }
 
@@ -340,7 +340,7 @@
   const THEMES = {
     rainbow: {
       '--coupon-bg': '#FFFCF5',
-      '--divider-color': '#FFD93D',
+      '--divider-color': '#F5D87A',
       '--cell-border': '#F0E8D0',
       '--label-color': '#444',
       '--line-color': '#FFD93D',
