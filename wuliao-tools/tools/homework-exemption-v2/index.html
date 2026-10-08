@@ -44,20 +44,24 @@
     .cut-h1 { top: 37mm; }   .cut-h2 { top: 74mm; }   .cut-h3 { top: 111mm; }
     .cut-h4 { top: 148mm; }  .cut-h5 { top: 185mm; }  .cut-h6 { top: 222mm; }
     .cut-h7 { top: 259mm; }
-    .cut-v1 { position: absolute; top: 0; bottom: 0; left: 70mm; border-left: 1px dashed #C0C0C0; pointer-events: none; z-index: 10; }
-    .cut-v2 { position: absolute; top: 0; bottom: 0; left: 140mm; border-left: 1px dashed #C0C0C0; pointer-events: none; z-index: 10; }
+    .cut-v1, .cut-v2 {
+      position: absolute; top: 0; bottom: 0;
+      border-left: 1px dashed #C0C0C0;
+      pointer-events: none; z-index: 10;
+    }
+    .cut-v1 { left: 70mm; }
+    .cut-v2 { left: 140mm; }
 
     /* =============================================
        单张免作业券（70mm × 37mm）
-       内容：标题+说明 | 2×2信息网格 | 规则
     ============================================= */
     .coupon {
       position: relative;
-      background: #FFFCF5;
+      background: var(--coupon-bg);
       break-inside: avoid;
       display: flex;
       flex-direction: column;
-      padding: 2mm 2.5mm 1.5mm;
+      padding: 2.5mm 3mm 2mm;
       overflow: hidden;
     }
 
@@ -71,59 +75,75 @@
       font-family: "Noto Serif SC", "STSong", "SimSun", serif;
       font-size: 11pt;
       font-weight: 900;
-      color: #E8505B;
-      letter-spacing: 1.5px;
+      color: #1a1a1a;
+      letter-spacing: 2px;
       line-height: 1;
     }
 
+    /* 标题下说明文字 */
     .card-desc {
       text-align: center;
-      margin-top: 0.3mm;
+      margin-top: 0.4mm;
+      flex-shrink: 0;
     }
 
     .card-desc span {
       font-size: 5pt;
       color: #CC3333;
       font-weight: 500;
+      letter-spacing: 0.2px;
     }
 
-    /* ========== 分隔线 ========== */
+    /* ========== 金色分隔线 ========== */
     .card-divider {
-      height: 1.2px;
-      background: linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent);
-      margin: 1mm 2mm 0;
+      height: 1px;
+      background: var(--divider-color);
+      margin: 1.2mm 4mm 0;
       flex-shrink: 0;
     }
 
-    /* ========== 信息区（2×2网格） ========== */
+    /* ========== 信息区（2×2 网格） ========== */
     .card-info {
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 0;
-      padding: 1mm 1mm 0;
-      align-items: start;
+      padding: 1.5mm 1.5mm 0;
     }
 
+    /* 每个格子：图标 + 标签 + 内容 */
     .info-cell {
       display: flex;
       align-items: center;
       gap: 0.8mm;
+      padding: 0 1mm;
       font-size: 5.5pt;
       color: #555;
       line-height: 1;
-      padding: 0 0.5mm;
+      border-right: 1px solid var(--cell-border);
+    }
+
+    /* 右侧两个格子去掉右边框 */
+    .info-cell:nth-child(2),
+    .info-cell:nth-child(4) {
+      border-right: none;
+    }
+
+    /* 下方两个格子去掉上边框 */
+    .info-cell:nth-child(3),
+    .info-cell:nth-child(4) {
+      border-top: 1px solid var(--cell-border);
     }
 
     .info-icon {
-      width: 4.5mm;
-      height: 4.5mm;
+      width: 5mm;
+      height: 5mm;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 5pt;
+      font-size: 5.5pt;
       flex-shrink: 0;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
@@ -136,15 +156,16 @@
 
     .info-label {
       font-weight: 700;
-      color: #444;
+      color: var(--label-color);
       font-size: 5.5pt;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .info-line {
       flex: 1;
-      border-bottom: 1px dashed #FFD93D;
-      height: 4mm;
+      border-bottom: 1px dashed var(--line-color);
+      height: 4.5mm;
       display: flex;
       align-items: center;
     }
@@ -152,39 +173,17 @@
     .info-fixed {
       flex: 1;
       font-weight: 700;
-      color: #5B8DBE;
+      color: var(--fixed-color);
       font-size: 5.5pt;
       word-break: break-all;
-    }
-
-    /* ========== 规则区 ========== */
-    .card-rules {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5mm;
-      padding: 0.8mm 2mm 0;
-      flex-shrink: 0;
-    }
-
-    .rules-icon {
-      font-size: 5.5pt;
-      color: #FFD93D;
-      flex-shrink: 0;
-    }
-
-    .rules-text {
-      font-size: 5.5pt;
-      color: #888;
-      text-align: center;
     }
 
     /* 角花 */
     .corner-decor {
       position: absolute;
       font-size: 4.5pt;
-      opacity: 0.3;
-      color: #FFB347;
+      opacity: 0.35;
+      color: var(--deco-color);
     }
     .deco-tl { top: 1mm; left: 1mm; }
     .deco-br { bottom: 1mm; right: 1mm; }
@@ -341,67 +340,39 @@
   const THEMES = {
     rainbow: {
       '--coupon-bg': '#FFFCF5',
-      '--title-color': '#E8505B',
-      '--desc-color': '#CC3333',
-      '--divider-color': 'linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent)',
+      '--divider-color': '#FFD93D',
+      '--cell-border': '#F0E8D0',
       '--label-color': '#444',
       '--line-color': '#FFD93D',
       '--fixed-color': '#5B8DBE',
-      '--rules-text': '#888',
-      '--rules-icon': '#FFD93D',
       '--deco-color': '#FFB347',
-      '--icon-person-bg': '#FFF0F5',
-      '--icon-date-bg': '#FFF8E6',
-      '--icon-teacher-bg': '#EEF6FF',
-      '--icon-term-bg': '#F0FFF4',
     },
     classic: {
       '--coupon-bg': '#F8FAFF',
-      '--title-color': '#1B4F8A',
-      '--desc-color': '#1B4F8A',
-      '--divider-color': 'linear-gradient(90deg, transparent, #C9A84C 15%, #C9A84C 85%, transparent)',
+      '--divider-color': '#C9A84C',
+      '--cell-border': '#D8D8D8',
       '--label-color': '#1B4F8A',
       '--line-color': '#C9A84C',
       '--fixed-color': '#1B4F8A',
-      '--rules-text': '#556',
-      '--rules-icon': '#C9A84C',
       '--deco-color': '#1B4F8A',
-      '--icon-person-bg': '#EEF4FF',
-      '--icon-date-bg': '#EEF4FF',
-      '--icon-teacher-bg': '#EEF4FF',
-      '--icon-term-bg': '#EEF4FF',
     },
     nature: {
       '--coupon-bg': '#F0FFF4',
-      '--title-color': '#2D7A3A',
-      '--desc-color': '#2D7A3A',
-      '--divider-color': 'linear-gradient(90deg, transparent, #7CB87A 15%, #7CB87A 85%, transparent)',
+      '--divider-color': '#7CB87A',
+      '--cell-border': '#D0E8D0',
       '--label-color': '#2D7A3A',
       '--line-color': '#7CB87A',
       '--fixed-color': '#2D7A3A',
-      '--rules-text': '#6B9B3A',
-      '--rules-icon': '#7CB87A',
       '--deco-color': '#7CB87A',
-      '--icon-person-bg': '#E8F5E8',
-      '--icon-date-bg': '#E8F5E8',
-      '--icon-teacher-bg': '#E8F5E8',
-      '--icon-term-bg': '#E8F5E8',
     },
     pink: {
       '--coupon-bg': '#FFF5F8',
-      '--title-color': '#E05580',
-      '--desc-color': '#E05580',
-      '--divider-color': 'linear-gradient(90deg, transparent, #FFB3CC 15%, #FFB3CC 85%, transparent)',
+      '--divider-color': '#FFB3CC',
+      '--cell-border': '#FFD0DC',
       '--label-color': '#C04870',
       '--line-color': '#FFB3CC',
       '--fixed-color': '#C04870',
-      '--rules-text': '#997',
-      '--rules-icon': '#FF8FAB',
       '--deco-color': '#FF8FAB',
-      '--icon-person-bg': '#FFE8F0',
-      '--icon-date-bg': '#FFF0F5',
-      '--icon-teacher-bg': '#F5E8FF',
-      '--icon-term-bg': '#E8F5FF',
     }
   };
 
@@ -439,11 +410,6 @@
             <span class="info-fixed term-text">${term}</span>
           </div>
         </div>
-        <div class="card-rules">
-          <span class="rules-icon">✦</span>
-          <span class="rules-text">本券可免除一次作业</span>
-          <span class="rules-icon">✦</span>
-        </div>
         <div class="corner-decor deco-tl">✿</div>
         <div class="corner-decor deco-br">❀</div>
       `;
@@ -457,22 +423,6 @@
     for (const [k, v] of Object.entries(t)) root.style.setProperty(k, v);
     document.querySelectorAll('.theme-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === name);
-    });
-    // 应用标题颜色
-    document.querySelectorAll('.card-header h1').forEach(el => {
-      el.style.color = t['--title-color'];
-    });
-    document.querySelectorAll('.card-desc span').forEach(el => {
-      el.style.color = t['--desc-color'];
-    });
-    document.querySelectorAll('.rules-text').forEach(el => {
-      el.style.color = t['--rules-text'];
-    });
-    document.querySelectorAll('.rules-icon').forEach(el => {
-      el.style.color = t['--rules-icon'];
-    });
-    document.querySelectorAll('.corner-decor').forEach(el => {
-      el.style.color = t['--deco-color'];
     });
   }
 
