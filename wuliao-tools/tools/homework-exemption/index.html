@@ -20,22 +20,20 @@
     }
 
     /* =============================================
-       A4 纸张：精确 210mm × 297mm
-       布局：2列 × 3行，无间隙
-       每格 = 105mm 宽 × 99mm 高
+       A4 纸张：210mm × 297mm，2列×3行
     ============================================= */
     .a4-page {
       width: 210mm;
       height: 297mm;
       background: #FFFFFF;
       display: grid;
-      grid-template-columns: 1fr 1fr;   /* 各105mm */
-      grid-template-rows: 1fr 1fr 1fr;  /* 各99mm */
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
       box-shadow: 0 4px 24px rgba(0,0,0,0.12);
       position: relative;
     }
 
-    /* 裁剪参考线（仅打印时显示） */
+    /* 裁剪参考线 */
     .cut-line-h1, .cut-line-h2 {
       position: absolute;
       left: 0; right: 0;
@@ -56,7 +54,6 @@
 
     /* =============================================
        单张免作业券
-       每格 105mm × 99mm，内部自适应排版
     ============================================= */
     .coupon {
       position: relative;
@@ -64,11 +61,11 @@
       break-inside: avoid;
       display: flex;
       flex-direction: column;
-      padding: 7mm 8mm 6mm;
+      padding: 9mm 10mm 8mm;
       overflow: hidden;
     }
 
-    /* 顶部彩虹条（每列第一个卡片顶部） */
+    /* 顶部彩虹条 */
     .rainbow-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -78,18 +75,16 @@
         #6BCB77 50%, #4FACFE 66%, #A18CD1 83%, #FF6B8A 100%);
     }
 
-    /* 标题区 */
+    /* ========== 标题区 ========== */
     .card-header {
       text-align: center;
       padding-top: 5mm;
-      padding-bottom: 2.5mm;
     }
 
     .stars {
       font-size: 9pt;
       color: #FFB347;
       letter-spacing: 3px;
-      line-height: 1;
     }
 
     .card-header h1 {
@@ -98,36 +93,35 @@
       font-weight: 900;
       color: #E8505B;
       letter-spacing: 3px;
-      line-height: 1.15;
+      line-height: 1.2;
       margin-top: 1.5mm;
     }
 
-    /* 标题装饰线 */
     .title-underline {
       height: 2px;
-      margin: 2mm 2mm 0;
+      margin: 2.5mm 8mm 0;
       background: linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent);
       border-radius: 1px;
     }
 
-    /* =============================================
-       内容信息区（图标 + 标签 + 下划线）
-    ============================================= */
+    /* ========== 内容信息区 ========== */
     .card-info {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-evenly;
-      padding: 2mm 0;
+      padding: 3mm 0;
     }
 
     .info-row {
       display: flex;
       align-items: center;
+      justify-content: center;    /* 关键：内容居中 */
       gap: 2.5mm;
       font-size: 10pt;
       color: #555;
       line-height: 1;
+      width: 100%;
     }
 
     .info-icon {
@@ -157,6 +151,7 @@
 
     .info-line {
       flex: 1;
+      max-width: 50mm;
       border-bottom: 1.5px dashed #FFD93D;
       height: 7mm;
       display: flex;
@@ -165,18 +160,14 @@
 
     .info-fixed {
       font-weight: 700;
-      color: #5B8DBE;   /* 改用友好蓝色，不再用红色 */
+      color: #5B8DBE;
       font-size: 10pt;
     }
 
-    /* =============================================
-       使用说明区
-    ============================================= */
+    /* ========== 使用说明区 ========== */
     .card-rules {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2mm;
-      padding: 2mm 3mm;
+      margin: 2mm 6mm 0;
+      padding: 2.5mm 4mm;
       background: #FFFBF0;
       border-radius: 6px;
       border: 1px dashed #FFE0A0;
@@ -185,6 +176,7 @@
     .rule {
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 2mm;
       font-size: 7pt;
       color: #888;
@@ -207,50 +199,11 @@
       -webkit-print-color-adjust: exact;
     }
 
-    /* =============================================
-       印章装饰（右下方，淡色）
-    ============================================= */
-    .stamp {
-      position: absolute;
-      bottom: 6mm;
-      right: 7mm;
-      width: 16mm;
-      height: 16mm;
-      border: 2px solid #5B8DBE;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.2;
-      print-color-adjust: exact;
-      -webkit-print-color-adjust: exact;
-    }
-
-    .stamp-inner {
-      border: 1px solid #5B8DBE;
-      width: 12mm;
-      height: 12mm;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .stamp-text {
-      font-size: 3.5pt;
-      font-weight: 700;
-      color: #5B8DBE;
-      text-align: center;
-      line-height: 1.3;
-    }
-
     /* 角花 */
     .corner-decor {
       position: absolute;
       font-size: 7pt;
-      opacity: 0.25;
+      opacity: 0.3;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
@@ -318,7 +271,7 @@
       .export-bar { display: none !important; }
 
       .coupon, .rainbow-bar, .info-icon,
-      .rule-num, .stamp, .corner-decor {
+      .rule-num, .corner-decor {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
@@ -370,7 +323,6 @@
       <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
-    <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
     <div class="corner-decor deco-bl">❀</div>
@@ -411,7 +363,6 @@
       <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
-    <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
     <div class="corner-decor deco-bl">❀</div>
@@ -452,7 +403,6 @@
       <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
-    <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
     <div class="corner-decor deco-bl">❀</div>
@@ -493,7 +443,6 @@
       <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
-    <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
     <div class="corner-decor deco-bl">❀</div>
@@ -534,7 +483,6 @@
       <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
-    <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
     <div class="corner-decor deco-bl">❀</div>
@@ -575,7 +523,6 @@
       <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
       <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
     </div>
-    <div class="stamp"><div class="stamp-inner"><div class="stamp-text">郑老师<br>签发</div></div></div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
     <div class="corner-decor deco-bl">❀</div>
@@ -585,7 +532,7 @@
 
 <div class="export-bar">
   <button class="export-btn" id="exportPng">📥 导出 A4 PNG 图片</button>
-  <p class="hint">点击后等待几秒，浏览器自动下载整页高清图片<br>支持直接打印：文件 → 打印 → 选择「无边距」效果更佳</p>
+  <p class="hint">点击后等待几秒，浏览器自动下载 A4 满页高清图片（2480×3508px，300dpi）<br>支持直接打印：文件 → 打印 → 选择「无边距」效果更佳</p>
 </div>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -595,14 +542,17 @@
     const a4Page = document.getElementById('a4Page');
     btn.disabled = true;
     btn.textContent = '⏳ 正在生成图片...';
+
+    // 关键：直接传 element，让 html2canvas 自动获取元素真实尺寸
+    // 用 scale: 3 让 1mm ≈ 11.81px（A4: 2480×3508px @ 300dpi）
     try {
       const canvas = await html2canvas(a4Page, {
-        scale: 3,
+        scale: 3,                // 缩放 3 倍（CSS px → 物理 px）
         useCORS: true,
         backgroundColor: '#ffffff',
-        width: 2480,
-        height: 3508,
-        logging: false
+        logging: false,
+        windowWidth: a4Page.offsetWidth,   // 截图窗口宽度 = 元素实际宽度
+        windowHeight: a4Page.offsetHeight   // 截图窗口高度 = 元素实际高度
       });
       const link = document.createElement('a');
       link.download = '免作业券-A4.png';
