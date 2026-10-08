@@ -20,8 +20,7 @@
     }
 
     /* =============================================
-       A4 纸张：210mm × 297mm
-       布局：3列 × 4行 = 12张券
+       A4 纸张：210mm × 297mm，3列 × 4行 = 12张券
     ============================================= */
     .a4-page {
       width: 210mm;
@@ -64,7 +63,6 @@
       overflow: hidden;
     }
 
-    /* 顶部装饰条 */
     .top-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -74,7 +72,6 @@
       -webkit-print-color-adjust: exact;
     }
 
-    /* ========== 标题区 ========== */
     .card-header {
       text-align: center;
       padding-top: 4.5mm;
@@ -105,7 +102,6 @@
       border-radius: 1px;
     }
 
-    /* ========== 内容信息区 ========== */
     .card-info {
       flex: 1;
       display: flex;
@@ -166,7 +162,6 @@
       font-size: 8pt;
     }
 
-    /* ========== 使用说明区 ========== */
     .card-rules {
       margin: 1.5mm 3mm 0;
       padding: 1.5mm 3mm;
@@ -182,6 +177,7 @@
       color: var(--rules-text);
       line-height: 1.7;
     }
+
     .rule span { flex: 1; }
 
     .rule-num {
@@ -201,7 +197,6 @@
       -webkit-print-color-adjust: exact;
     }
 
-    /* 角花 */
     .corner-decor {
       position: absolute;
       font-size: 6pt;
@@ -242,7 +237,6 @@
       min-width: 48px;
     }
 
-    /* 主题按钮 */
     .theme-btn {
       padding: 6px 14px;
       border: 2px solid #ddd;
@@ -256,16 +250,13 @@
       white-space: nowrap;
     }
 
-    .theme-btn:hover {
-      border-color: #aaa;
-    }
+    .theme-btn:hover { border-color: #aaa; }
 
     .theme-btn.active {
       font-weight: 700;
       box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
     }
 
-    /* 输入框 */
     .settings-input {
       padding: 6px 10px;
       border: 1.5px solid #ddd;
@@ -277,9 +268,7 @@
       min-width: 80px;
     }
 
-    .settings-input:focus {
-      border-color: #FF9A3C;
-    }
+    .settings-input:focus { border-color: #FF9A3C; }
 
     /* =============================================
        导出按钮
@@ -321,7 +310,6 @@
     .hint {
       font-size: 12px;
       color: #888;
-      text-align: center;
     }
 
     /* =============================================
@@ -340,7 +328,6 @@
 </head>
 <body>
 
-<!-- A4 整页 -->
 <div class="a4-page" id="a4Page">
   <div class="cut-line-h1"></div>
   <div class="cut-line-h2"></div>
@@ -348,9 +335,463 @@
   <div class="cut-line-v1"></div>
   <div class="cut-line-v2"></div>
 
-  <!-- 12张券，由JS统一渲染 -->
-  
-</div>
+  <!-- 第1行 第1列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第1行 第2列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第1行 第3列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第2行 第1列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第2行 第2列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第2行 第3列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第3行 第1列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第3行 第2列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第3行 第3列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第4行 第1列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第4行 第2列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- 第4行 第3列 -->
+  <div class="coupon">
+    <div class="top-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed teacher-text">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed term-text">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+</div><!-- end .a4-page -->
 
 <!-- 设置面板 -->
 <div class="settings-panel">
@@ -363,9 +804,9 @@
   </div>
   <div class="settings-section">
     <span class="settings-label">📝 发放人</span>
-    <input class="settings-input" id="inputTeacher" value="郑老师" placeholder="请输入发放人" oninput="updateTeacher(this.value)">
+    <input class="settings-input" id="inputTeacher" value="郑老师" oninput="updateTeacher(this.value)">
     <span class="settings-label" style="margin-left:12px">📅 有效期</span>
-    <input class="settings-input" id="inputTerm" value="本学期" placeholder="请输入有效期" oninput="updateTerm(this.value)">
+    <input class="settings-input" id="inputTerm" value="本学期" oninput="updateTerm(this.value)">
   </div>
 </div>
 
@@ -377,214 +818,141 @@
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
-    // =============================================
-    // 4套主题配置
-    // =============================================
-    const THEMES = {
-      rainbow: {
-        '--coupon-bg': '#FFFCF5',
-        '--topbar-bg': 'linear-gradient(90deg, #FF6B8A 0%, #FF9A3C 16%, #FFD93D 33%, #6BCB77 50%, #4FACFE 66%, #A18CD1 83%, #FF6B8A 100%)',
-        '--star-color': '#FFB347',
-        '--title-color': '#E8505B',
-        '--divider-color': 'linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent)',
-        '--text-color': '#555',
-        '--label-color': '#444',
-        '--line-color': '#FFD93D',
-        '--fixed-color': '#5B8DBE',
-        '--icon-person-bg': '#FFF0F5',
-        '--icon-date-bg': '#FFF8E6',
-        '--icon-teacher-bg': '#EEF6FF',
-        '--icon-term-bg': '#F0FFF4',
-        '--rules-bg': '#FFFBF0',
-        '--rules-border': '#FFE0A0',
-        '--rules-text': '#888',
-        '--num-bg': '#FFD93D',
-        '--num-color': '#fff',
-        '--deco-color': '#FFB347',
-      },
-      academy: {
-        '--coupon-bg': '#F8FAFF',
-        '--topbar-bg': 'linear-gradient(90deg, #1B4F8A 0%, #2E75BD 40%, #C9A84C 100%)',
-        '--star-color': '#C9A84C',
-        '--title-color': '#1B4F8A',
-        '--divider-color': 'linear-gradient(90deg, transparent, #C9A84C 15%, #C9A84C 85%, transparent)',
-        '--text-color': '#334',
-        '--label-color': '#1B4F8A',
-        '--line-color': '#C9A84C',
-        '--fixed-color': '#1B4F8A',
-        '--icon-person-bg': '#EEF4FF',
-        '--icon-date-bg': '#FFF9E6',
-        '--icon-teacher-bg': '#EEF4FF',
-        '--icon-term-bg': '#EEF4FF',
-        '--rules-bg': '#F0F4FF',
-        '--rules-border': '#B8CFEE',
-        '--rules-text': '#556',
-        '--num-bg': '#1B4F8A',
-        '--num-color': '#fff',
-        '--deco-color': '#1B4F8A',
-      },
-      pink: {
-        '--coupon-bg': '#FFF5F8',
-        '--topbar-bg': 'linear-gradient(90deg, #FF8FAB 0%, #FFB3CC 40%, #FFD6E7 100%)',
-        '--star-color': '#FF8FAB',
-        '--title-color': '#E05580',
-        '--divider-color': 'linear-gradient(90deg, transparent, #FFB3CC 15%, #FFB3CC 85%, transparent)',
-        '--text-color': '#664',
-        '--label-color': '#C04870',
-        '--line-color': '#FFB3CC',
-        '--fixed-color': '#C04870',
-        '--icon-person-bg': '#FFE8F0',
-        '--icon-date-bg': '#FFF0F5',
-        '--icon-teacher-bg': '#F5E8FF',
-        '--icon-term-bg': '#E8F5FF',
-        '--rules-bg': '#FFF0F5',
-        '--rules-border': '#FFCCD8',
-        '--rules-text': '#997',
-        '--num-bg': '#FF8FAB',
-        '--num-color': '#fff',
-        '--deco-color': '#FF8FAB',
-      },
-      space: {
-        '--coupon-bg': '#0B1025',
-        '--topbar-bg': 'linear-gradient(90deg, #1a1a4e 0%, #2d2d8a 40%, #6B3FA0 100%)',
-        '--star-color': '#A78BFA',
-        '--title-color': '#A78BFA',
-        '--divider-color': 'linear-gradient(90deg, transparent, #6B3FA0 15%, #6B3FA0 85%, transparent)',
-        '--text-color': '#C4B5FD',
-        '--label-color': '#A78BFA',
-        '--line-color': '#6B3FA0',
-        '--fixed-color': '#A78BFA',
-        '--icon-person-bg': '#1E1B4B',
-        '--icon-date-bg': '#1E1B4B',
-        '--icon-teacher-bg': '#1E1B4B',
-        '--icon-term-bg': '#1E1B4B',
-        '--rules-bg': '#0F0E2A',
-        '--rules-border': '#2D2D8A',
-        '--rules-text': '#7C6FA0',
-        '--num-bg': '#6B3FA0',
-        '--num-color': '#fff',
-        '--deco-color': '#A78BFA',
-      }
-    };
-
-    // 当前状态
-    let currentTheme = 'rainbow';
-    let teacher = '郑老师';
-    let term = '本学期';
-
-    // =============================================
-    // 生成12张券HTML
-    // =============================================
-    function renderCoupons() {
-      const a4Page = document.getElementById('a4Page');
-      for (let i = 0; i < 12; i++) {
-        const div = document.createElement('div');
-        div.className = 'coupon';
-        div.innerHTML = `
-        <div class="coupon">
-          <div class="top-bar"></div>
-          <div class="card-header">
-            <div class="stars">★ ★ ★</div>
-            <h1>免作业券</h1>
-          </div>
-          <div class="title-underline"></div>
-          <div class="card-info">
-            <div class="info-row">
-              <div class="info-icon icon-person">🎒</div>
-              <span class="info-label">使用人：</span>
-              <div class="info-line"></div>
-            </div>
-            <div class="info-row">
-              <div class="info-icon icon-date">📅</div>
-              <span class="info-label">使用日期：</span>
-              <div class="info-line"></div>
-            </div>
-            <div class="info-row">
-              <div class="info-icon icon-teacher">🏫</div>
-              <span class="info-label">发放人：</span>
-              <div class="info-fixed" class="teacher-text">${teacher}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-icon icon-term">📚</div>
-              <span class="info-label">有效期：</span>
-              <div class="info-fixed" class="term-text">${term}</div>
-            </div>
-          </div>
-          <div class="card-rules">
-            <div class="rule"><div class="rule-num">1</div><span>本券可免除一次指定作业</span></div>
-            <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改无效</span></div>
-          </div>
-          <div class="corner-decor deco-tl">✿</div>
-          <div class="corner-decor deco-tr">✿</div>
-        </div>`;
-      }
-      a4Page.appendChild(div);
+  // =============================================
+  // 4套主题配置
+  // =============================================
+  const THEMES = {
+    rainbow: {
+      '--coupon-bg': '#FFFCF5',
+      '--topbar-bg': 'linear-gradient(90deg, #FF6B8A 0%, #FF9A3C 16%, #FFD93D 33%, #6BCB77 50%, #4FACFE 66%, #A18CD1 83%, #FF6B8A 100%)',
+      '--star-color': '#FFB347',
+      '--title-color': '#E8505B',
+      '--divider-color': 'linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent)',
+      '--text-color': '#555',
+      '--label-color': '#444',
+      '--line-color': '#FFD93D',
+      '--fixed-color': '#5B8DBE',
+      '--icon-person-bg': '#FFF0F5',
+      '--icon-date-bg': '#FFF8E6',
+      '--icon-teacher-bg': '#EEF6FF',
+      '--icon-term-bg': '#F0FFF4',
+      '--rules-bg': '#FFFBF0',
+      '--rules-border': '#FFE0A0',
+      '--rules-text': '#888',
+      '--num-bg': '#FFD93D',
+      '--num-color': '#fff',
+      '--deco-color': '#FFB347',
+    },
+    academy: {
+      '--coupon-bg': '#F8FAFF',
+      '--topbar-bg': 'linear-gradient(90deg, #1B4F8A 0%, #2E75BD 40%, #C9A84C 100%)',
+      '--star-color': '#C9A84C',
+      '--title-color': '#1B4F8A',
+      '--divider-color': 'linear-gradient(90deg, transparent, #C9A84C 15%, #C9A84C 85%, transparent)',
+      '--text-color': '#334',
+      '--label-color': '#1B4F8A',
+      '--line-color': '#C9A84C',
+      '--fixed-color': '#1B4F8A',
+      '--icon-person-bg': '#EEF4FF',
+      '--icon-date-bg': '#FFF9E6',
+      '--icon-teacher-bg': '#EEF4FF',
+      '--icon-term-bg': '#EEF4FF',
+      '--rules-bg': '#F0F4FF',
+      '--rules-border': '#B8CFEE',
+      '--rules-text': '#556',
+      '--num-bg': '#1B4F8A',
+      '--num-color': '#fff',
+      '--deco-color': '#1B4F8A',
+    },
+    pink: {
+      '--coupon-bg': '#FFF5F8',
+      '--topbar-bg': 'linear-gradient(90deg, #FF8FAB 0%, #FFB3CC 40%, #FFD6E7 100%)',
+      '--star-color': '#FF8FAB',
+      '--title-color': '#E05580',
+      '--divider-color': 'linear-gradient(90deg, transparent, #FFB3CC 15%, #FFB3CC 85%, transparent)',
+      '--text-color': '#664',
+      '--label-color': '#C04870',
+      '--line-color': '#FFB3CC',
+      '--fixed-color': '#C04870',
+      '--icon-person-bg': '#FFE8F0',
+      '--icon-date-bg': '#FFF0F5',
+      '--icon-teacher-bg': '#F5E8FF',
+      '--icon-term-bg': '#E8F5FF',
+      '--rules-bg': '#FFF0F5',
+      '--rules-border': '#FFCCD8',
+      '--rules-text': '#997',
+      '--num-bg': '#FF8FAB',
+      '--num-color': '#fff',
+      '--deco-color': '#FF8FAB',
+    },
+    space: {
+      '--coupon-bg': '#0B1025',
+      '--topbar-bg': 'linear-gradient(90deg, #1a1a4e 0%, #2d2d8a 40%, #6B3FA0 100%)',
+      '--star-color': '#A78BFA',
+      '--title-color': '#A78BFA',
+      '--divider-color': 'linear-gradient(90deg, transparent, #6B3FA0 15%, #6B3FA0 85%, transparent)',
+      '--text-color': '#C4B5FD',
+      '--label-color': '#A78BFA',
+      '--line-color': '#6B3FA0',
+      '--fixed-color': '#A78BFA',
+      '--icon-person-bg': '#1E1B4B',
+      '--icon-date-bg': '#1E1B4B',
+      '--icon-teacher-bg': '#1E1B4B',
+      '--icon-term-bg': '#1E1B4B',
+      '--rules-bg': '#0F0E2A',
+      '--rules-border': '#2D2D8A',
+      '--rules-text': '#7C6FA0',
+      '--num-bg': '#6B3FA0',
+      '--num-color': '#fff',
+      '--deco-color': '#A78BFA',
     }
+  };
 
-    // =============================================
-    // 切换主题
-    // =============================================
-    function setTheme(themeName) {
-      currentTheme = themeName;
-      const root = document.documentElement;
-      const theme = THEMES[themeName];
-      for (const [key, val] of Object.entries(theme)) {
-        root.style.setProperty(key, val);
-      }
-      // 更新按钮高亮
-      document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.theme === themeName);
-      });
-    }
-
-    // =============================================
-    // 更新发放人
-    // =============================================
-    function updateTeacher(val) {
-      teacher = val || '郑老师';
-      document.querySelectorAll('#teacherText').forEach(el => el.textContent = teacher);
-    }
-
-    // =============================================
-    // 更新有效期
-    // =============================================
-    function updateTerm(val) {
-      term = val || '本学期';
-      document.querySelectorAll('#termText').forEach(el => el.textContent = term);
-    }
-
-    // =============================================
-    // 导出PNG
-    // =============================================
-    document.getElementById('exportPng').addEventListener('click', async function () {
-      const btn = this;
-      const a4Page = document.getElementById('a4Page');
-      btn.disabled = true;
-      btn.textContent = '⏳ 正在生成图片...';
-      try {
-        const canvas = await html2canvas(a4Page, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          windowWidth: Math.round(a4Page.offsetWidth),
-          windowHeight: Math.round(a4Page.offsetHeight)
-        });
-        const link = document.createElement('a');
-        link.download = `免作业券-${currentTheme}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
-      } catch (e) {
-        alert('生成失败: ' + e.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '📥 导出 A4 PNG 图片';
-      }
+  function setTheme(name) {
+    const root = document.documentElement;
+    const t = THEMES[name];
+    for (const [k, v] of Object.entries(t)) root.style.setProperty(k, v);
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.theme === name);
     });
+  }
 
-    // 初始化
-    renderCoupons();
-    setTheme('rainbow');
-  </script>
+  function updateTeacher(val) {
+    document.querySelectorAll('.teacher-text').forEach(el => el.textContent = val || '郑老师');
+  }
+
+  function updateTerm(val) {
+    document.querySelectorAll('.term-text').forEach(el => el.textContent = val || '本学期');
+  }
+
+  document.getElementById('exportPng').addEventListener('click', async function () {
+    const btn = this;
+    const a4Page = document.getElementById('a4Page');
+    btn.disabled = true;
+    btn.textContent = '⏳ 正在生成图片...';
+    try {
+      const canvas = await html2canvas(a4Page, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: Math.round(a4Page.offsetWidth),
+        windowHeight: Math.round(a4Page.offsetHeight)
+      });
+      const link = document.createElement('a');
+      link.download = '免作业券-A4.png';
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+    } catch (e) {
+      alert('生成失败: ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📥 导出 A4 PNG 图片';
+    }
+  });
+
+  // 默认应用彩虹主题
+  setTheme('rainbow');
+</script>
 </body>
 </html>
