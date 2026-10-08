@@ -20,40 +20,49 @@
     }
 
     /* =============================================
-       A4 纸张：210mm × 297mm，2列×3行
+       A4 纸张：210mm × 297mm
+       布局：3列 × 4行 = 12张券
+       边距：左右各5mm，上下各5mm
+       每格：宽 (210-10)/3 = 66.67mm，高 (297-10)/4 = 71.75mm
+       为方便计算取整：66mm × 71mm，内容区约 58mm宽
     ============================================= */
     .a4-page {
       width: 210mm;
       height: 297mm;
       background: #FFFFFF;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr;
+      /* 3列等宽，4行等高，无间隙紧贴 */
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
       box-shadow: 0 4px 24px rgba(0,0,0,0.12);
       position: relative;
     }
 
-    /* 裁剪参考线 */
-    .cut-line-h1, .cut-line-h2 {
+    /* 裁剪参考线（行/列分隔） */
+    .cut-line-h1, .cut-line-h2, .cut-line-h3 {
       position: absolute;
       left: 0; right: 0;
       border-top: 1px dashed #C0C0C0;
       pointer-events: none;
       z-index: 10;
     }
-    .cut-line-h1 { top: 99mm; }
-    .cut-line-h2 { top: 198mm; }
-    .cut-line-v {
+    .cut-line-h1 { top: 74.25mm; }
+    .cut-line-h2 { top: 148.5mm; }
+    .cut-line-h3 { top: 222.75mm; }
+
+    .cut-line-v1, .cut-line-v2 {
       position: absolute;
       top: 0; bottom: 0;
-      left: 105mm;
       border-left: 1px dashed #C0C0C0;
       pointer-events: none;
       z-index: 10;
     }
+    .cut-line-v1 { left: 70mm; }
+    .cut-line-v2 { left: 140mm; }
 
     /* =============================================
        单张免作业券
+       每格 66.67mm × 71.75mm，取整约 67mm × 72mm
     ============================================= */
     .coupon {
       position: relative;
@@ -61,7 +70,7 @@
       break-inside: avoid;
       display: flex;
       flex-direction: column;
-      padding: 9mm 10mm 8mm;
+      padding: 5mm 5mm 4mm;
       overflow: hidden;
     }
 
@@ -69,7 +78,7 @@
     .rainbow-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 4mm;
+      height: 3.5mm;
       background: linear-gradient(90deg,
         #FF6B8A 0%, #FF9A3C 16%, #FFD93D 33%,
         #6BCB77 50%, #4FACFE 66%, #A18CD1 83%, #FF6B8A 100%);
@@ -78,28 +87,30 @@
     /* ========== 标题区 ========== */
     .card-header {
       text-align: center;
-      padding-top: 5mm;
+      padding-top: 4.5mm;
+      padding-left: 3mm;
+      padding-right: 3mm;
     }
 
     .stars {
-      font-size: 9pt;
+      font-size: 7.5pt;
       color: #FFB347;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
     }
 
     .card-header h1 {
       font-family: "Noto Serif SC", "STSong", "SimSun", serif;
-      font-size: 22pt;
+      font-size: 16pt;
       font-weight: 900;
       color: #E8505B;
-      letter-spacing: 3px;
-      line-height: 1.2;
-      margin-top: 1.5mm;
+      letter-spacing: 2px;
+      line-height: 1.1;
+      margin-top: 0.5mm;
     }
 
     .title-underline {
-      height: 2px;
-      margin: 2.5mm 8mm 0;
+      height: 1.5px;
+      margin: 1.5mm 4mm 0;
       background: linear-gradient(90deg, transparent, #FFD93D 15%, #FFD93D 85%, transparent);
       border-radius: 1px;
     }
@@ -110,86 +121,85 @@
       display: flex;
       flex-direction: column;
       justify-content: space-evenly;
-      padding: 3mm 0;
+      padding: 1.5mm 3mm 0;
     }
 
+    /* 关键：4行统一结构，标签左、内容区右，视觉整齐 */
     .info-row {
       display: flex;
       align-items: center;
-      justify-content: center;    /* 关键：内容居中 */
-      gap: 2.5mm;
-      font-size: 10pt;
+      gap: 1.5mm;
+      font-size: 8pt;
       color: #555;
       line-height: 1;
-      width: 100%;
     }
 
     .info-icon {
-      width: 8mm;
-      height: 8mm;
+      width: 6mm;
+      height: 6mm;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 9pt;
+      font-size: 7pt;
       flex-shrink: 0;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
 
-    .icon-person { background: #FFF0F5; }
-    .icon-date   { background: #FFF8E6; }
-    .icon-teacher{ background: #EEF6FF; }
-    .icon-term   { background: #F0FFF4; }
+    .icon-person  { background: #FFF0F5; }
+    .icon-date    { background: #FFF8E6; }
+    .icon-teacher { background: #EEF6FF; }
+    .icon-term    { background: #F0FFF4; }
 
     .info-label {
       font-weight: 700;
       color: #444;
+      font-size: 8pt;
       white-space: nowrap;
-      font-size: 10pt;
+      min-width: 13mm;   /* 标签统一最小宽度，对齐 */
     }
 
     .info-line {
       flex: 1;
-      max-width: 50mm;
       border-bottom: 1.5px dashed #FFD93D;
-      height: 7mm;
+      height: 6mm;
       display: flex;
       align-items: center;
     }
 
     .info-fixed {
+      flex: 1;
       font-weight: 700;
       color: #5B8DBE;
-      font-size: 10pt;
+      font-size: 8pt;
     }
 
     /* ========== 使用说明区 ========== */
     .card-rules {
-      margin: 2mm 6mm 0;
-      padding: 2.5mm 4mm;
+      margin: 1.5mm 3mm 0;
+      padding: 1.5mm 3mm;
       background: #FFFBF0;
-      border-radius: 6px;
+      border-radius: 5px;
       border: 1px dashed #FFE0A0;
     }
 
     .rule {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
-      gap: 2mm;
-      font-size: 7pt;
+      gap: 1.5mm;
+      font-size: 6pt;
       color: #888;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .rule-num {
-      width: 4.5mm;
-      height: 4.5mm;
+      width: 3.8mm;
+      height: 3.8mm;
       border-radius: 50%;
       background: #FFD93D;
       color: #fff;
-      font-size: 5.5pt;
+      font-size: 5pt;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -199,17 +209,16 @@
       -webkit-print-color-adjust: exact;
     }
 
-    /* 角花 */
+    /* 角花装饰 */
     .corner-decor {
       position: absolute;
-      font-size: 7pt;
+      font-size: 6pt;
       opacity: 0.3;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
-    .deco-tl { top: 5mm; left: 6mm; }
-    .deco-tr { top: 5mm; right: 6mm; }
-    .deco-bl { bottom: 5mm; left: 6mm; }
+    .deco-tl { top: 4mm; left: 4mm; }
+    .deco-tr { top: 4mm; right: 4mm; }
 
     /* =============================================
        导出按钮
@@ -280,13 +289,15 @@
 </head>
 <body>
 
-<!-- A4 整页：2列 × 3行 = 6张免作业券 -->
+<!-- A4 整页：3列 × 4行 = 12张免作业券 -->
 <div class="a4-page" id="a4Page">
 
-  <!-- 裁剪参考线 -->
+  <!-- 裁剪参考线：3条横线 + 2条竖线 -->
   <div class="cut-line-h1"></div>
   <div class="cut-line-h2"></div>
-  <div class="cut-line-v"></div>
+  <div class="cut-line-h3"></div>
+  <div class="cut-line-v1"></div>
+  <div class="cut-line-v2"></div>
 
   <!-- ==================== 第1行 第1列 ==================== -->
   <div class="coupon">
@@ -310,12 +321,12 @@
       <div class="info-row">
         <div class="info-icon icon-teacher">🏫</div>
         <span class="info-label">发放人：</span>
-        <span class="info-fixed">郑老师</span>
+        <div class="info-fixed">郑老师</div>
       </div>
       <div class="info-row">
         <div class="info-icon icon-term">📚</div>
         <span class="info-label">有效期：</span>
-        <span class="info-fixed">本学期</span>
+        <div class="info-fixed">本学期</div>
       </div>
     </div>
     <div class="card-rules">
@@ -325,7 +336,6 @@
     </div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
-    <div class="corner-decor deco-bl">❀</div>
   </div>
 
   <!-- ==================== 第1行 第2列 ==================== -->
@@ -350,12 +360,12 @@
       <div class="info-row">
         <div class="info-icon icon-teacher">🏫</div>
         <span class="info-label">发放人：</span>
-        <span class="info-fixed">郑老师</span>
+        <div class="info-fixed">郑老师</div>
       </div>
       <div class="info-row">
         <div class="info-icon icon-term">📚</div>
         <span class="info-label">有效期：</span>
-        <span class="info-fixed">本学期</span>
+        <div class="info-fixed">本学期</div>
       </div>
     </div>
     <div class="card-rules">
@@ -365,7 +375,45 @@
     </div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
-    <div class="corner-decor deco-bl">❀</div>
+  </div>
+
+  <!-- ==================== 第1行 第3列 ==================== -->
+  <div class="coupon">
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本卡可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
+      <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
   </div>
 
   <!-- ==================== 第2行 第1列 ==================== -->
@@ -390,12 +438,12 @@
       <div class="info-row">
         <div class="info-icon icon-teacher">🏫</div>
         <span class="info-label">发放人：</span>
-        <span class="info-fixed">郑老师</span>
+        <div class="info-fixed">郑老师</div>
       </div>
       <div class="info-row">
         <div class="info-icon icon-term">📚</div>
         <span class="info-label">有效期：</span>
-        <span class="info-fixed">本学期</span>
+        <div class="info-fixed">本学期</div>
       </div>
     </div>
     <div class="card-rules">
@@ -405,7 +453,6 @@
     </div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
-    <div class="corner-decor deco-bl">❀</div>
   </div>
 
   <!-- ==================== 第2行 第2列 ==================== -->
@@ -430,12 +477,12 @@
       <div class="info-row">
         <div class="info-icon icon-teacher">🏫</div>
         <span class="info-label">发放人：</span>
-        <span class="info-fixed">郑老师</span>
+        <div class="info-fixed">郑老师</div>
       </div>
       <div class="info-row">
         <div class="info-icon icon-term">📚</div>
         <span class="info-label">有效期：</span>
-        <span class="info-fixed">本学期</span>
+        <div class="info-fixed">本学期</div>
       </div>
     </div>
     <div class="card-rules">
@@ -445,7 +492,45 @@
     </div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
-    <div class="corner-decor deco-bl">❀</div>
+  </div>
+
+  <!-- ==================== 第2行 第3列 ==================== -->
+  <div class="coupon">
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本卡可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
+      <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
   </div>
 
   <!-- ==================== 第3行 第1列 ==================== -->
@@ -470,12 +555,12 @@
       <div class="info-row">
         <div class="info-icon icon-teacher">🏫</div>
         <span class="info-label">发放人：</span>
-        <span class="info-fixed">郑老师</span>
+        <div class="info-fixed">郑老师</div>
       </div>
       <div class="info-row">
         <div class="info-icon icon-term">📚</div>
         <span class="info-label">有效期：</span>
-        <span class="info-fixed">本学期</span>
+        <div class="info-fixed">本学期</div>
       </div>
     </div>
     <div class="card-rules">
@@ -485,7 +570,6 @@
     </div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
-    <div class="corner-decor deco-bl">❀</div>
   </div>
 
   <!-- ==================== 第3行 第2列 ==================== -->
@@ -510,12 +594,12 @@
       <div class="info-row">
         <div class="info-icon icon-teacher">🏫</div>
         <span class="info-label">发放人：</span>
-        <span class="info-fixed">郑老师</span>
+        <div class="info-fixed">郑老师</div>
       </div>
       <div class="info-row">
         <div class="info-icon icon-term">📚</div>
         <span class="info-label">有效期：</span>
-        <span class="info-fixed">本学期</span>
+        <div class="info-fixed">本学期</div>
       </div>
     </div>
     <div class="card-rules">
@@ -525,14 +609,169 @@
     </div>
     <div class="corner-decor deco-tl">✿</div>
     <div class="corner-decor deco-tr">✿</div>
-    <div class="corner-decor deco-bl">❀</div>
+  </div>
+
+  <!-- ==================== 第3行 第3列 ==================== -->
+  <div class="coupon">
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本卡可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
+      <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- ==================== 第4行 第1列 ==================== -->
+  <div class="coupon">
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本卡可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
+      <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- ==================== 第4行 第2列 ==================== -->
+  <div class="coupon">
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本卡可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
+      <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
+  </div>
+
+  <!-- ==================== 第4行 第3列 ==================== -->
+  <div class="coupon">
+    <div class="rainbow-bar"></div>
+    <div class="card-header">
+      <div class="stars">★ ★ ★</div>
+      <h1>免作业券</h1>
+    </div>
+    <div class="title-underline"></div>
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-icon icon-person">🎒</div>
+        <span class="info-label">使用人：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-date">📅</div>
+        <span class="info-label">使用日期：</span>
+        <div class="info-line"></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-teacher">🏫</div>
+        <span class="info-label">发放人：</span>
+        <div class="info-fixed">郑老师</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon icon-term">📚</div>
+        <span class="info-label">有效期：</span>
+        <div class="info-fixed">本学期</div>
+      </div>
+    </div>
+    <div class="card-rules">
+      <div class="rule"><div class="rule-num">1</div><span>本卡可免除一次指定作业</span></div>
+      <div class="rule"><div class="rule-num">2</div><span>限本人使用，涂改复印无效</span></div>
+      <div class="rule"><div class="rule-num">3</div><span>最终解释权归发放老师所有</span></div>
+    </div>
+    <div class="corner-decor deco-tl">✿</div>
+    <div class="corner-decor deco-tr">✿</div>
   </div>
 
 </div><!-- end .a4-page -->
 
 <div class="export-bar">
   <button class="export-btn" id="exportPng">📥 导出 A4 PNG 图片</button>
-  <p class="hint">点击后等待几秒，浏览器自动下载 A4 满页高清图片（2480×3508px，300dpi）<br>支持直接打印：文件 → 打印 → 选择「无边距」效果更佳</p>
+  <p class="hint">点击后等待几秒，浏览器自动下载 A4 满页高清图片<br>支持直接打印：文件 → 打印 → 选择「无边距」效果更佳</p>
 </div>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -543,19 +782,19 @@
     btn.disabled = true;
     btn.textContent = '⏳ 正在生成图片...';
 
-    // 关键：直接传 element，让 html2canvas 自动获取元素真实尺寸
-    // 用 scale: 3 让 1mm ≈ 11.81px（A4: 2480×3508px @ 300dpi）
+    // 精确 300dpi A4 尺寸：2480 × 3508 px
+    // html2canvas 的 windowWidth/Height 让它截取正确尺寸，scale 控制输出分辨率
     try {
       const canvas = await html2canvas(a4Page, {
-        scale: 3,                // 缩放 3 倍（CSS px → 物理 px）
+        scale: 3.13,            // 精确达到 300dpi: 793px * 3.13 ≈ 2480px
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        windowWidth: a4Page.offsetWidth,   // 截图窗口宽度 = 元素实际宽度
-        windowHeight: a4Page.offsetHeight   // 截图窗口高度 = 元素实际高度
+        windowWidth: Math.round(a4Page.offsetWidth),
+        windowHeight: Math.round(a4Page.offsetHeight)
       });
       const link = document.createElement('a');
-      link.download = '免作业券-A4.png';
+      link.download = '免作业券-A4-12张.png';
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
     } catch (e) {
