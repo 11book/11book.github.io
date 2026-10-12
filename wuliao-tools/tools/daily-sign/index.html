@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>今日日签</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -47,6 +46,22 @@
     .bg {
       position: absolute;
       inset: 0;
+    }
+
+    /* 背景日期数字 */
+    .date-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(200px, 55vw, 280px);
+      font-weight: 900;
+      color: rgba(255,255,255,0.06);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
     }
 
     .orb {
@@ -242,13 +257,6 @@
       font-size: 20px;
     }
 
-    /* 隐藏canvas */
-    #exportCanvas {
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
-    }
-
     /* 提示toast */
     .toast {
       position: fixed;
@@ -270,6 +278,16 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
+
+    /* 隐藏的导出容器 */
+    #export-container {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -278,6 +296,7 @@
     <div class="phone-frame">
       <div class="card" id="card">
         <div class="bg" id="bg">
+          <div class="date-bg" id="date-bg"></div>
           <div class="orb orb-1"></div>
           <div class="orb orb-2"></div>
           <div class="orb orb-3"></div>
@@ -301,13 +320,13 @@
   <div class="export-section">
     <button class="export-btn" onclick="exportImage()">
       <span class="icon">📸</span>
-      <span>导出图片</span>
+      <span>导出高清图片</span>
     </button>
   </div>
 
   <div class="toast" id="toast">正在导出...</div>
-  <canvas id="exportCanvas"></canvas>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     // ============ 每日数据配置 ============
     const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -403,11 +422,15 @@
     function init() {
       const now = new Date();
       const day = now.getDay();
+      const date = now.getDate();
       const theme = THEMES[day];
 
       // 设置背景
       const bg = document.getElementById('bg');
       bg.style.background = theme.gradient;
+
+      // 设置日期背景数字
+      document.getElementById('date-bg').textContent = date;
 
       // 设置光圈颜色
       document.querySelector('.orb-1').style.background = theme.orb1;
@@ -439,50 +462,107 @@
 
     init();
 
-    // ============ 导出图片功能 ============
+    // ============ 导出高清图片功能 ============
     function exportImage() {
       const toast = document.getElementById('toast');
-      toast.textContent = '正在生成图片...';
+      toast.textContent = '正在生成高清图片...';
       toast.classList.add('show');
 
+      // 创建高清导出容器 (1080x1920 = 抖音推荐尺寸)
+      const exportContainer = document.createElement('div');
+      exportContainer.style.cssText = `
+        position: fixed;
+        left: -9999px;
+        top: -9999px;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+      `;
+
+      // 复制card内容
       const card = document.getElementById('card');
+      const clone = card.cloneNode(true);
+      
+      // 设置导出容器尺寸
+      clone.style.width = '1080px';
+      clone.style.height = '1920px';
+      clone.style.borderRadius = '0';
+      clone.style.position = 'relative';
 
-      // 使用html2canvas导出
-      html2canvas(card, {
-        scale: 2, // 2倍清晰度
-        useCORS: true,
-        backgroundColor: null,
-        logging: false
-      }).then(canvas => {
-        // 转换为blob并下载
-        canvas.toBlob(function(blob) {
-          if (blob) {
-            const now = new Date();
-            const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
-            const dayName = WEEKDAYS[now.getDay()];
-            const filename = `日签_${dateStr}${dayName}.png`;
+      // 缩放内容以适应1080宽度
+      const originalWidth = card.offsetWidth;
+      const scale = 1080 / originalWidth;
 
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+      // 获取原始样式
+      const originalStyles = {
+        padding: card.querySelector('.content').style.cssText || 'padding: 50px 30px 60px;'
+      };
 
-            toast.textContent = '✅ 已保存！';
-            setTimeout(() => toast.classList.remove('show'), 2000);
-          } else {
-            toast.textContent = '导出失败，请重试';
-            setTimeout(() => toast.classList.remove('show'), 2000);
-          }
-        }, 'image/png');
-      }).catch(err => {
-        console.error('Export error:', err);
-        toast.textContent = '导出失败';
-        setTimeout(() => toast.classList.remove('show'), 2000);
+      // 设置导出内容padding (按比例放大)
+      clone.querySelector('.content').style.cssText = `
+        padding: ${50 * scale}px ${30 * scale}px ${60 * scale}px;
+      `;
+
+      // 调整日期背景字体大小
+      const dateBg = clone.querySelector('.date-bg');
+      if (dateBg) {
+        dateBg.style.fontSize = `clamp(${200 * scale}px, 55vw, ${280 * scale}px)`;
+      }
+
+      // 调整orb大小
+      const orbs = clone.querySelectorAll('.orb');
+      orbs.forEach((orb, i) => {
+        const sizes = [280, 220, 180];
+        orb.style.width = `${sizes[i] * scale}px`;
+        orb.style.height = `${sizes[i] * scale}px`;
       });
+
+      exportContainer.appendChild(clone);
+      document.body.appendChild(exportContainer);
+
+      // 等待图片加载完成后导出
+      setTimeout(() => {
+        html2canvas(exportContainer, {
+          scale: 1,
+          width: 1080,
+          height: 1920,
+          useCORS: true,
+          backgroundColor: null,
+          logging: false
+        }).then(canvas => {
+          // 下载图片
+          const now = new Date();
+          const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
+          const dayName = WEEKDAYS[now.getDay()];
+          const filename = `日签_${dateStr}${dayName}_${Date.now()}.png`;
+
+          canvas.toBlob(function(blob) {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+
+              toast.textContent = '✅ 已保存！1080x1920高清图';
+              setTimeout(() => toast.classList.remove('show'), 3000);
+            } else {
+              toast.textContent = '❌ 导出失败，请重试';
+              setTimeout(() => toast.classList.remove('show'), 2000);
+            }
+            document.body.removeChild(exportContainer);
+          }, 'image/png', 1.0);
+
+        }).catch(err => {
+          console.error('Export error:', err);
+          toast.textContent = '❌ 导出失败';
+          setTimeout(() => toast.classList.remove('show'), 2000);
+          document.body.removeChild(exportContainer);
+        });
+      }, 100);
     }
   </script>
 </body>
