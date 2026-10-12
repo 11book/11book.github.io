@@ -5,84 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>今日日签</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
       width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
+      min-height: 100%;
+      background: #1a1a2e;
       font-family: "Noto Sans SC", sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0a0a0f;
+      padding: 20px;
+      padding-bottom: 120px;
     }
 
+    /* 第一部分：手机竖屏预览区 */
+    .preview-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .phone-frame {
+      position: relative;
+      width: 100%;
+      max-width: 375px;
+      aspect-ratio: 9 / 16;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 2px rgba(255,255,255,0.1),
+        0 25px 80px rgba(0,0,0,0.5);
+    }
+
+    /* 日签内容 */
     .card {
       position: relative;
       width: 100%;
-      height: 100vh;
-      max-width: 450px;
-      overflow: hidden;
+      height: 100%;
     }
 
-    @media (min-width: 500px) {
-      .card {
-        height: 100vh;
-        border-radius: 0;
-      }
-    }
-
-    /* 背景层 */
     .bg {
       position: absolute;
       inset: 0;
-      transition: all 1s ease;
     }
 
-    /* 装饰光圈 */
     .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(60px);
+      filter: blur(50px);
       opacity: 0.6;
     }
     .orb-1 {
-      width: 300px;
-      height: 300px;
-      top: -100px;
-      right: -80px;
-      background: var(--orb1-color, #667eea);
+      width: 280px;
+      height: 280px;
+      top: -80px;
+      right: -60px;
       animation: orbFloat 8s ease-in-out infinite;
     }
     .orb-2 {
-      width: 250px;
-      height: 250px;
-      bottom: 100px;
-      left: -100px;
-      background: var(--orb2-color, #764ba2);
+      width: 220px;
+      height: 220px;
+      bottom: 120px;
+      left: -80px;
       animation: orbFloat 10s ease-in-out infinite reverse;
     }
     .orb-3 {
-      width: 200px;
-      height: 200px;
-      bottom: -50px;
-      right: 50px;
-      background: var(--orb3-color, #f093fb);
+      width: 180px;
+      height: 180px;
+      bottom: -30px;
+      right: 40px;
       animation: orbFloat 7s ease-in-out infinite 2s;
     }
 
     @keyframes orbFloat {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(20px, -30px) scale(1.05); }
-      66% { transform: translate(-15px, 15px) scale(0.95); }
+      33% { transform: translate(15px, -20px) scale(1.05); }
+      66% { transform: translate(-10px, 10px) scale(0.95); }
     }
 
-    /* 内容层 */
     .content {
       position: relative;
       z-index: 10;
@@ -90,21 +90,20 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 60px 36px 48px;
+      padding: 50px 30px 60px;
     }
 
-    /* 星期标签 */
     .weekday-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.2);
       color: white;
-      padding: 8px 20px;
+      padding: 6px 16px;
       border-radius: 50px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       letter-spacing: 1px;
       width: fit-content;
@@ -113,15 +112,14 @@
     }
 
     @keyframes slideDown {
-      0% { opacity: 0; transform: translateY(-30px); }
+      0% { opacity: 0; transform: translateY(-20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
 
     .weekday-badge .emoji {
-      font-size: 16px;
+      font-size: 14px;
     }
 
-    /* 主文案区 */
     .main-area {
       flex: 1;
       display: flex;
@@ -132,26 +130,16 @@
     }
 
     @keyframes fadeUp {
-      0% { opacity: 0; transform: translateY(40px); }
+      0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .date-num {
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(80px, 25vw, 120px);
-      font-weight: 900;
-      color: rgba(255,255,255,0.08);
-      line-height: 1;
-      margin-bottom: -20px;
-      letter-spacing: -4px;
     }
 
     .main-quote {
       font-family: "Noto Serif SC", serif;
-      font-size: clamp(24px, 6.5vw, 32px);
+      font-size: clamp(20px, 6vw, 28px);
       font-weight: 700;
       color: white;
-      line-height: 1.5;
+      line-height: 1.6;
       text-shadow: 0 4px 30px rgba(0,0,0,0.3);
     }
 
@@ -163,50 +151,29 @@
     }
 
     .main-quote .big {
-      font-size: clamp(36px, 10vw, 48px);
+      font-size: clamp(32px, 9vw, 42px);
       display: block;
-      margin: 8px 0;
+      margin: 6px 0;
     }
 
-    /* 分割线 */
     .divider {
-      width: 50px;
-      height: 3px;
+      width: 40px;
+      height: 2px;
       background: rgba(255,255,255,0.5);
       border-radius: 2px;
-      margin: 28px 0;
+      margin: 20px 0 16px;
       animation: expandIn 0.8s 0.8s both;
     }
 
     @keyframes expandIn {
       0% { width: 0; opacity: 0; }
-      100% { width: 50px; opacity: 1; }
+      100% { width: 40px; opacity: 1; }
     }
 
-    /* 底部文案 */
-    .sub-area {
-      animation: fadeIn 1s 0.9s both;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    .sub-quote {
-      font-size: clamp(14px, 4vw, 16px);
-      color: rgba(255,255,255,0.85);
-      font-weight: 400;
-      line-height: 1.8;
-      letter-spacing: 0.5px;
-    }
-
-    /* emoji表情组 */
     .emoji-row {
       display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      font-size: 28px;
+      gap: 10px;
+      font-size: 24px;
     }
 
     .emoji-row span {
@@ -224,64 +191,128 @@
       100% { opacity: 1; transform: scale(1) rotate(0deg); }
     }
 
-    /* 底部签名 */
-    .footer {
+    .sub-quote {
+      font-size: clamp(13px, 3.8vw, 15px);
+      color: rgba(255,255,255,0.9);
+      font-weight: 400;
+      line-height: 1.7;
+      margin-top: 12px;
+    }
+
+    /* 第二部分：导出按钮区 */
+    .export-section {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, #1a1a2e 60%, transparent);
+      padding: 20px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .export-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 16px 48px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: "Noto Sans SC", sans-serif;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
       align-items: center;
-      margin-top: 32px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      gap: 8px;
     }
 
-    .time-info {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 1px;
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
     }
 
-    .brand {
-      font-size: 11px;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 2px;
+    .export-btn:active {
+      transform: translateY(0);
+    }
+
+    .export-btn .icon {
+      font-size: 20px;
+    }
+
+    /* 隐藏canvas */
+    #exportCanvas {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
+
+    /* 提示toast */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(0,0,0,0.85);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
   </style>
 </head>
 <body>
-  <div class="card" id="card">
-    <div class="bg" id="bg">
-      <div class="orb orb-1"></div>
-      <div class="orb orb-2"></div>
-      <div class="orb orb-3"></div>
-    </div>
+  <!-- 第一部分：手机竖屏预览 -->
+  <div class="preview-wrapper">
+    <div class="phone-frame">
+      <div class="card" id="card">
+        <div class="bg" id="bg">
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
+          <div class="orb orb-3"></div>
+        </div>
 
-    <div class="content">
-      <div class="weekday-badge" id="weekday-badge"></div>
+        <div class="content">
+          <div class="weekday-badge" id="weekday-badge"></div>
 
-      <div class="main-area">
-        <div class="date-num" id="date-num"></div>
-        <div class="main-quote" id="main-quote"></div>
-        <div class="divider"></div>
-      </div>
-
-      <div class="sub-area">
-        <div class="emoji-row" id="emoji-row"></div>
-        <div class="sub-quote" id="sub-quote"></div>
-      </div>
-
-      <div class="footer">
-        <div class="time-info" id="time-info"></div>
-        <div class="brand">无厘头实验室</div>
+          <div class="main-area">
+            <div class="main-quote" id="main-quote"></div>
+            <div class="divider"></div>
+            <div class="emoji-row" id="emoji-row"></div>
+            <div class="sub-quote" id="sub-quote"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- 第二部分：导出按钮 -->
+  <div class="export-section">
+    <button class="export-btn" onclick="exportImage()">
+      <span class="icon">📸</span>
+      <span>导出图片</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast">正在导出...</div>
+  <canvas id="exportCanvas"></canvas>
 
   <script>
     // ============ 每日数据配置 ============
     const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
     const THEMES = {
-      // 周一：冲刺型
       1: {
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
         orb1: '#667eea', orb2: '#764ba2', orb3: '#f093fb',
@@ -294,7 +325,6 @@
           { main: '<big>新的一周</big>，满血复活！今天也要<big>全力以赴</>！', sub: '不逼自己一把，永远不知道自己能多优秀' }
         ]
       },
-      // 周二：坚持型
       2: {
         gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
         orb1: '#4facfe', orb2: '#00f2fe', orb3: '#38f9d7',
@@ -307,7 +337,6 @@
           { main: '<big>第二天</>，状态拉满！今天效率<big>翻倍</>！', sub: '专注当下，每一步都是在靠近目标' }
         ]
       },
-      // 周三：突破型
       3: {
         gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
         orb1: '#fa709a', orb2: '#fee140', orb3: '#ff9a44',
@@ -320,7 +349,6 @@
           { main: '今天要<big>超神</>！把困难踩在脚下，<big>大步向前</>！', sub: '不是因为有希望才坚持，是坚持了才有希望' }
         ]
       },
-      // 周四：冲刺型
       4: {
         gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
         orb1: '#a18cd1', orb2: '#fbc2eb', orb3: '#ffecd2',
@@ -333,7 +361,6 @@
           { main: '胜利在<big>望</>！就差<big>一步</>，冲到就是胜利！', sub: '不是因为看到希望才努力，是努力了才看到希望' }
         ]
       },
-      // 周五：解放型
       5: {
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         orb1: '#f093fb', orb2: '#f5576c', orb3: '#ffd89b',
@@ -346,7 +373,6 @@
           { main: '<big>周五</>心情最好！把本周<big>收尾</>，下周<big>再战</>！', sub: '完成比完美更重要，先完成再完美' }
         ]
       },
-      // 周六：放松型
       6: {
         gradient: 'linear-gradient(135deg, #96fbc4 0%, #f9f586 100%)',
         orb1: '#96fbc4', orb2: '#f9f586', orb3: '#ffd89b',
@@ -359,7 +385,6 @@
           { main: '<big>周六</>的阳光格外甜，<big>想干嘛</>就干嘛！', sub: '难得的闲暇，就让自己彻底放松一下吧' }
         ]
       },
-      // 周日：收心型
       0: {
         gradient: 'linear-gradient(135deg, #6a85b6 0%, #bac8e0 100%)',
         orb1: '#6a85b6', orb2: '#bac8e0', orb3: '#a8d8ea',
@@ -378,11 +403,6 @@
     function init() {
       const now = new Date();
       const day = now.getDay();
-      const date = now.getDate();
-      const month = now.getMonth() + 1;
-      const year = now.getFullYear();
-      const weekday = WEEKDAYS[day];
-
       const theme = THEMES[day];
 
       // 设置背景
@@ -390,9 +410,6 @@
       bg.style.background = theme.gradient;
 
       // 设置光圈颜色
-      document.documentElement.style.setProperty('--orb1-color', theme.orb1);
-      document.documentElement.style.setProperty('--orb2-color', theme.orb2);
-      document.documentElement.style.setProperty('--orb3-color', theme.orb3);
       document.querySelector('.orb-1').style.background = theme.orb1;
       document.querySelector('.orb-2').style.background = theme.orb2;
       document.querySelector('.orb-3').style.background = theme.orb3;
@@ -404,9 +421,6 @@
       // 设置星期标签
       const badge = document.getElementById('weekday-badge');
       badge.innerHTML = `<span class="emoji">${theme.badge}</span> ${theme.badgeText}`;
-
-      // 设置日期数字
-      document.getElementById('date-num').textContent = date;
 
       // 随机选一条文案
       const quote = theme.quotes[Math.floor(Math.random() * theme.quotes.length)];
@@ -421,12 +435,55 @@
 
       // 渲染底部文案
       document.getElementById('sub-quote').textContent = quote.sub;
-
-      // 底部时间
-      document.getElementById('time-info').textContent = `${year}.${month}.${date} ${weekday}`;
     }
 
     init();
+
+    // ============ 导出图片功能 ============
+    function exportImage() {
+      const toast = document.getElementById('toast');
+      toast.textContent = '正在生成图片...';
+      toast.classList.add('show');
+
+      const card = document.getElementById('card');
+
+      // 使用html2canvas导出
+      html2canvas(card, {
+        scale: 2, // 2倍清晰度
+        useCORS: true,
+        backgroundColor: null,
+        logging: false
+      }).then(canvas => {
+        // 转换为blob并下载
+        canvas.toBlob(function(blob) {
+          if (blob) {
+            const now = new Date();
+            const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
+            const dayName = WEEKDAYS[now.getDay()];
+            const filename = `日签_${dateStr}${dayName}.png`;
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            toast.textContent = '✅ 已保存！';
+            setTimeout(() => toast.classList.remove('show'), 2000);
+          } else {
+            toast.textContent = '导出失败，请重试';
+            setTimeout(() => toast.classList.remove('show'), 2000);
+          }
+        }, 'image/png');
+      }).catch(err => {
+        console.error('Export error:', err);
+        toast.textContent = '导出失败';
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    }
   </script>
 </body>
 </html>
