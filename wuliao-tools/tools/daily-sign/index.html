@@ -2,488 +2,191 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>今日日签</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      background: #1a1a2e;
-      font-family: "Noto Sans SC", sans-serif;
-      padding: 20px;
-      padding-bottom: 120px;
-    }
-
-    /* 第一部分：手机竖屏预览区 */
-    .preview-wrapper {
+    body {
+      min-height: 100vh;
       display: flex;
+      align-items: center;
       justify-content: center;
-      margin-bottom: 30px;
-    }
-
-    .phone-frame {
-      position: relative;
-      width: 100%;
-      max-width: 375px;
-      aspect-ratio: 9 / 16;
-      border-radius: 32px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: "Noto Sans SC", sans-serif;
       overflow: hidden;
-      box-shadow: 
-        0 0 0 2px rgba(255,255,255,0.1),
-        0 25px 80px rgba(0,0,0,0.5);
+      padding: 20px;
     }
 
-    /* 日签内容 */
     .card {
       position: relative;
+      background: linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%);
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 420px;
       width: 100%;
-      height: 100%;
+      text-align: center;
+      box-shadow: 
+        0 25px 60px rgba(0,0,0,0.4),
+        0 0 80px rgba(102, 126, 234, 0.15);
+      animation: cardIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    .bg {
-      position: absolute;
-      inset: 0;
+    @keyframes cardIn {
+      0% { opacity: 0; transform: scale(0.8) translateY(40px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(50px);
-      opacity: 0.6;
-    }
-    .orb-1 {
-      width: 280px;
-      height: 280px;
-      top: -80px;
-      right: -60px;
-      animation: orbFloat 8s ease-in-out infinite;
-    }
-    .orb-2 {
-      width: 220px;
-      height: 220px;
-      bottom: 120px;
-      left: -80px;
-      animation: orbFloat 10s ease-in-out infinite reverse;
-    }
-    .orb-3 {
-      width: 180px;
-      height: 180px;
-      bottom: -30px;
-      right: 40px;
-      animation: orbFloat 7s ease-in-out infinite 2s;
+    .date-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 8px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      margin-bottom: 32px;
+      animation: fadeDown 0.8s 0.3s both;
     }
 
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(15px, -20px) scale(1.05); }
-      66% { transform: translate(-10px, 10px) scale(0.95); }
+    @keyframes fadeDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
-    .content {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 50px 30px 60px;
+    .quote-mark {
+      font-family: "Noto Serif SC", serif;
+      font-size: 72px;
+      color: #667eea;
+      opacity: 0.2;
+      line-height: 1;
+      animation: fadeIn 1s 0.5s both;
     }
 
-    .weekday-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.2);
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 0.2; }
+    }
+
+    .main-text {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 5vw, 28px);
+      font-weight: 600;
+      color: #2d3748;
+      line-height: 1.8;
+      margin: 16px 0 32px;
+      animation: textIn 1s 0.6s both;
+    }
+
+    @keyframes textIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .highlight {
+      color: #667eea;
+      font-weight: 700;
+    }
+
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      margin: 0 auto 24px;
+      border-radius: 2px;
+      animation: expandWidth 0.8s 0.8s both;
+    }
+
+    @keyframes expandWidth {
+      0% { width: 0; }
+      100% { width: 60px; }
+    }
+
+    .sub-text {
+      font-size: 14px;
+      color: #718096;
+      line-height: 1.8;
+      animation: fadeIn 1s 1s both;
+    }
+
+    .emoji-row {
+      font-size: 28px;
+      margin-bottom: 20px;
+      animation: bounceIn 1s 0.9s both;
+    }
+
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       color: white;
       padding: 6px 16px;
       border-radius: 50px;
       font-size: 12px;
       font-weight: 500;
-      letter-spacing: 1px;
-      width: fit-content;
-      animation: slideDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      opacity: 0;
+      margin-top: 20px;
+      animation: fadeIn 1s 1.1s both;
     }
 
-    @keyframes slideDown {
-      0% { opacity: 0; transform: translateY(-20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .weekday-badge .emoji {
-      font-size: 14px;
-    }
-
-    .main-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      animation: fadeUp 1s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      opacity: 0;
-    }
-
-    @keyframes fadeUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .main-quote {
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(20px, 6vw, 28px);
-      font-weight: 700;
-      color: white;
-      line-height: 1.6;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.3);
-    }
-
-    .main-quote .highlight {
-      background: linear-gradient(135deg, var(--highlight-from, #fff), var(--highlight-to, #fff));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .main-quote .big {
-      font-size: clamp(32px, 9vw, 42px);
-      display: block;
-      margin: 6px 0;
-    }
-
-    .divider {
-      width: 40px;
-      height: 2px;
-      background: rgba(255,255,255,0.5);
-      border-radius: 2px;
-      margin: 20px 0 16px;
-      animation: expandIn 0.8s 0.8s both;
-    }
-
-    @keyframes expandIn {
-      0% { width: 0; opacity: 0; }
-      100% { width: 40px; opacity: 1; }
-    }
-
-    .emoji-row {
-      display: flex;
-      gap: 10px;
-      font-size: 24px;
-    }
-
-    .emoji-row span {
-      animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-    .emoji-row span:nth-child(1) { animation-delay: 1s; }
-    .emoji-row span:nth-child(2) { animation-delay: 1.15s; }
-    .emoji-row span:nth-child(3) { animation-delay: 1.3s; }
-    .emoji-row span:nth-child(4) { animation-delay: 1.45s; }
-    .emoji-row span:nth-child(5) { animation-delay: 1.6s; }
-
-    @keyframes bounceIn {
-      0% { opacity: 0; transform: scale(0) rotate(-20deg); }
-      60% { transform: scale(1.3) rotate(10deg); }
-      100% { opacity: 1; transform: scale(1) rotate(0deg); }
-    }
-
-    .sub-quote {
-      font-size: clamp(13px, 3.8vw, 15px);
-      color: rgba(255,255,255,0.9);
-      font-weight: 400;
-      line-height: 1.7;
-      margin-top: 12px;
-    }
-
-    /* 第二部分：导出按钮区 */
-    .export-section {
+    /* Floating particles */
+    .particle {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, #1a1a2e 60%, transparent);
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      z-index: 100;
-    }
-
-    .export-btn {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      padding: 16px 48px;
-      border-radius: 50px;
-      font-size: 16px;
-      font-weight: 600;
-      font-family: "Noto Sans SC", sans-serif;
-      cursor: pointer;
-      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .export-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
-    }
-
-    .export-btn:active {
-      transform: translateY(0);
-    }
-
-    .export-btn .icon {
-      font-size: 20px;
-    }
-
-    /* 隐藏canvas */
-    #exportCanvas {
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
-    }
-
-    /* 提示toast */
-    .toast {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      background: rgba(0,0,0,0.85);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 12px;
-      font-size: 14px;
-      opacity: 0;
-      transition: all 0.3s ease;
+      width: 6px;
+      height: 6px;
+      background: rgba(102, 126, 234, 0.4);
+      border-radius: 50%;
       pointer-events: none;
-      z-index: 200;
+      animation: float 6s ease-in-out infinite;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 1s; }
+    .particle:nth-child(3) { left: 80%; top: 30%; animation-delay: 2s; }
+    .particle:nth-child(4) { left: 70%; top: 70%; animation-delay: 3s; }
+    .particle:nth-child(5) { left: 50%; top: 10%; animation-delay: 4s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+      50% { transform: translateY(-30px) rotate(180deg); opacity: 0.8; }
     }
   </style>
 </head>
 <body>
-  <!-- 第一部分：手机竖屏预览 -->
-  <div class="preview-wrapper">
-    <div class="phone-frame">
-      <div class="card" id="card">
-        <div class="bg" id="bg">
-          <div class="orb orb-1"></div>
-          <div class="orb orb-2"></div>
-          <div class="orb orb-3"></div>
-        </div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
 
-        <div class="content">
-          <div class="weekday-badge" id="weekday-badge"></div>
-
-          <div class="main-area">
-            <div class="main-quote" id="main-quote"></div>
-            <div class="divider"></div>
-            <div class="emoji-row" id="emoji-row"></div>
-            <div class="sub-quote" id="sub-quote"></div>
-          </div>
-        </div>
-      </div>
+  <div class="card">
+    <div class="date-badge">周一 · 早安</div>
+    
+    <div class="quote-mark">"</div>
+    
+    <div class="main-text">
+      这周<span class="highlight">只有5天</span>了<br>
+      今天也要快过去了<br>
+      <span class="highlight">还有四天</span>，就放假啦<br>
+      加油！冲！💪
     </div>
+
+    <div class="divider"></div>
+
+    <div class="emoji-row">🌟 ⏰ 🔥 ✨ 🌟</div>
+    
+    <div class="sub-text">
+      每一天都是新的开始<br>
+      坚持下去，胜利在望
+    </div>
+
+    <div class="tag">🌈 正能量日签</div>
   </div>
-
-  <!-- 第二部分：导出按钮 -->
-  <div class="export-section">
-    <button class="export-btn" onclick="exportImage()">
-      <span class="icon">📸</span>
-      <span>导出图片</span>
-    </button>
-  </div>
-
-  <div class="toast" id="toast">正在导出...</div>
-  <canvas id="exportCanvas"></canvas>
-
-  <script>
-    // ============ 每日数据配置 ============
-    const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-
-    const THEMES = {
-      1: {
-        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-        orb1: '#667eea', orb2: '#764ba2', orb3: '#f093fb',
-        highlightFrom: '#fff700', highlightTo: '#ff9500',
-        badge: '🌟', badgeText: '元气周一',
-        emojis: ['💪', '🔥', '⚡', '✨', '🌟'],
-        quotes: [
-          { main: '这周只有<big>5天</big>了，今天过完就<big>剩4天</big>，冲！', sub: '每一天都是新的开始，坚持下去，胜利就在眼前' },
-          { main: '<big>周一</big>到！困难都是<big>纸老虎</big>，一个一个消灭它！', sub: '别人可以，你也可以。加油，我们都在！' },
-          { main: '<big>新的一周</big>，满血复活！今天也要<big>全力以赴</>！', sub: '不逼自己一把，永远不知道自己能多优秀' }
-        ]
-      },
-      2: {
-        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        orb1: '#4facfe', orb2: '#00f2fe', orb3: '#38f9d7',
-        highlightFrom: '#00f2fe', highlightTo: '#4facfe',
-        badge: '🔥', badgeText: '加油周二',
-        emojis: ['💪', '🎯', '📈', '🚀', '💎'],
-        quotes: [
-          { main: '周二的你<big>最努力</big>，离周末还有<big>3天</>，稳！', sub: '路虽远行则将至，事虽难做则必成' },
-          { main: '坚持住！<big>周二</>正在流逝，<big>周三</>马上到来！', sub: '不要假装努力，结果不会陪你演戏' },
-          { main: '<big>第二天</>，状态拉满！今天效率<big>翻倍</>！', sub: '专注当下，每一步都是在靠近目标' }
-        ]
-      },
-      3: {
-        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        orb1: '#fa709a', orb2: '#fee140', orb3: '#ff9a44',
-        highlightFrom: '#fee140', highlightTo: '#fa709a',
-        badge: '⚡', badgeText: '突破周三',
-        emojis: ['⚡', '💥', '🔥', '🌈', '💫'],
-        quotes: [
-          { main: '周三分水岭！<big>过了一半</>，胜利在向你<big>招手</>！', sub: '最困难的时候，往往是转折的开始' },
-          { main: '<big>周三</>不努力，周末徒伤悲。现在就是<big>巅峰</>！', sub: '熬过最难的日子，就会看见不一样的风景' },
-          { main: '今天要<big>超神</>！把困难踩在脚下，<big>大步向前</>！', sub: '不是因为有希望才坚持，是坚持了才有希望' }
-        ]
-      },
-      4: {
-        gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-        orb1: '#a18cd1', orb2: '#fbc2eb', orb3: '#ffecd2',
-        highlightFrom: '#fbc2eb', highlightTo: '#a18cd1',
-        badge: '🚀', badgeText: '冲刺周四',
-        emojis: ['🚀', '🎯', '💪', '🔥', '⭐'],
-        quotes: [
-          { main: '周四啦！<big>最后一天</>上班，明天就是<big>周五</>！', sub: '咬紧牙关，再坚持一下，曙光就在前方' },
-          { main: '<big>疯狂星期四</>，疯狂冲刺！V我50...不对，<big>V我效率</>！', sub: '每一天的付出，都在为周末的自由铺路' },
-          { main: '胜利在<big>望</>！就差<big>一步</>，冲到就是胜利！', sub: '不是因为看到希望才努力，是努力了才看到希望' }
-        ]
-      },
-      5: {
-        gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        orb1: '#f093fb', orb2: '#f5576c', orb3: '#ffd89b',
-        highlightFrom: '#ffd89b', highlightTo: '#f5576c',
-        badge: '🎉', badgeText: '解放周五',
-        emojis: ['🎉', '🥳', '🎊', '🍾', '🎈'],
-        quotes: [
-          { main: '<big>周五</>到！<big>一周</>的辛苦即将换来做五休二的<big>幸福</>！', sub: '辛苦了一周，你值得所有的欢呼和放松' },
-          { main: '冲鸭！<big>最后一天</>，完美收官<big>就在今天</>！', sub: '周末是用来回血的，好好休息也是战斗力' },
-          { main: '<big>周五</>心情最好！把本周<big>收尾</>，下周<big>再战</>！', sub: '完成比完美更重要，先完成再完美' }
-        ]
-      },
-      6: {
-        gradient: 'linear-gradient(135deg, #96fbc4 0%, #f9f586 100%)',
-        orb1: '#96fbc4', orb2: '#f9f586', orb3: '#ffd89b',
-        highlightFrom: '#f9f586', highlightTo: '#96fbc4',
-        badge: '🌴', badgeText: '休闲周六',
-        emojis: ['🌴', '☀️', '🍉', '🎮', '😴'],
-        quotes: [
-          { main: '<big>周六</>到！睡到自然醒，今天只做<big>快乐</>的事！', sub: '工作日努力，周末尽情浪，这就是最好的生活' },
-          { main: '周末模式<big>ON</>！躺平是对一周辛苦的<big>最好奖励</>！', sub: '休息是为了走更远的路，今天只负责开心' },
-          { main: '<big>周六</>的阳光格外甜，<big>想干嘛</>就干嘛！', sub: '难得的闲暇，就让自己彻底放松一下吧' }
-        ]
-      },
-      0: {
-        gradient: 'linear-gradient(135deg, #6a85b6 0%, #bac8e0 100%)',
-        orb1: '#6a85b6', orb2: '#bac8e0', orb3: '#a8d8ea',
-        highlightFrom: '#a8d8ea', highlightTo: '#6a85b6',
-        badge: '📖', badgeText: '充周日',
-        emojis: ['📖', '🎯', '💭', '🌙', '✨'],
-        quotes: [
-          { main: '周日的夜晚，<big>收心</>一下，明天<big>继续战斗</>！', sub: '好好休息，调整状态，新的一周会更精彩' },
-          { main: '<big>周日</>余额不足，但<big>心态</>要满格！', sub: '用最好的状态迎接明天，相信自己一定行' },
-          { main: '今天好好<big>充电</>，明天满血<big>复活</>！', sub: '周末的每一点放松，都是为了下周的全力以赴' }
-        ]
-      }
-    };
-
-    // ============ 渲染逻辑 ============
-    function init() {
-      const now = new Date();
-      const day = now.getDay();
-      const theme = THEMES[day];
-
-      // 设置背景
-      const bg = document.getElementById('bg');
-      bg.style.background = theme.gradient;
-
-      // 设置光圈颜色
-      document.querySelector('.orb-1').style.background = theme.orb1;
-      document.querySelector('.orb-2').style.background = theme.orb2;
-      document.querySelector('.orb-3').style.background = theme.orb3;
-
-      // 设置高亮渐变色
-      document.documentElement.style.setProperty('--highlight-from', theme.highlightFrom);
-      document.documentElement.style.setProperty('--highlight-to', theme.highlightTo);
-
-      // 设置星期标签
-      const badge = document.getElementById('weekday-badge');
-      badge.innerHTML = `<span class="emoji">${theme.badge}</span> ${theme.badgeText}`;
-
-      // 随机选一条文案
-      const quote = theme.quotes[Math.floor(Math.random() * theme.quotes.length)];
-
-      // 渲染主文案
-      const mainQuote = document.getElementById('main-quote');
-      mainQuote.innerHTML = quote.main.replace(/<big>(.*?)<\/big>/g, '<span class="highlight">$1</span>');
-
-      // 渲染emoji
-      const emojiRow = document.getElementById('emoji-row');
-      emojiRow.innerHTML = theme.emojis.map(e => `<span>${e}</span>`).join('');
-
-      // 渲染底部文案
-      document.getElementById('sub-quote').textContent = quote.sub;
-    }
-
-    init();
-
-    // ============ 导出图片功能 ============
-    function exportImage() {
-      const toast = document.getElementById('toast');
-      toast.textContent = '正在生成图片...';
-      toast.classList.add('show');
-
-      const card = document.getElementById('card');
-
-      // 使用html2canvas导出
-      html2canvas(card, {
-        scale: 2, // 2倍清晰度
-        useCORS: true,
-        backgroundColor: null,
-        logging: false
-      }).then(canvas => {
-        // 转换为blob并下载
-        canvas.toBlob(function(blob) {
-          if (blob) {
-            const now = new Date();
-            const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
-            const dayName = WEEKDAYS[now.getDay()];
-            const filename = `日签_${dateStr}${dayName}.png`;
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            toast.textContent = '✅ 已保存！';
-            setTimeout(() => toast.classList.remove('show'), 2000);
-          } else {
-            toast.textContent = '导出失败，请重试';
-            setTimeout(() => toast.classList.remove('show'), 2000);
-          }
-        }, 'image/png');
-      }).catch(err => {
-        console.error('Export error:', err);
-        toast.textContent = '导出失败';
-        setTimeout(() => toast.classList.remove('show'), 2000);
-      });
-    }
-  </script>
 </body>
 </html>
