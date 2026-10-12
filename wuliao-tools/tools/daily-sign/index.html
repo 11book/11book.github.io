@@ -35,7 +35,6 @@
         0 25px 80px rgba(0,0,0,0.5);
     }
 
-    /* 日签内容 */
     .card {
       position: relative;
       width: 100%;
@@ -48,55 +47,123 @@
       inset: 0;
     }
 
-    /* 背景日期数字 - 放在上半部分 */
-    .date-bg {
+    /* 左侧大日期装饰 */
+    .date-decor {
       position: absolute;
-      top: 8%;
-      left: 50%;
-      transform: translateX(-50%);
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .date-num {
       font-family: "Noto Serif SC", serif;
-      font-size: clamp(140px, 38vw, 180px);
+      font-size: clamp(100px, 28vw, 130px);
       font-weight: 900;
-      color: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.12);
       line-height: 1;
-      letter-spacing: -8px;
-      pointer-events: none;
-      user-select: none;
-      z-index: 1;
+      letter-spacing: -4px;
+      writing-mode: vertical-rl;
+    }
+
+    .date-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+      margin-top: 8px;
+    }
+
+    /* 装饰线条 */
+    .deco-lines {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .deco-line {
+      height: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 1px;
+    }
+
+    .deco-line:nth-child(1) { width: 40px; }
+    .deco-line:nth-child(2) { width: 25px; }
+    .deco-line:nth-child(3) { width: 50px; }
+    .deco-line:nth-child(4) { width: 18px; }
+
+    /* 装饰圆点 */
+    .deco-dots {
+      position: absolute;
+      left: 20px;
+      bottom: 80px;
+      display: flex;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    .deco-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+    }
+
+    .deco-dot:nth-child(2) { background: rgba(255,255,255,0.4); }
+    .deco-dot:nth-child(3) { background: rgba(255,255,255,0.55); }
+
+    /* 装饰方块 */
+    .deco-square {
+      position: absolute;
+      right: 15px;
+      top: 60px;
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      transform: rotate(15deg);
+      z-index: 2;
     }
 
     .orb {
       position: absolute;
       border-radius: 50%;
       filter: blur(50px);
-      opacity: 0.6;
+      opacity: 0.55;
     }
     .orb-1 {
-      width: 280px;
-      height: 280px;
-      top: -80px;
-      right: -60px;
+      width: 260px;
+      height: 260px;
+      top: -90px;
+      right: -70px;
       animation: orbFloat 8s ease-in-out infinite;
     }
     .orb-2 {
-      width: 220px;
-      height: 220px;
-      bottom: 80px;
-      left: -80px;
+      width: 200px;
+      height: 200px;
+      bottom: 60px;
+      left: -60px;
       animation: orbFloat 10s ease-in-out infinite reverse;
     }
     .orb-3 {
-      width: 180px;
-      height: 180px;
-      bottom: -30px;
-      right: 40px;
+      width: 160px;
+      height: 160px;
+      bottom: -20px;
+      right: 30px;
       animation: orbFloat 7s ease-in-out infinite 2s;
     }
 
     @keyframes orbFloat {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(15px, -20px) scale(1.05); }
-      66% { transform: translate(-10px, 10px) scale(0.95); }
+      33% { transform: translate(12px, -18px) scale(1.05); }
+      66% { transform: translate(-8px, 8px) scale(0.95); }
     }
 
     .content {
@@ -106,7 +173,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 44px 28px 48px;
+      padding: 40px 28px 52px;
     }
 
     .weekday-badge {
@@ -117,9 +184,9 @@
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.25);
       color: white;
-      padding: 8px 18px;
+      padding: 7px 16px;
       border-radius: 50px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       letter-spacing: 1px;
       width: fit-content;
@@ -133,15 +200,15 @@
     }
 
     .weekday-badge .emoji {
-      font-size: 15px;
+      font-size: 14px;
     }
 
-    /* 中间区域 - 文案 */
     .main-area {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      padding-left: 70px;
       animation: fadeUp 1s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       opacity: 0;
     }
@@ -153,10 +220,10 @@
 
     .main-quote {
       font-family: "Noto Serif SC", serif;
-      font-size: clamp(22px, 6.5vw, 30px);
+      font-size: clamp(21px, 6vw, 28px);
       font-weight: 700;
       color: white;
-      line-height: 1.65;
+      line-height: 1.7;
       text-shadow: 0 4px 30px rgba(0,0,0,0.25);
     }
 
@@ -168,29 +235,29 @@
     }
 
     .main-quote .big {
-      font-size: clamp(34px, 10vw, 44px);
+      font-size: clamp(32px, 9vw, 42px);
       display: block;
-      margin: 8px 0;
+      margin: 6px 0;
     }
 
     .divider {
-      width: 44px;
+      width: 40px;
       height: 3px;
-      background: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.55);
       border-radius: 2px;
-      margin: 22px 0 18px;
+      margin: 20px 0 16px;
       animation: expandIn 0.8s 0.8s both;
     }
 
     @keyframes expandIn {
       0% { width: 0; opacity: 0; }
-      100% { width: 44px; opacity: 1; }
+      100% { width: 40px; opacity: 1; }
     }
 
     .emoji-row {
       display: flex;
-      gap: 12px;
-      font-size: 26px;
+      gap: 10px;
+      font-size: 24px;
     }
 
     .emoji-row span {
@@ -209,11 +276,11 @@
     }
 
     .sub-quote {
-      font-size: clamp(14px, 4vw, 16px);
-      color: rgba(255,255,255,0.92);
+      font-size: clamp(13px, 3.8vw, 15px);
+      color: rgba(255,255,255,0.9);
       font-weight: 400;
       line-height: 1.7;
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
     /* 第二部分：导出按钮区 */
@@ -259,7 +326,6 @@
       font-size: 20px;
     }
 
-    /* 提示toast */
     .toast {
       position: fixed;
       top: 50%;
@@ -283,12 +349,28 @@
   </style>
 </head>
 <body>
-  <!-- 第一部分：手机竖屏预览 -->
   <div class="preview-wrapper">
     <div class="phone-frame">
       <div class="card" id="card">
         <div class="bg" id="bg">
-          <div class="date-bg" id="date-bg"></div>
+          <!-- 装饰元素 -->
+          <div class="date-decor">
+            <div class="date-num" id="date-num"></div>
+            <div class="date-line"></div>
+          </div>
+          <div class="deco-lines">
+            <div class="deco-line"></div>
+            <div class="deco-line"></div>
+            <div class="deco-line"></div>
+            <div class="deco-line"></div>
+          </div>
+          <div class="deco-dots">
+            <div class="deco-dot"></div>
+            <div class="deco-dot"></div>
+            <div class="deco-dot"></div>
+          </div>
+          <div class="deco-square"></div>
+          <!-- 光圈 -->
           <div class="orb orb-1"></div>
           <div class="orb orb-2"></div>
           <div class="orb orb-3"></div>
@@ -308,7 +390,6 @@
     </div>
   </div>
 
-  <!-- 第二部分：导出按钮 -->
   <div class="export-section">
     <button class="export-btn" id="exportBtn">
       <span class="icon">📸</span>
@@ -320,7 +401,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    // ============ 每日数据配置 ============
     const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
     const THEMES = {
@@ -331,9 +411,9 @@
         badge: '🌟', badgeText: '元气周一',
         emojis: ['💪', '🔥', '⚡', '✨', '🌟'],
         quotes: [
-          { main: '这周只有<big>5天</big>了<br>今天过完就<big>剩4天</big>，冲！', sub: '每一天都是新的开始，坚持下去，胜利就在眼前' },
-          { main: '<big>周一</big>到！<br>困难都是<big>纸老虎</big>，一个一个消灭它！', sub: '别人可以，你也可以。加油，我们都在！' },
-          { main: '<big>新的一周</big>满血复活！<br>今天也要<big>全力以赴</>！', sub: '不逼自己一把，永远不知道自己能多优秀' }
+          { main: '这周只有<b>5天</b>了<br>今天过完就<b>剩4天</b>，冲！', sub: '每一天都是新的开始，坚持下去，胜利就在眼前' },
+          { main: '<b>周一</b>到！<br>困难都是<b>纸老虎</b>！', sub: '别人可以，你也可以。加油，我们都在！' },
+          { main: '<b>新的一周</b>满血复活！<br>今天也要<b>全力以赴</>！', sub: '不逼自己一把，永远不知道自己能多优秀' }
         ]
       },
       2: {
@@ -343,9 +423,9 @@
         badge: '🔥', badgeText: '加油周二',
         emojis: ['💪', '🎯', '📈', '🚀', '💎'],
         quotes: [
-          { main: '周二的你<big>最努力</big><br>离周末还有<big>3天</>，稳！', sub: '路虽远行则将至，事虽难做则必成' },
-          { main: '坚持住！<big>周二</>正在流逝<br><big>周三</>马上到来！', sub: '不要假装努力，结果不会陪你演戏' },
-          { main: '<big>第二天</>状态拉满！<br>今天效率<big>翻倍</>！', sub: '专注当下，每一步都是在靠近目标' }
+          { main: '周二的你<b>最努力</b><br>离周末还有<b>3天</>，稳！', sub: '路虽远行则将至，事虽难做则必成' },
+          { main: '坚持住！<b>周二</>正在流逝<br><b>周三</>马上到来！', sub: '不要假装努力，结果不会陪你演戏' },
+          { main: '<b>第二天</>状态拉满！<br>今天效率<b>翻倍</>！', sub: '专注当下，每一步都是在靠近目标' }
         ]
       },
       3: {
@@ -355,9 +435,9 @@
         badge: '⚡', badgeText: '突破周三',
         emojis: ['⚡', '💥', '🔥', '🌈', '💫'],
         quotes: [
-          { main: '周三分水岭！<big>过了一半</><br>胜利在向你<big>招手</>！', sub: '最困难的时候，往往是转折的开始' },
-          { main: '<big>周三</>不努力，周末徒伤悲<br>现在就是<big>巅峰</>！', sub: '熬过最难的日子，就会看见不一样的风景' },
-          { main: '今天要<big>超神</>！<br>把困难踩在脚下，<big>大步向前</>！', sub: '不是因为有希望才坚持，是坚持了才有希望' }
+          { main: '周三分水岭！<b>过了一半</><br>胜利在向你<b>招手</>！', sub: '最困难的时候，往往是转折的开始' },
+          { main: '<b>周三</>不努力，周末徒伤悲<br>现在就是<b>巅峰</>！', sub: '熬过最难的日子，就会看见不一样的风景' },
+          { main: '今天要<b>超神</>！<br>把困难踩在脚下，<b>大步向前</>！', sub: '不是因为有希望才坚持，是坚持了才有希望' }
         ]
       },
       4: {
@@ -367,9 +447,9 @@
         badge: '🚀', badgeText: '冲刺周四',
         emojis: ['🚀', '🎯', '💪', '🔥', '⭐'],
         quotes: [
-          { main: '周四啦！<big>最后一天</>上班<br>明天就是<big>周五</>！', sub: '咬紧牙关，再坚持一下，曙光就在前方' },
-          { main: '<big>疯狂星期四</>疯狂冲刺！<br><big>V我效率</>！', sub: '每一天的付出，都在为周末的自由铺路' },
-          { main: '胜利在<big>望</>！<br>就差<big>一步</>，冲到就是胜利！', sub: '不是因为看到希望才努力，是努力了才看到希望' }
+          { main: '周四啦！<b>最后一天</>上班<br>明天就是<b>周五</>！', sub: '咬紧牙关，再坚持一下，曙光就在前方' },
+          { main: '<b>疯狂星期四</>疯狂冲刺！<br><b>V我效率</>！', sub: '每一天的付出，都在为周末的自由铺路' },
+          { main: '胜利在<b>望</>！<br>就差<b>一步</>，冲到就是胜利！', sub: '不是因为看到希望才努力，是努力了才看到希望' }
         ]
       },
       5: {
@@ -379,9 +459,9 @@
         badge: '🎉', badgeText: '解放周五',
         emojis: ['🎉', '🥳', '🎊', '🍾', '🎈'],
         quotes: [
-          { main: '<big>周五</>到！<big>一周</>辛苦<br>换来做五休二的<big>幸福</>！', sub: '辛苦了一周，你值得所有的欢呼和放松' },
-          { main: '冲鸭！<big>最后一天</><br>完美收官<big>就在今天</>！', sub: '周末是用来回血的，好好休息也是战斗力' },
-          { main: '<big>周五</>心情最好！<br>把本周<big>收尾</>，下周<big>再战</>！', sub: '完成比完美更重要，先完成再完美' }
+          { main: '<b>周五</>到！<b>一周</>辛苦<br>换来做五休二的<b>幸福</>！', sub: '辛苦了一周，你值得所有的欢呼和放松' },
+          { main: '冲鸭！<b>最后一天</><br>完美收官<b>就在今天</>！', sub: '周末是用来回血的，好好休息也是战斗力' },
+          { main: '<b>周五</>心情最好！<br>把本周<b>收尾</>，下周<b>再战</>！', sub: '完成比完美更重要，先完成再完美' }
         ]
       },
       6: {
@@ -391,9 +471,9 @@
         badge: '🌴', badgeText: '休闲周六',
         emojis: ['🌴', '☀️', '🍉', '🎮', '😴'],
         quotes: [
-          { main: '<big>周六</>到！<br>睡到自然醒，只做<big>快乐</>的事！', sub: '工作日努力，周末尽情浪，这就是最好的生活' },
-          { main: '周末模式<big>ON</>！<br>躺平是对一周辛苦的<big>最好奖励</>！', sub: '休息是为了走更远的路，今天只负责开心' },
-          { main: '<big>周六</>的阳光格外甜<br><big>想干嘛</>就干嘛！', sub: '难得的闲暇，就让自己彻底放松一下吧' }
+          { main: '<b>周六</>到！<br>睡到自然醒，只做<b>快乐</>的事！', sub: '工作日努力，周末尽情浪，这就是最好的生活' },
+          { main: '周末模式<b>ON</>！<br>躺平是对一周辛苦的<b>最好奖励</>！', sub: '休息是为了走更远的路，今天只负责开心' },
+          { main: '<b>周六</>的阳光格外甜<br><b>想干嘛</>就干嘛！', sub: '难得的闲暇，就让自己彻底放松一下吧' }
         ]
       },
       0: {
@@ -403,209 +483,244 @@
         badge: '📖', badgeText: '充周日',
         emojis: ['📖', '🎯', '💭', '🌙', '✨'],
         quotes: [
-          { main: '周日夜晚，<big>收心</>一下<br>明天<big>继续战斗</>！', sub: '好好休息，调整状态，新的一周会更精彩' },
-          { main: '<big>周日</>余额不足<br>但<big>心态</>要满格！', sub: '用最好的状态迎接明天，相信自己一定行' },
-          { main: '今天好好<big>充电</><br>明天满血<big>复活</>！', sub: '周末的每一点放松，都是为了下周的全力以赴' }
+          { main: '周日夜晚，<b>收心</>一下<br>明天<b>继续战斗</>！', sub: '好好休息，调整状态，新的一周会更精彩' },
+          { main: '<b>周日</>余额不足<br>但<b>心态</>要满格！', sub: '用最好的状态迎接明天，相信自己一定行' },
+          { main: '今天好好<b>充电</><br>明天满血<b>复活</>！', sub: '周末的每一点放松，都是为了下周的全力以赴' }
         ]
       }
     };
 
-    // ============ 全局数据 ============
     let currentDay = 0;
     let currentTheme = null;
     let currentQuote = null;
 
-    // ============ 渲染逻辑 ============
     function init() {
       const now = new Date();
       currentDay = now.getDay();
       const date = now.getDate();
       currentTheme = THEMES[currentDay];
 
-      // 设置背景
       const bg = document.getElementById('bg');
       bg.style.background = currentTheme.gradient;
 
-      // 设置日期背景数字
-      document.getElementById('date-bg').textContent = date;
+      document.getElementById('date-num').textContent = date;
 
-      // 设置光圈颜色
       document.querySelector('.orb-1').style.background = currentTheme.orb1;
       document.querySelector('.orb-2').style.background = currentTheme.orb2;
       document.querySelector('.orb-3').style.background = currentTheme.orb3;
 
-      // 设置高亮渐变色
       document.documentElement.style.setProperty('--highlight-from', currentTheme.highlightFrom);
       document.documentElement.style.setProperty('--highlight-to', currentTheme.highlightTo);
 
-      // 设置星期标签
       const badge = document.getElementById('weekday-badge');
       badge.innerHTML = `<span class="emoji">${currentTheme.badge}</span> ${currentTheme.badgeText}`;
 
-      // 随机选一条文案
       currentQuote = currentTheme.quotes[Math.floor(Math.random() * currentTheme.quotes.length)];
 
-      // 渲染主文案
       const mainQuote = document.getElementById('main-quote');
-      mainQuote.innerHTML = currentQuote.main.replace(/<big>(.*?)<\/big>/g, '<span class="highlight">$1</span>');
+      mainQuote.innerHTML = currentQuote.main.replace(/<b>(.*?)<\/b>/g, '<span class="highlight">$1</span>');
 
-      // 渲染emoji
       const emojiRow = document.getElementById('emoji-row');
       emojiRow.innerHTML = currentTheme.emojis.map(e => `<span>${e}</span>`).join('');
 
-      // 渲染底部文案
       document.getElementById('sub-quote').textContent = currentQuote.sub;
     }
 
     init();
 
-    // ============ 导出高清图片功能 ============
     document.getElementById('exportBtn').addEventListener('click', exportImage);
+
+    // 清理HTML标签，保留纯文本
+    function stripHtml(html) {
+      return html.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+    }
+
+    // 解析带格式的文案，返回纯文本行和 highlight 信息
+    function parseQuoteText(html) {
+      // 先把<br>换成换行符
+      const withNewlines = html.replace(/<br\s*\/?>/gi, '\n');
+      const lines = withNewlines.split('\n');
+      return lines.map(line => {
+        const parts = [];
+        let lastIndex = 0;
+        const regex = /<b>(.*?)<\/b>/g;
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+          if (match.index > lastIndex) {
+            parts.push({ text: line.slice(lastIndex, match.index), highlight: false });
+          }
+          parts.push({ text: match[1], highlight: true });
+          lastIndex = regex.lastIndex;
+        }
+        if (lastIndex < line.length) {
+          parts.push({ text: line.slice(lastIndex), highlight: false });
+        }
+        return parts.length > 0 ? parts : [{ text: line, highlight: false }];
+      });
+    }
 
     function exportImage() {
       const toast = document.getElementById('toast');
       toast.textContent = '正在生成高清图片...';
       toast.classList.add('show');
 
-      const originalCard = document.getElementById('card');
-      const originalWidth = originalCard.offsetWidth;
-      const originalHeight = originalCard.offsetHeight;
-      const scale = 1080 / originalWidth;
-
-      // 创建离屏canvas
       const canvas = document.createElement('canvas');
       canvas.width = 1080;
       canvas.height = 1920;
       const ctx = canvas.getContext('2d');
+      const theme = currentTheme;
+      const now = new Date();
+      const date = now.getDate();
 
       // 绘制渐变背景
-      const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
-      const theme = currentTheme;
-      const orbColors = [theme.orb1, theme.orb2, theme.orb3];
-
-      // 解析渐变色
-      const gradientParts = theme.gradient.match(/linear-gradient\(.*?\)/g);
-      if (gradientParts) {
-        const gradStr = gradientParts[0];
-        const colorStops = gradStr.match(/#[a-fA-F0-9]{6}/g) || [];
-        if (colorStops.length >= 2) {
-          const grad = ctx.createLinearGradient(0, 0, 0, 1920);
-          colorStops.forEach((color, i) => {
-            grad.addColorStop(i / (colorStops.length - 1), color);
-          });
-          ctx.fillStyle = grad;
-        } else {
-          ctx.fillStyle = '#667eea';
-        }
-      } else {
-        ctx.fillStyle = '#667eea';
-      }
+      const grad = ctx.createLinearGradient(0, 0, 0, 1920);
+      const colors = theme.gradient.match(/#[a-fA-F0-9]{6}/g) || ['#667eea', '#764ba2'];
+      colors.forEach((c, i) => {
+        grad.addColorStop(i / (colors.length - 1), c);
+      });
+      ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 1080, 1920);
 
       // 绘制光圈
       const orbData = [
-        { x: 1080 - 60, y: -80, size: 280 },
-        { x: -80, y: 1920 * 0.6, size: 220 },
-        { x: 1080 * 0.7, y: 1920 - 30, size: 180 }
+        { x: 1080 - 70, y: -90, size: 260 },
+        { x: -60, y: 1920 * 0.6, size: 200 },
+        { x: 1080 * 0.7, y: 1920 - 20, size: 160 }
       ];
-
+      const orbColors = [theme.orb1, theme.orb2, theme.orb3];
       orbData.forEach((orb, i) => {
-        const grd = ctx.createRadialGradient(
-          orb.x, orb.y, 0,
-          orb.x, orb.y, orb.size
-        );
+        const grd = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.size);
         grd.addColorStop(0, orbColors[i]);
         grd.addColorStop(1, 'transparent');
+        ctx.globalAlpha = 0.55;
         ctx.fillStyle = grd;
-        ctx.globalAlpha = 0.6;
         ctx.fillRect(0, 0, 1080, 1920);
       });
       ctx.globalAlpha = 1;
 
-      // 绘制日期背景数字
-      const now = new Date();
-      ctx.font = `900 ${140 * scale}px "Noto Serif SC", serif`;
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText(now.getDate(), 540, 1920 * 0.08);
-
-      // 绘制星期标签
-      ctx.font = `500 ${13 * scale}px "Noto Sans SC", sans-serif`;
-      const badgeText = `${theme.badge} ${theme.badgeText}`;
-      const badgeWidth = 120 * scale;
-      const badgeHeight = 32 * scale;
-      const badgeX = (1080 - badgeWidth) / 2;
-      const badgeY = 44 * scale;
-
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      roundRect(ctx, badgeX, badgeY, badgeWidth, badgeHeight, badgeHeight / 2);
-      ctx.fill();
-
-      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-      ctx.lineWidth = 1;
-      roundRect(ctx, badgeX, badgeY, badgeWidth, badgeHeight, badgeHeight / 2);
+      // 绘制装饰方块
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      roundRect(ctx, 1080 - 55, 60, 40, 40, 8);
       ctx.stroke();
 
+      // 绘制右侧装饰线条
+      const lineX = 1080 - 35;
+      const lineYs = [1920 * 0.35, 1920 * 0.35 + 16, 1920 * 0.35 + 32, 1920 * 0.35 + 48];
+      const lineWidths = [40, 25, 50, 18];
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      lineYs.forEach((y, i) => {
+        ctx.fillRect(lineX, y, lineWidths[i], 2);
+      });
+
+      // 绘制底部装饰圆点
+      const dotX = 30;
+      const dotY = 1920 - 100;
+      const dotSizes = [6, 6, 6];
+      const dotOpacities = [0.25, 0.4, 0.55];
+      dotSizes.forEach((size, i) => {
+        ctx.beginPath();
+        ctx.arc(dotX + i * 18, dotY, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${dotOpacities[i]})`;
+        ctx.fill();
+      });
+
+      // 绘制左侧日期装饰（竖排文字）
+      ctx.save();
+      ctx.font = `900 130px "Noto Serif SC", serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // 竖排文字效果
+      ctx.translate(40, 1920 / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(date, 0, 0);
+      ctx.restore();
+
+      // 绘制左侧日期下划线
+      const lineGrad = ctx.createLinearGradient(40, 1920 / 2 + 80, 40, 1920 / 2 + 140);
+      lineGrad.addColorStop(0, 'rgba(255,255,255,0.3)');
+      lineGrad.addColorStop(1, 'transparent');
+      ctx.strokeStyle = lineGrad;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(40, 1920 / 2 + 80);
+      ctx.lineTo(40, 1920 / 2 + 140);
+      ctx.stroke();
+
+      // 绘制星期标签
+      const badgeText = `${theme.badge} ${theme.badgeText}`;
+      const badgeW = 130;
+      const badgeH = 34;
+      const badgeX = (1080 - badgeW) / 2;
+      const badgeY = 40;
+
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath();
+      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeH / 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeH / 2);
+      ctx.stroke();
+
+      ctx.font = `500 12px "Noto Sans SC", sans-serif`;
       ctx.fillStyle = 'white';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(badgeText, 540, badgeY + badgeHeight / 2);
+      ctx.fillText(badgeText, 540, badgeY + badgeH / 2);
 
       // 绘制主文案
+      const quoteLines = parseQuoteText(currentQuote.main);
+      const mainStartY = 1920 * 0.38;
+      const lineH = 58;
+
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
-      const mainY = 1920 * 0.38;
-      const mainLines = currentQuote.main.split('<br>');
-      let lineY = mainY;
-      const lineHeight = 1.65 * 30 * scale;
 
-      mainLines.forEach(line => {
-        // 检测是否有高亮
-        const parts = line.split(/<big>(.*?)<\/big>/);
-        let x = 1080 * 0.1;
-        
-        parts.forEach((part, i) => {
-          if (i % 2 === 1) {
-            // 高亮文字
-            ctx.font = `700 ${30 * scale}px "Noto Serif SC", serif`;
-            const grad = ctx.createLinearGradient(x, lineY, x + 100, lineY);
+      quoteLines.forEach((parts, lineIdx) => {
+        let x = 540 - 150;
+        const y = mainStartY + lineIdx * lineH;
+
+        parts.forEach(part => {
+          ctx.font = `700 28px "Noto Serif SC", serif`;
+          if (part.highlight) {
+            const grad = ctx.createLinearGradient(x, y, x + 200, y);
             grad.addColorStop(0, theme.highlightFrom);
             grad.addColorStop(1, theme.highlightTo);
             ctx.fillStyle = grad;
-            const metrics = ctx.measureText(part);
-            ctx.fillText(part, x, lineY);
-            x += metrics.width;
           } else {
-            // 普通文字
-            ctx.font = `700 ${30 * scale}px "Noto Serif SC", serif`;
             ctx.fillStyle = 'white';
-            ctx.fillText(part, x, lineY);
-            x += ctx.measureText(part).width;
           }
+          ctx.fillText(part.text, x, y);
+          x += ctx.measureText(part.text).width;
         });
-        lineY += lineHeight;
       });
 
       // 绘制分割线
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillRect(1080 * 0.1, lineY + 22 * scale, 44 * scale, 3 * scale);
+      const dividerY = mainStartY + quoteLines.length * lineH + 20;
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.fillRect(540 - 150, dividerY, 40, 3);
 
       // 绘制emoji
-      lineY += 60 * scale;
-      ctx.font = `${26 * scale}px sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      const emojis = theme.emojis.join('  ');
-      ctx.fillText(emojis, 1080 * 0.1, lineY);
+      const emojiY = dividerY + 35;
+      ctx.font = '24px sans-serif';
+      ctx.fillStyle = 'white';
+      ctx.fillText(theme.emojis.join('  '), 540 - 150, emojiY);
 
       // 绘制底部文案
-      lineY += 50 * scale;
-      ctx.font = `400 ${16 * scale}px "Noto Sans SC", sans-serif`;
-      ctx.fillStyle = 'rgba(255,255,255,0.92)';
-      ctx.fillText(currentQuote.sub, 1080 * 0.1, lineY);
+      const subY = emojiY + 45;
+      ctx.font = `400 15px "Noto Sans SC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      // 底部文案自动换行
+      const subLines = wrapText(ctx, currentQuote.sub, 540 - 150, subY, 540 + 150, 26);
+      subLines.forEach((line, i) => {
+        ctx.fillText(line.text, line.x, line.y);
+      });
 
-      // 下载图片
+      // 下载
       canvas.toBlob(function(blob) {
         if (blob) {
           const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
@@ -630,19 +745,41 @@
       }, 'image/png', 1.0);
     }
 
-    // 圆角矩形辅助函数
-    function roundRect(ctx, x, y, width, height, radius) {
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + width - radius, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-      ctx.lineTo(x + width, y + height - radius);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-      ctx.lineTo(x + radius, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
       ctx.closePath();
+    }
+
+    // 文字换行辅助
+    function wrapText(ctx, text, x, startY, maxX, lineHeight) {
+      const lines = [];
+      let current = '';
+      const words = text.split('');
+      let y = startY;
+      const maxWidth = maxX - x;
+
+      words.forEach(char => {
+        const test = current + char;
+        if (ctx.measureText(test).width > maxWidth && current.length > 0) {
+          lines.push({ text: current, x, y });
+          current = char;
+          y += lineHeight;
+        } else {
+          current = test;
+        }
+      });
+      if (current) {
+        lines.push({ text: current, x, y });
+      }
+      return lines;
     }
   </script>
 </body>
