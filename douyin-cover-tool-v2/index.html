@@ -13,7 +13,9 @@ header .v{background:#111;color:#fff;font-size:11px;padding:3px 9px;border-radiu
 header span{color:#8a9099;font-size:12px}
 header a{color:#3b6ef6;text-decoration:none;font-size:12px;border:1px solid #dcdfe4;padding:4px 10px;border-radius:999px}
 header a:hover{border-color:#3b6ef6}
-.wrap{max-width:1340px;margin:0 auto;padding:16px;display:grid;grid-template-columns:340px 1fr;gap:16px}
+.wrap{max-width:1340px;margin:0 auto;padding:16px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px}
+.wrap>div{min-width:0}
+.card{min-width:0;overflow:hidden}
 .card{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:15px;margin-bottom:14px}
 .card h2{font-size:12px;color:#8a9099;margin:0 0 10px;font-weight:700;letter-spacing:.6px}
 label{display:block;margin-bottom:11px;font-size:13px;color:#555}
@@ -26,22 +28,25 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
 .drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
 .drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
-.tpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
-.t{border:2px solid #e6e8eb;border-radius:10px;overflow:hidden;cursor:pointer;background:#fff;position:relative}
+.tpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;min-width:0}
+.tpl .t{min-width:0}
+.t{border:2px solid #e6e8eb;border-radius:10px;overflow:hidden;cursor:pointer;background:#fff;position:relative;min-width:0}
+.t canvas{max-width:100%}
 .t.on{border-color:#111;box-shadow:0 4px 14px rgba(0,0,0,.13)}
 .t canvas{width:100%;display:block}
 .t .n{padding:6px 9px;font-size:12px;color:#555;display:flex;justify-content:space-between;align-items:center}
 .t.on .n{color:#111;font-weight:700}
 .rec{position:absolute;top:6px;left:6px;background:#111;color:#fff;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700}
 .stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
-.pv{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:12px}
+.stage>*{min-width:0}
+.pv{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:12px;min-width:0}
 .pv h4{margin:0 0 9px;font-size:11px;color:#8a9099;font-weight:700}
 .pv canvas{display:block;border-radius:6px}
-.pv .main canvas{width:300px;box-shadow:0 6px 20px rgba(0,0,0,.09)}
-.pv .mini canvas{width:132px;box-shadow:0 3px 10px rgba(0,0,0,.09)}
-.pv .mini{text-align:center}
-.pv .mini .cap{font-size:11px;color:#8a9099;margin-top:6px}
-.pv .v9 canvas{width:150px;box-shadow:0 3px 10px rgba(0,0,0,.09)}
+.pv.main canvas{width:300px;max-width:100%;box-shadow:0 6px 20px rgba(0,0,0,.09)}
+.pv.mini canvas{width:132px;max-width:100%;box-shadow:0 3px 10px rgba(0,0,0,.09)}
+.pv.mini{text-align:center;min-width:0}
+.pv.mini .cap{font-size:11px;color:#8a9099;margin-top:6px}
+.pv.v9 canvas{width:150px;max-width:100%;box-shadow:0 3px 10px rgba(0,0,0,.09)}
 .btns{display:flex;flex-direction:column;gap:9px;min-width:200px}
 button.big{background:#111;color:#fff;border:none;border-radius:9px;padding:13px 15px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 button.big:hover{background:#000}
@@ -68,8 +73,12 @@ button.ghost b{float:right;color:#111}
 @media(max-width:900px){
   html,body{max-width:100%;overflow-x:hidden}
   #mtop{display:flex}
+  #mbar{display:flex}
   header{display:none}
-  .wrap{padding-top:56px}
+  .wrap{padding:56px 10px 78px;max-width:100%}
+  /* 移动端折叠「预览与导出」里的三个大预览，只留主预览 */
+  .pv.mini,.pv.v9{display:none}
+  .pv.main canvas{width:min(52vw,230px)}
   .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:10px 10px 74px;gap:10px}
   body{padding-bottom:0}
   body{font-size:15px}
@@ -788,33 +797,12 @@ refresh();
 </div>
 <div id="mbar">
   <button id="mExport">导出封面 1080×1440</button>
-  <button id="mTgl">编辑内容</button>
 </div>
 <script>
-/* 移动端底部固定条 */
+/* 移动端：单列滚动 + 顶部实时预览条 + 底部吸底导出 */
 (function(){
   var bar=document.getElementById('mbar');
-  var mExport=document.getElementById('mExport'),mTgl=document.getElementById('mTgl');
-  var cards=document.querySelectorAll('.wrap > div');
-  var editCol=cards[0], viewCol=cards[1];
-  var isMobile=function(){return window.innerWidth<=900;};
-  var editing=true;
-  function apply(){
-    if(!isMobile()){
-      bar.style.display='none';
-      editCol.style.display='';viewCol.style.display='';
-      return;
-    }
-    bar.style.display='flex';
-    editing=!editing;
-    editCol.style.display=editing?'':'none';
-    viewCol.style.display=editing?'none':'';
-    mTgl.textContent=editing?'看预览 →':'← 编辑内容';
-    if(!editing) window.scrollTo({top:0,behavior:'smooth'});
-  }
-  mTgl.onclick=apply;
-  mExport.onclick=function(){exportCanvas(CW,CH,'image/png','cover-1080x1440.png');};
-  /* 顶部实时预览条 */
+  var mExport=document.getElementById('mExport');
   var mtp=document.querySelector('#mtop .mtp');
   var mtName=document.getElementById('mtName'), mtCol=document.getElementById('mtCol');
   var mtBtn=document.getElementById('mtBtn');
@@ -826,19 +814,17 @@ refresh();
     cx.clearRect(0,0,1080,1440);
     cx.drawImage(src,0,0);
     var L=LAYOUTS.find(function(x){return x.id===state.layout;});
-    mtName.textContent=(L?L.id+' '+L.name:'')+' · '+document.getElementById('pv').width+'×1440';
+    mtName.textContent=(L?L.id+' '+L.name:'')+' · 1080×1440';
     mtCol.textContent=COLLECTIONS[state.col].icon+' '+COLLECTIONS[state.col].name+' — '+D().title;
   }
   var _refresh=refresh;
   refresh=function(){_refresh();syncTop();};
-  mtBtn.onclick=function(){ editing=false; apply(); };
-  setTimeout(syncTop,120);
-  setTimeout(syncTop,700);
-  window.addEventListener('resize',function(){
-    if(!isMobile()){bar.style.display='none';editCol.style.display='';viewCol.style.display='';}
-  });
-  /* 首次进入手机：显示预览 */
-  if(isMobile()){ editing=true; apply(); }
+  mExport.onclick=function(){exportCanvas(CW,CH,'image/png','cover-'+COLLECTIONS[state.col].id+'-'+state.layout+'-1080x1440.png');};
+  mtBtn.onclick=function(){
+    document.getElementById('pv').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  setTimeout(syncTop,100);
+  setTimeout(syncTop,800);
 })();
 </script>
 </body>
