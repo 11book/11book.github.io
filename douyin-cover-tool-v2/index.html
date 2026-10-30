@@ -53,7 +53,64 @@ button.ghost b{float:right;color:#111}
 .hook{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .hook button{font-size:11px;padding:4px 9px;border:1px solid #dcdfe4;background:#fff;border-radius:999px;cursor:pointer;font-family:inherit}
 .hook button:hover{border-color:#111}
-@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+/* ============ 移动端适配 ============ */
+#mtop{display:none;position:fixed;left:0;right:0;top:0;z-index:21;align-items:center;gap:10px;padding:7px 10px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e6e8eb}
+#mtop .mtp{width:44px;height:59px;border-radius:5px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.16);flex:0 0 auto;background:#eee}
+#mtop .mtp canvas{width:100%;height:100%;display:block}
+#mtop .mti{flex:1;min-width:0}
+#mtop .mti b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mtop .mti span{display:block;font-size:11px;color:#8a9099;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mtop button{border:1px solid #dcdfe4;background:#fff;border-radius:8px;font-family:inherit;font-size:12px;padding:7px 11px;cursor:pointer;flex:0 0 auto}
+#mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #e6e8eb}
+#mbar button{border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;padding:12px 14px;cursor:pointer}
+#mExport{background:#111;color:#fff;flex:1}
+#mTgl{background:#fff;color:#111;border:1px solid #dcdfe4!important;flex:0 0 auto}
+@media(max-width:900px){
+  html,body{max-width:100%;overflow-x:hidden}
+  #mtop{display:flex}
+  header{display:none}
+  .wrap{padding-top:56px}
+  .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:10px 10px 74px;gap:10px}
+  body{padding-bottom:0}
+  body{font-size:15px}
+  header{padding:8px 12px;gap:8px}
+  header h1{font-size:15px}
+  header .v{font-size:10px;padding:2px 7px}
+  header span{display:none}
+  header a{margin-left:auto;font-size:11px;padding:3px 8px}
+  .card{padding:12px;margin-bottom:10px;border-radius:10px}
+  .card h2{font-size:11px;margin-bottom:9px}
+  /* 输入框 ≥16px 防 iOS 自动放大 */
+  label input{font-size:16px;padding:10px 12px}
+  /* 模板：3 列小卡 */
+  .tpl{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:100%}
+  .tpl .t{min-width:0}
+  .tpl .t .n span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+  .t .n{padding:5px 6px;font-size:11px}
+  .t .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rec{top:4px;left:4px;font-size:9px;padding:1px 5px}
+  /* 预览：主预览吸顶跟随 */
+  .pv.main{position:sticky;top:44px;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
+  .pv.main canvas{width:min(46vw,200px);margin:0 auto}
+  .pv.main h4{margin-bottom:6px;font-size:10px;text-align:center}
+  .pv.main label{margin-top:6px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px}
+  .pv.main label input{width:auto;margin:0}
+  .stage{gap:10px}
+  .pv.mini canvas{width:88px}
+  .pv.v9 canvas{width:96px}
+  .pv.mini,.pv.v9{padding:8px}
+  .pv.mini h4,.pv.v9 h4{font-size:10px}
+  .btns{min-width:100%;flex-direction:row;flex-wrap:wrap;gap:8px}
+  .btns button.big{flex:1 1 100%}
+  .btns button.ghost{flex:1 1 calc(50% - 4px);text-align:center;padding:11px 8px;font-size:12.5px}
+  .btns button.ghost b{float:none;display:block;margin-top:2px}
+  .tips{flex:1 1 100%;font-size:11.5px;line-height:1.75}
+  .hook button{font-size:12px;padding:6px 11px}
+}
+@media(max-width:560px){
+  .tpl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pv.main canvas{width:min(52vw,190px)}
+}
 </style>
 </head>
 <body>
@@ -703,7 +760,7 @@ function exportCanvas(w,h,type,name,id){
   else{ x.save();x.filter='blur(28px) brightness(.72)';x.drawImage(src,-40,200,w+80,w+80);x.restore(); x.drawImage(src,0,(h-CH)/2); }
   c.toBlob(b=>dl(b,name),type||'image/png',0.92);
 }
-document.getElementById('exp34').onclick=()=>exportCanvas(CW,CH,'image/png','cover-1080x1440.png');
+document.getElementById('exp34').onclick=()=>exportCanvas(CW,CH,'image/png','cover-'+COLLECTIONS[state.col].id+'-'+state.layout+'-1080x1440.png');
 document.getElementById('exp916').onclick=()=>exportCanvas(1080,1920,'image/png','cover-1080x1920.png');
 document.getElementById('expjpg').onclick=()=>exportCanvas(CW,CH,'image/jpeg','cover-1080x1440.jpg');
 document.getElementById('exptrio').onclick=()=>{
@@ -722,6 +779,67 @@ Object.keys(COLLECTIONS).forEach(k=>{
   im.src=COLLECTIONS[k].img;
 });
 refresh();
+</script>
+
+<div id="mtop">
+  <div class="mtp"></div>
+  <div class="mti"><b id="mtName">A1 上字下图</b><span id="mtCol">你带娃在玩啥呢？</span></div>
+  <button id="mtBtn">放大看</button>
+</div>
+<div id="mbar">
+  <button id="mExport">导出封面 1080×1440</button>
+  <button id="mTgl">编辑内容</button>
+</div>
+<script>
+/* 移动端底部固定条 */
+(function(){
+  var bar=document.getElementById('mbar');
+  var mExport=document.getElementById('mExport'),mTgl=document.getElementById('mTgl');
+  var cards=document.querySelectorAll('.wrap > div');
+  var editCol=cards[0], viewCol=cards[1];
+  var isMobile=function(){return window.innerWidth<=900;};
+  var editing=true;
+  function apply(){
+    if(!isMobile()){
+      bar.style.display='none';
+      editCol.style.display='';viewCol.style.display='';
+      return;
+    }
+    bar.style.display='flex';
+    editing=!editing;
+    editCol.style.display=editing?'':'none';
+    viewCol.style.display=editing?'none':'';
+    mTgl.textContent=editing?'看预览 →':'← 编辑内容';
+    if(!editing) window.scrollTo({top:0,behavior:'smooth'});
+  }
+  mTgl.onclick=apply;
+  mExport.onclick=function(){exportCanvas(CW,CH,'image/png','cover-1080x1440.png');};
+  /* 顶部实时预览条 */
+  var mtp=document.querySelector('#mtop .mtp');
+  var mtName=document.getElementById('mtName'), mtCol=document.getElementById('mtCol');
+  var mtBtn=document.getElementById('mtBtn');
+  var miniCv=document.createElement('canvas');miniCv.width=1080;miniCv.height=1440;
+  mtp.appendChild(miniCv);
+  function syncTop(){
+    var src=document.getElementById('pv');
+    var cx=miniCv.getContext('2d');
+    cx.clearRect(0,0,1080,1440);
+    cx.drawImage(src,0,0);
+    var L=LAYOUTS.find(function(x){return x.id===state.layout;});
+    mtName.textContent=(L?L.id+' '+L.name:'')+' · '+document.getElementById('pv').width+'×1440';
+    mtCol.textContent=COLLECTIONS[state.col].icon+' '+COLLECTIONS[state.col].name+' — '+D().title;
+  }
+  var _refresh=refresh;
+  refresh=function(){_refresh();syncTop();};
+  mtBtn.onclick=function(){ editing=false; apply(); };
+  setTimeout(syncTop,120);
+  setTimeout(syncTop,700);
+  window.addEventListener('resize',function(){
+    if(!isMobile()){bar.style.display='none';editCol.style.display='';viewCol.style.display='';}
+  });
+  /* 首次进入手机：显示预览 */
+  if(isMobile()){ editing=true; apply(); }
+})();
 </script>
 </body>
 </html>
