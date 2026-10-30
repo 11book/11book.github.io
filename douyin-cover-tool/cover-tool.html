@@ -105,6 +105,8 @@ button.ghost:hover{border-color:#222}
 </div>
 
 <script>
+const W = 1080, H = 1920, SAFE_Y = 240, SAFE_H = 1440;
+
 /* ---------- 合集视觉系统（统一骨架 + 合集差异 token） ---------- */
 const COLLECTIONS = {
   play: {
@@ -404,20 +406,28 @@ const RENDER = {
 
 
 /* ---------------- 状态与交互 ---------------- */
-const state={col:'play',layout:'P1',title:'',sub:'',badge:'',tag:'',img:null,imgKey:null};
-const imgs={};
+const state={col:'play',layout:'P1',title:'',sub:'',badge:'',tag:'',img:null};
+const imgs={};   /* col -> HTMLImageElement */
 function imgOf(id){
   const L=LAYOUTS.find(l=>l.id===id)||LAYOUTS[0];
-  return state.img||imgs[COLLECTIONS[L.col].img];
+  return state.img || imgs[L.col] || null;
+}
+function safeDraw(ctx,id){
+  const img=imgOf(id);
+  if(!img){ ctx.fillStyle='#2a2d33'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#8a9099'; ctx.font=F(700,48); ctx.textAlign='center';
+    ctx.fillText('图片加载中…',W/2,900); ctx.textAlign='left'; return; }
+  try{ RENDER[id](ctx,D(),img); }
+  catch(e){ console.error('render error',id,e);
+    ctx.fillStyle='#3a1f1f'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ffb4b4'; ctx.font=F(700,42); ctx.textAlign='center';
+    ctx.fillText('渲染出错：'+id,W/2,900); ctx.textAlign='left'; }
 }
 function D(){const L=LAYOUTS.find(l=>l.id===state.layout)||LAYOUTS[0];
   const p=PRESETS[state.layout]||{};
   return {col:L.col,layout:state.layout,title:state.title||p.title||'',sub:state.sub||p.sub||'',
     badge:state.badge||p.badge||'',tag:state.tag||p.tag||''};}
-function drawDesign(ctx,id){
-  const L=LAYOUTS.find(l=>l.id===id)||LAYOUTS[0];
-  RENDER[id](ctx,D(),imgOf(id));
-}
+function drawDesign(ctx,id){ safeDraw(ctx,id); }
 function refresh(){
   const c=document.getElementById('pv'),x=c.getContext('2d');
   const t=document.createElement('canvas');t.width=1080;t.height=1920;
@@ -502,14 +512,16 @@ document.getElementById('exptrio').onclick=()=>{
     x.drawImage(t,0,240,1080,1440,i*1080,0,1080,1440);});
   c.toBlob(b=>dl(b,'trio-3240x1440.png'),'image/png');
 };
-/* 启动 */
-let pending=3;
-Object.values(COLLECTIONS).forEach(C=>{
-  const im=new Image();
-  im.onload=im.onerror=()=>{if(--pending===0)start();};
-  im.src=C.img;
-});
+/* 启动：先建界面，再异步加载示例图，加载完刷新 */
 function start(){buildCols();buildTpls();refresh();}
+let pending=Object.keys(COLLECTIONS).length;
+Object.keys(COLLECTIONS).forEach(k=>{
+  const im=new Image();
+  im.onload=()=>{imgs[k]=im;if(--pending===0)refresh();};
+  im.onerror=()=>{imgs[k]=null;if(--pending===0)refresh();};
+  im.src=COLLECTIONS[k].img;
+});
+start();
 </script>
 </body>
 </html>
