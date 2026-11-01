@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>戒酒30天 · 开戒仪式</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#0d0b12;color:#fff;overflow-x:hidden;min-height:100vh}
+#bg{position:fixed;inset:0;z-index:0}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:28px 20px 60px}
+.hero{text-align:center;padding:20px 0 8px}
+.tag{display:inline-block;font-size:11px;letter-spacing:3px;padding:5px 12px;border:1px solid rgba(255,255,255,.25);border-radius:99px;color:#ffcf6b}
+h1{font-size:34px;line-height:1.2;margin:16px 0 6px;font-weight:800;background:linear-gradient(90deg,#ffd76e,#ff8a5b,#ff5f9e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:13px;color:#a49fb5;letter-spacing:1px}
+.big{display:flex;justify-content:center;align-items:baseline;gap:6px;margin:22px 0 6px}
+.big b{font-size:86px;line-height:1;font-weight:800;color:#ffd76e;text-shadow:0 0 30px rgba(255,180,60,.45)}
+.big span{font-size:20px;color:#c9c4d6}
+.stat{margin:26px 0 30px}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ffd76e,#ff5f9e);transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.bar-t{display:flex;justify-content:space-between;font-size:11px;color:#8b869a;margin-top:8px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(8px)}
+.card h3{font-size:13px;color:#ffcf6b;margin-bottom:12px;letter-spacing:1px}
+.item{display:flex;gap:10px;font-size:13px;line-height:1.7;color:#ddd8e6;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.item:last-child{border:0}
+.item b{color:#ffd76e;font-weight:600;flex:0 0 auto}
+.gain{display:flex;gap:10px;flex-wrap:wrap}
+.gain div{flex:1 1 44%;background:rgba(255,255,255,.05);border-radius:14px;padding:14px 12px;text-align:center}
+.gain b{display:block;font-size:24px;color:#7ee7c0}
+.gain span{font-size:11px;color:#8b869a}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:17px;font-size:17px;font-weight:700;color:#2a1206;background:linear-gradient(90deg,#ffd76e,#ff9d5c);box-shadow:0 10px 30px rgba(255,160,60,.28);cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:rgba(255,255,255,.08);color:#ddd8e6;box-shadow:none;font-size:15px;padding:14px}
+.tips{margin-top:12px;font-size:13px;color:#c8c3d2;line-height:1.8}
+.tips li{list-style:none;padding-left:20px;position:relative;margin-bottom:8px}
+.tips li:before{content:"🍶";position:absolute;left:0;font-size:12px}
+#toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);z-index:99;background:rgba(20,16,30,.94);border:1px solid rgba(255,215,110,.4);border-radius:20px;padding:26px 28px;text-align:center;opacity:0;pointer-events:none;transition:.35s;backdrop-filter:blur(10px);max-width:80vw}
+#toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast h4{font-size:22px;color:#ffd76e;margin-bottom:8px}
+#toast p{font-size:13px;color:#cfc9db;line-height:1.7}
+.cup{font-size:64px;animation:cheer .5s}
+@keyframes cheer{0%{transform:scale(.4) rotate(-25deg);opacity:0}60%{transform:scale(1.25) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+.foot{text-align:center;font-size:11px;color:#6f6a7e;margin-top:26px;line-height:1.8}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">NOVEMBER · DAY 1</span>
+    <h1>戒酒 30 天<br>今夜开戒</h1>
+    <div class="sub">滴酒未沾 · 干得漂亮</div>
+  </div>
+
+  <div class="big"><b id="d">30</b><span>天零一滴</span></div>
+  <div class="stat">
+    <div class="bar"><i id="fill"></i></div>
+    <div class="bar-t"><span>11月1日 开戒</span><span id="left">还剩 30 天</span></div>
+  </div>
+
+  <div class="card">
+    <h3>📜 戒酒实录</h3>
+    <div class="item"><b>11/01</b><span>正式开戒。今晚这一杯，是给自己的奖状。</span></div>
+    <div class="item"><b>10月</b><span>整月无酒记录保持完整，纹丝不动。</span></div>
+    <div class="item"><b>荣誉</b><span>被朋友劝了 N 次，摇了 N 次头。</span></div>
+  </div>
+
+  <div class="card">
+    <h3>💰 30天省下的钱</h3>
+    <div class="gain">
+      <div><b id="money">0</b><span>累计节省（元）</span></div>
+      <div><b id="cups">0</b><span>忍住没喝的杯数</span></div>
+      <div><b>30</b><span>清醒的早晨</span></div>
+      <div><b>0</b><span>进医院的次数</span></div>
+    </div>
+  </div>
+
+  <button class="btn" id="go">🍶 开启今晚的庆祝</button>
+  <button class="btn ghost" id="again">再开一瓶（假装）</button>
+
+  <div class="card" style="margin-top:14px">
+    <h3>🥂 今晚的仪式清单</h3>
+    <ul class="tips">
+      <li>先喝一杯温水，让胃打个招呼</li>
+      <li>第一杯慢慢来，别上头，30天别白费</li>
+      <li>配点下酒菜，护住胃黏膜</li>
+      <li>喝到微醺就停，明天继续清醒</li>
+      <li>拍张照发朋友圈，纪念第 30 天的自己</li>
+    </ul>
+  </div>
+
+  <div class="foot">无厘头实验室 · 017<br>戒的不是酒，是那个想要逃避的自己</div>
+</div>
+
+<div id="toast"><div class="cup">🥂</div><h4 id="tt"></h4><p id="tp"></p></div>
+
+<script>
+(function(){
+var D=30;
+document.getElementById('d').textContent=D;
+document.getElementById('left').textContent='圆满达成 100%';
+setTimeout(function(){document.getElementById('fill').style.width='100%'},200);
+document.getElementById('money').textContent=(D*20).toLocaleString();
+document.getElementById('cups').textContent=D*2;
+
+var msg=[
+ ['🍶','开戒大吉！','30天没碰，今晚这一杯，你是主角。'],
+ ['🎉','身体给你鼓掌','它已经准备好掌声了。'],
+ ['💪','自律 30 天','没有一晚是白熬的，敬坚持。'],
+ ['🌙','悠着点','明天还要上班，够了就行。'],
+ ['🥂','敬 30 天前的自己','那个说“就喝一口”的你，今天出关了。']
+];
+var i=0;
+function show(){var m=msg[i%msg.length];i++;document.getElementById('tt').textContent=m[1];document.getElementById('tp').textContent=m[2];document.getElementById('toast').classList.add('on');}
+document.getElementById('go').onclick=function(){show();burst();};
+document.getElementById('again').onclick=function(){show();burst();};
+setTimeout(function(){document.getElementById('toast').classList.remove('on')},2600);
+
+// canvas confetti
+var c=document.getElementById('bg'),x=c.getContext('2d'),W,H,ps=[];
+function rz(){W=c.width=innerWidth;H=c.height=innerHeight;}
+rz();addEventListener('resize',rz);
+var cols=['#ffd76e','#ff8a5b','#ff5f9e','#7ee7c0','#8ab6ff'];
+function burst(){for(var k=0;k<90;k++)ps.push({x:innerWidth/2+(Math.random()-.5)*160,y:innerHeight*.35,vx:(Math.random()-.5)*9,vy:-6-Math.random()*9,g:.32,w:6+Math.random()*7,h:4+Math.random()*6,c:cols[(Math.random()*cols.length)|0],a:1});}
+function loop(){
+ x.clearRect(0,0,W,H);
+ for(var i=ps.length-1;i>=0;i--){var p=ps[i];p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.a-=.006;p.vx*=.995;
+  if(p.a<=0||p.y>H+30){ps.splice(i,1);continue;}
+  x.save();x.globalAlpha=Math.max(p.a,0);x.translate(p.x,p.y);x.rotate(p.x/12);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore();}
+ requestAnimationFrame(loop);
+}
+loop();
+// 背景微光
+function glow(){var g=x.createRadialGradient(W*0.5,H*0.2,0,W*0.5,H*0.2,H*0.8);g.addColorStop(0,'rgba(255,140,60,.10)');g.addColorStop(1,'rgba(13,11,18,0)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+setInterval(glow,50);
+})();
+</script>
+</body>
+</html>
