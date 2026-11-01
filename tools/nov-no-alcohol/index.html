@@ -3,125 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>戒酒0天 · 今晚开戒</title>
+<title>滴酒未沾 · 今夜开戒</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#0d0b12;color:#fff;overflow-x:hidden;min-height:100vh}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:#0d0b12;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #bg{position:fixed;inset:0;z-index:0}
-.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:26px 18px 60px}
-.hero{text-align:center;padding:18px 0 4px}
-.tag{display:inline-block;font-size:11px;letter-spacing:3px;padding:5px 12px;border:1px solid rgba(255,255,255,.25);border-radius:99px;color:#ffcf6b}
-h1{font-size:30px;line-height:1.25;margin:14px 0 6px;font-weight:800;background:linear-gradient(90deg,#ffd76e,#ff8a5b,#ff5f9e);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{font-size:13px;color:#a49fb5;letter-spacing:1px}
-.big{display:flex;justify-content:center;align-items:baseline;gap:6px;margin:24px 0 4px}
-.big b{font-size:78px;line-height:1;font-weight:800;color:#ffd76e;text-shadow:0 0 30px rgba(255,180,60,.45)}
-.big span{font-size:19px;color:#c9c4d6}
-.big em{font-style:normal;font-size:14px;color:#7ee7c0}
-.note{font-size:12px;color:#8b869a;text-align:center;margin-top:6px}
-.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:18px;margin-bottom:14px}
-.card h3{font-size:13px;color:#ffcf6b;margin-bottom:12px;letter-spacing:1px}
-.item{display:flex;gap:10px;font-size:13px;line-height:1.7;color:#ddd8e6;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
-.item:last-child{border:0}
-.item b{color:#ffd76e;font-weight:600;flex:0 0 auto}
-.gain{display:flex;gap:9px;flex-wrap:wrap}
-.gain div{flex:1 1 44%;background:rgba(255,255,255,.05);border-radius:14px;padding:13px 10px;text-align:center}
-.gain b{display:block;font-size:23px;color:#7ee7c0}
-.gain span{font-size:11px;color:#8b869a}
-.btn{display:block;width:100%;border:0;border-radius:16px;padding:17px;font-size:17px;font-weight:700;color:#2a1206;background:linear-gradient(90deg,#ffd76e,#ff9d5c);box-shadow:0 10px 30px rgba(255,160,60,.28);cursor:pointer;font-family:inherit}
+.wrap{position:relative;z-index:2;max-width:420px;margin:0 auto;padding:40px 26px;text-align:center}
+h1{font-size:38px;line-height:1.3;font-weight:800;background:linear-gradient(90deg,#ffd76e,#ff8a5b,#ff5f9e);-webkit-background-clip:text;background-clip:text;color:transparent}
+p{font-size:16px;color:#c9c4d6;margin-top:14px;line-height:1.8}
+.bar{height:6px;border-radius:99px;background:rgba(255,255,255,.1);margin:26px 0 30px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffd76e,#ff5f9e)}
+.cup{font-size:78px;animation:cheer .6s}
+@keyframes cheer{0%{transform:scale(.3) rotate(-30deg);opacity:0}60%{transform:scale(1.2) rotate(12deg)}100%{transform:scale(1)}}
+h2{font-size:22px;color:#ffd76e;margin-top:18px}
+.btn{margin-top:32px;width:100%;border:0;border-radius:16px;padding:16px;font-size:17px;font-weight:700;color:#2a1206;background:linear-gradient(90deg,#ffd76e,#ff9d5c);box-shadow:0 10px 30px rgba(255,160,60,.3);cursor:pointer;font-family:inherit}
 .btn:active{transform:scale(.97)}
-.btn.ghost{background:rgba(255,255,255,.08);color:#ddd8e6;box-shadow:none;font-size:15px;padding:14px}
-.tips{margin-top:4px;font-size:13px;color:#c8c3d2;line-height:1.8}
-.tips li{list-style:none;padding-left:22px;position:relative;margin-bottom:8px}
-.tips li:before{content:"🍶";position:absolute;left:0;font-size:12px}
-#toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);z-index:99;background:rgba(20,16,30,.95);border:1px solid rgba(255,215,110,.4);border-radius:20px;padding:26px 26px;text-align:center;opacity:0;pointer-events:none;transition:.35s;backdrop-filter:blur(10px);max-width:82vw}
-#toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
-#toast h4{font-size:21px;color:#ffd76e;margin:8px 0}
-#toast p{font-size:13px;color:#cfc9db;line-height:1.7}
-.cup{font-size:58px;animation:cheer .5s}
-@keyframes cheer{0%{transform:scale(.4) rotate(-25deg);opacity:0}60%{transform:scale(1.25) rotate(10deg)}100%{transform:scale(1)}}
-.foot{text-align:center;font-size:11px;color:#6f6a7e;margin-top:24px;line-height:1.8}
-.stamp{position:absolute;right:14px;top:14px;border:2px solid rgba(255,95,158,.75);color:#ff5f9e;font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;transform:rotate(-12deg);letter-spacing:2px;opacity:.9}
+.foot{margin-top:26px;font-size:11px;color:#6f6a7e}
 </style>
 </head>
 <body>
 <canvas id="bg"></canvas>
 <div class="wrap">
-  <div class="hero" style="position:relative">
-    <span class="tag">NOVEMBER · DAY 1</span>
-    <h1>11月至今<br>滴酒未沾</h1>
-    <div class="sub">一项了不起的成就</div>
-  </div>
-
-  <div class="big"><b>0</b><span>天</span><em>战绩辉煌</em></div>
-  <div class="note">（从 11 月 1 日 00:00 算起，全长 18 小时，一秒不差）</div>
-
-  <div class="card" style="position:relative;margin-top:20px">
-    <div class="stamp">真·零战绩</div>
-    <h3>📜 戒酒战绩单</h3>
-    <div class="item"><b>11/01</b><span>00:00 正式进入戒酒状态</span></div>
-    <div class="item"><b>11/01</b><span>18:00 仍在坚持（已坚持 18 小时）</span></div>
-    <div class="item"><b>11/01</b><span>18:48 宣告戒酒圆满成功，今晚开戒庆祝</span></div>
-    <div class="item"><b>战绩</b><span>0 场酒局 · 0 次推脱 · 0 位朋友被拒</span></div>
-  </div>
-
-  <div class="card">
-    <h3>💰 戒酒带来的改变</h3>
-    <div class="gain">
-      <div><b>0</b><span>省下的钱（元）</span></div>
-      <div><b>0</b><span>忍住没喝的杯数</span></div>
-      <div><b>1</b><span>清醒的早晨</span></div>
-      <div><b>0</b><span>进医院的次数</span></div>
-    </div>
-  </div>
-
-  <button class="btn" id="go">🍶 今晚必须庆祝一下</button>
-  <button class="btn ghost" id="again">再来一杯（反正已经戒过了）</button>
-
-  <div class="card" style="margin-top:14px">
-    <h3>🥂 开戒理由（十分充分）</h3>
-    <ul class="tips">
-      <li>戒酒期间滴水未沾，值得一杯犒劳</li>
-      <li>今天是 11 月 1 号，戒酒 0 天，历史最长纪录</li>
-      <li>再不打，就没机会了——因为 0 天随时可以破戒</li>
-      <li>不为别的，就为这 18 小时的无上荣耀</li>
-    </ul>
-  </div>
-
-  <div class="foot">无厘头实验室 · 017<br>戒酒时长 0 天，战绩载入史册</div>
+  <div class="cup">🥂</div>
+  <h1>11月至今<br>滴酒未沾</h1>
+  <div class="bar"><i></i></div>
+  <h2>今晚开戒，举杯庆祝！</h2>
+  <p>一杯敬这个清醒的 11 月，一杯敬今晚的放松</p>
+  <button class="btn" id="go">🍶 干杯</button>
+  <div class="foot">无厘头实验室 · 017</div>
 </div>
-
-<div id="toast"><div class="cup">🥂</div><h4 id="tt"></h4><p id="tp"></p></div>
-
 <script>
-(function(){
-var msg=[
- ['🍶','开戒大吉','戒酒 0 天，纪念意义重大，值得干一杯。'],
- ['🏆','历史新纪录','0 天，你就是这项记录的保持者。'],
- ['💪','意志如钢','18 小时，说起来也还行。'],
- ['🥂','敬 0 天','敬那个今天一滴没沾的自己。'],
- ['😂','别太感动','明天还想继续戒，随时可以再来一轮 0 天。']
-];
-var i=0;
-function show(){var m=msg[i%msg.length];i++;document.getElementById('tt').textContent=m[1];document.getElementById('tp').textContent=m[2];document.getElementById('toast').classList.add('on');}
-document.getElementById('go').onclick=function(){show();burst();};
-document.getElementById('again').onclick=function(){show();burst();};
-setTimeout(function(){document.getElementById('toast').classList.remove('on')},2600);
-
 var c=document.getElementById('bg'),x=c.getContext('2d'),W,H,ps=[];
-function rz(){W=c.width=innerWidth;H=c.height=innerHeight;}
-rz();addEventListener('resize',rz);
+function rz(){W=c.width=innerWidth;H=c.height=innerHeight;}rz();addEventListener('resize',rz);
 var cols=['#ffd76e','#ff8a5b','#ff5f9e','#7ee7c0','#8ab6ff'];
-function burst(){for(var k=0;k<90;k++)ps.push({x:innerWidth/2+(Math.random()-.5)*170,y:innerHeight*.35,vx:(Math.random()-.5)*9,vy:-6-Math.random()*9,g:.32,w:6+Math.random()*7,h:4+Math.random()*6,c:cols[(Math.random()*cols.length)|0],a:1});}
-function loop(){
- x.clearRect(0,0,W,H);
- var g=x.createRadialGradient(W*.5,H*.2,0,W*.5,H*.2,H*.85);g.addColorStop(0,'rgba(255,140,60,.10)');g.addColorStop(1,'rgba(13,11,18,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
- for(var i=ps.length-1;i>=0;i--){var p=ps[i];p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.a-=.006;p.vx*=.995;
-  if(p.a<=0||p.y>H+30){ps.splice(i,1);continue;}
-  x.save();x.globalAlpha=Math.max(p.a,0);x.translate(p.x,p.y);x.rotate(p.x/12);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore();}
- requestAnimationFrame(loop);
-}
-loop();
-})();
+function burst(){for(var k=0;k<100;k++)ps.push({x:innerWidth/2+(Math.random()-.5)*180,y:innerHeight*.4,vx:(Math.random()-.5)*9,vy:-6-Math.random()*9,g:.32,w:6+Math.random()*7,h:4+Math.random()*6,c:cols[(Math.random()*cols.length)|0],a:1});}
+document.getElementById('go').onclick=burst;
+function loop(){x.clearRect(0,0,W,H);
+var g=x.createRadialGradient(W*.5,H*.35,0,W*.5,H*.35,H*.8);g.addColorStop(0,'rgba(255,140,60,.12)');g.addColorStop(1,'rgba(13,11,18,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+for(var i=ps.length-1;i>=0;i--){var p=ps[i];p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.a-=.006;p.vx*=.995;
+if(p.a<=0||p.y>H+30){ps.splice(i,1);continue;}
+x.save();x.globalAlpha=Math.max(p.a,0);x.translate(p.x,p.y);x.rotate(p.x/12);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore();}
+requestAnimationFrame(loop);}loop();
 </script>
 </body>
 </html>
