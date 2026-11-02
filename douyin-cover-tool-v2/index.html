@@ -713,7 +713,10 @@ function buildTpls(){
     const d=document.createElement('div');
     d.className='t'+(state.layout===l.id?' on':'');
     const c=document.createElement('canvas');c.width=240;c.height=320;
-    drawDesign(c.getContext('2d'),l.id,false);
+    /* 缩略图：先把坐标系缩放到 240×320，否则按 1080×1440 画会被裁掉 */
+    const cx=c.getContext('2d');
+    cx.setTransform(c.width/CW,0,0,c.height/CH,0,0);
+    drawDesign(cx,l.id,false);
     const n=document.createElement('div');n.className='n';
     n.innerHTML='<span>'+l.id+' '+l.name+'</span>';
     if(rec.includes(l.id)){const r=document.createElement('span');r.className='rec';r.textContent='荐';n.appendChild(r);}
