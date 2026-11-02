@@ -16,6 +16,7 @@ header a:hover{border-color:#3b6ef6}
 .wrap{max-width:1340px;margin:0 auto;padding:16px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px}
 .wrap>div{min-width:0}
 .card{min-width:0;overflow:hidden}
+.card.wide{grid-column:1/-1}
 .card{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:15px;margin-bottom:14px}
 .card h2{font-size:12px;color:#8a9099;margin:0 0 10px;font-weight:700;letter-spacing:.6px}
 label{display:block;margin-bottom:11px;font-size:13px;color:#555}
@@ -28,15 +29,15 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
 .drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
 .drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
-.tpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;min-width:0}
+.tpl{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;min-width:0}
 .tpl .t{min-width:0}
 .t{border:2px solid #e6e8eb;border-radius:10px;overflow:hidden;cursor:pointer;background:#fff;position:relative;min-width:0}
 .t canvas{max-width:100%}
 .t.on{border-color:#111;box-shadow:0 4px 14px rgba(0,0,0,.13)}
 .t canvas{width:100%;display:block}
-.t .n{padding:6px 9px;font-size:12px;color:#555;display:flex;justify-content:space-between;align-items:center}
+.t .n{padding:4px 6px;font-size:11px;color:#555;display:flex;justify-content:space-between;align-items:center;gap:4px;line-height:1.35}
 .t.on .n{color:#111;font-weight:700}
-.rec{position:absolute;top:6px;left:6px;background:#111;color:#fff;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700}
+.rec{background:#111;color:#fff;font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;flex:0 0 auto}
 .stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
 .stage>*{min-width:0}
 .pv{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:12px;min-width:0}
@@ -75,11 +76,11 @@ button.ghost b{float:right;color:#111}
   #mtop{display:flex}
   #mbar{display:flex}
   header{display:none}
-  .wrap{padding:56px 10px 78px;max-width:100%}
+  .wrap{padding:80px 10px 84px;max-width:100%}
   /* 移动端折叠「预览与导出」里的三个大预览，只留主预览 */
   .pv.mini,.pv.v9{display:none}
   .pv.main canvas{width:min(52vw,230px)}
-  .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:10px 10px 74px;gap:10px}
+  .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
   body{padding-bottom:0}
   body{font-size:15px}
   header{padding:8px 12px;gap:8px}
@@ -92,12 +93,11 @@ button.ghost b{float:right;color:#111}
   /* 输入框 ≥16px 防 iOS 自动放大 */
   label input{font-size:16px;padding:10px 12px}
   /* 模板：3 列小卡 */
-  .tpl{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:100%}
+  .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:100%}
   .tpl .t{min-width:0}
   .tpl .t .n span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
   .t .n{padding:5px 6px;font-size:11px}
   .t .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .rec{top:4px;left:4px;font-size:9px;padding:1px 5px}
   /* 预览：主预览吸顶跟随 */
   .pv.main{position:sticky;top:44px;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
   .pv.main canvas{width:min(46vw,200px);margin:0 auto}
@@ -117,7 +117,7 @@ button.ghost b{float:right;color:#111}
   .hook button{font-size:12px;padding:6px 11px}
 }
 @media(max-width:560px){
-  .tpl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
   .pv.main canvas{width:min(52vw,190px)}
 }
 </style>
@@ -129,9 +129,14 @@ button.ghost b{float:right;color:#111}
   <a href="cover-tool.html">← v1 经典版（对比用）</a>
 </header>
 <div class="wrap">
+  <div class="card wide">
+      <h2>① 版式（8 款骨架，任意合集可用；带「荐」的是该合集推荐）</h2>
+      <div class="tpl" id="tpls"></div>
+    </div>
+
   <div>
     <div class="card">
-      <h2>① 标题（最多 3 层文字）</h2>
+      <h2>② 标题（最多 3 层文字）</h2>
       <label>主标题 <span class="hint">建议 3–8 字，手机上一眼能读完</span>
         <input id="title" placeholder="例：纸杯塔能有多高"></label>
       <label>副标题 <span class="hint">主标题的一半大小，只留一句</span>
@@ -143,7 +148,7 @@ button.ghost b{float:right;color:#111}
     </div>
 
     <div class="card">
-      <h2>② 主图</h2>
+      <h2>③ 主图</h2>
       <div class="drop" id="drop">
         <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
         <input type="file" id="file" accept="image/*" hidden>
@@ -151,17 +156,12 @@ button.ghost b{float:right;color:#111}
     </div>
 
     <div class="card">
-      <h2>③ 合集（决定配色与角标）</h2>
+      <h2>④ 合集（决定配色与角标）</h2>
       <div class="chips" id="cols"></div>
     </div>
   </div>
 
   <div>
-    <div class="card">
-      <h2>④ 版式（8 款骨架，任意合集可用；带「荐」的是该合集推荐）</h2>
-      <div class="tpl" id="tpls"></div>
-    </div>
-
     <div class="card">
       <h2>预览与导出</h2>
       <div class="stage">
@@ -466,33 +466,33 @@ const RENDER = {
     ctx.beginPath();ctx.arc(CW-90,190,220,0,7);ctx.fill();
     ctx.globalAlpha=1;
 
-    colPill(ctx,C,0,120,40,'center');
+    colPill(ctx,C,0,118,40,'center');
     /* 主标题居中，占高约 18% */
     const b=titleBlock(ctx,d.title,CW-160,180,92,3);
     const lh=Math.round(b.size*1.14);
-    const yy=520-(b.lines.length-1)*lh;
+    const yy=498-(b.lines.length-1)*lh;
     ctx.font=F(900,b.size);ctx.textAlign='center';ctx.fillStyle=C.ink;
     b.lines.forEach((l,i)=>ctx.fillText(l,CW/2,yy+i*lh));
     ctx.textAlign='left';
-    /* 简洁下划线 */
+    /* 简洁下划线（与标题留出安全间距，不压字） */
     ctx.strokeStyle=C.accent;ctx.lineWidth=14;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(CW/2-140,566);ctx.lineTo(CW/2+140,566);ctx.stroke();
-    text1(ctx,d.sub,CW/2,672,CW-200,54,C.subInk,700,'center');
-    /* 底部两个小标签 */
+    ctx.beginPath();ctx.moveTo(CW/2-140,596);ctx.lineTo(CW/2+140,596);ctx.stroke();
+    text1(ctx,d.sub,CW/2,688,CW-200,54,C.subInk,700,'center');
+    /* 底部两个小标签（与下方圆图留 25px 间距） */
     const chips=[d.tag,d.badge].filter(Boolean);
     let total=0,gaps=20;
     const ws=chips.map(c=>{ctx.font=F(800,42);return ctx.measureText(c).width+68;});
     total=ws.reduce((a,b)=>a+b,0)+gaps*(chips.length-1);
     let x=(CW-total)/2;
-    chips.forEach((c,i)=>{tagPill(ctx,c,x,790,42,C.dark,null,C.primary);x+=ws[i]+gaps;});
-    /* 底部圆图 */
+    chips.forEach((c,i)=>{tagPill(ctx,c,x,752,42,C.dark,null,C.primary);x+=ws[i]+gaps;});
+    /* 底部圆图（顶边 865，不与标签重叠；底边 1265 < 1280 安全线） */
     if(img){
       ctx.save();ctx.shadowBlur=40;ctx.shadowColor='rgba(60,40,20,.20)';
-      ctx.beginPath();ctx.arc(CW/2,1050,230,0,7);ctx.fillStyle='#fff';ctx.fill();
+      ctx.beginPath();ctx.arc(CW/2,1065,200,0,7);ctx.fillStyle='#fff';ctx.fill();
       ctx.restore();
-      ctx.save();ctx.beginPath();ctx.arc(CW/2,1050,230,0,7);ctx.clip();
-      coverDraw(ctx,img,CW/2-230,820,460,460,0);ctx.restore();
-      ctx.strokeStyle=C.primary;ctx.lineWidth=12;ctx.beginPath();ctx.arc(CW/2,1050,236,0,7);ctx.stroke();
+      ctx.save();ctx.beginPath();ctx.arc(CW/2,1065,200,0,7);ctx.clip();
+      coverDraw(ctx,img,CW/2-200,865,400,400,0);ctx.restore();
+      ctx.strokeStyle=C.primary;ctx.lineWidth=12;ctx.beginPath();ctx.arc(CW/2,1065,206,0,7);ctx.stroke();
     }
   },
 
@@ -528,14 +528,15 @@ const RENDER = {
     ctx.fillStyle=pg;ctx.fillRect(0,760,CW,460);
     ctx.restore();
     /* 主标题：白字 + 轻阴影 */
-    drawTitle(ctx,d.title,SAFE.left,920,CW-SAFE.left-SAFE.right,150,'#FFF7EA',
+    drawTitle(ctx,d.title,SAFE.left,880,CW-SAFE.left-SAFE.right,150,'#FFF7EA',
       {min:84,maxLines:2,shadow:'rgba(20,10,4,.75)',shadowBlur:22});
-    text1(ctx,d.sub,SAFE.left,1022,CW-SAFE.left-SAFE.right,54,'#FFF7EA',800);
+    /* 副标题与主标题留 60px，避免上下压字 */
+    text1(ctx,d.sub,SAFE.left,1042,CW-SAFE.left-SAFE.right,54,'#FFF7EA',800);
     /* 底部标签 */
-    ctx.fillStyle=C.primary;rr(ctx,SAFE.left,1064,150,60,30);ctx.fill();
+    ctx.fillStyle=C.primary;rr(ctx,SAFE.left,1092,150,60,30);ctx.fill();
     ctx.fillStyle=C.dark;ctx.font=F(800,36);ctx.textBaseline='middle';
-    ctx.fillText(d.badge||'合集',SAFE.left+75,1095);ctx.textBaseline='alphabetic';
-    if(d.tag)text1(ctx,d.tag,SAFE.left+190,1106,400,44,'rgba(255,247,234,.9)',700);
+    ctx.fillText(d.badge||'合集',SAFE.left+75,1123);ctx.textBaseline='alphabetic';
+    if(d.tag)text1(ctx,d.tag,SAFE.left+190,1134,400,44,'rgba(255,247,234,.9)',700);
   },
 
   /* A5 编号杂志 —— 超大描边序号 + 左对齐标题 */
@@ -711,11 +712,11 @@ function buildTpls(){
   LAYOUTS.forEach(l=>{
     const d=document.createElement('div');
     d.className='t'+(state.layout===l.id?' on':'');
-    if(rec.includes(l.id)){const r=document.createElement('div');r.className='rec';r.textContent='荐';d.appendChild(r);}
-    const c=document.createElement('canvas');c.width=280;c.height=373;
+    const c=document.createElement('canvas');c.width=240;c.height=320;
     drawDesign(c.getContext('2d'),l.id,false);
     const n=document.createElement('div');n.className='n';
     n.innerHTML='<span>'+l.id+' '+l.name+'</span>';
+    if(rec.includes(l.id)){const r=document.createElement('span');r.className='rec';r.textContent='荐';n.appendChild(r);}
     n.title=l.desc;
     d.appendChild(c);d.appendChild(n);
     d.onclick=()=>{state.layout=l.id;buildTpls();refresh();};
