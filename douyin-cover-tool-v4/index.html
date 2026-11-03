@@ -396,7 +396,7 @@ function ring(ctx,cx,cy,r,w,color){
 function fitText(ctx,text,maxW,maxSize,minSize,weight,maxLines){
   text=(text||'').trim();
   if(!text) return {size:maxSize,lines:[]};
-  for(let s=maxSize;s>=minSize;s-=2){
+  const wrapAt=(s)=>{
     ctx.font=F(weight,s);
     const lines=[]; let cur='';
     for(const ch of text){
@@ -405,10 +405,22 @@ function fitText(ctx,text,maxW,maxSize,minSize,weight,maxLines){
       else cur=t;
     }
     if(cur) lines.push(cur);
+    return lines;
+  };
+  for(let s=maxSize;s>=minSize;s-=2){
+    const lines=wrapAt(s);
     if(lines.length<=maxLines) return {size:s,lines:lines};
   }
+  /* 已到最小字号：仍按 maxLines 换行；超出的部分截断并加省略号，绝不横向溢出 */
   ctx.font=F(weight,minSize);
-  return {size:minSize,lines:[text]};
+  let lines=wrapAt(minSize);
+  if(lines.length>maxLines){
+    lines=lines.slice(0,maxLines);
+    let last=lines[maxLines-1];
+    while(last.length>1 && ctx.measureText(last+'…').width>maxW) last=last.slice(0,-1);
+    lines[maxLines-1]=last+'…';
+  }
+  return {size:minSize,lines:lines};
 }
 
 /* ---------------------------------------------------------------
@@ -418,41 +430,64 @@ function fitText(ctx,text,maxW,maxSize,minSize,weight,maxLines){
    --------------------------------------------------------------- */
 function textBlock(ctx,d,o){
   const k=o.k||1;
-  const maxT=Math.round((o.titleSize||120)*k), minT=Math.round(38*k);
-  const maxS=Math.round((o.subSize||46)*k),  minS=Math.round(24*k);
+  const maxT=Math.round((o.titleSize||120)*k), minT=Math.round(40*k);
+  const maxS=Math.round((o.subSize||46)*k),  minS=Math.round(26*k);
   const w=o.w;
   const t=fitText(ctx,d.title,w,maxT,minT,900,o.lines||2);
-  const lh=Math.round(t.size*1.22);
+  const lh=Math.round(t.size*(o.lh||1.30));
   const hasSub=!!(d.sub&&d.sub.trim());
   const st=hasSub?fitText(ctx,d.sub,w,maxS,minS,600,1):null;
-  const slh=st?Math.round(st.size*1.2):0;
-  const gap=Math.round((o.gap||34)*k);
-  const nLines=t.lines.length;
-  const blockH=nLines*lh + (st? gap+slh : 0);
-  const firstBase = (o.anchor==='bottom')
-    ? o.y - blockH + t.size*0.86
-    : o.y + t.size*0.86;
-  /* 居中时落笔点必须是「框中心」而不是框左边界，否则整块文字往左溢出画布 */
+  /* gap 语义：标题墨迹底 与 副标题墨迹顶 之间的「净空隙」(px)，越大越松弛 */
+  const gap=Math.round((o.gap===undefined?48:o.gap)*k);
   const align=o.align||'left';
   const drawX = (align==='center') ? o.x + w/2 : o.x;
+
+  /* 用真实字体度量（actualBoundingBox）取代魔法系数 0.86，中文才准 */
+  ctx.font=F(900,t.size);
+  const tm=ctx.measureText(t.lines[0]||'中');
+  const tAsc=tm.actualBoundingBoxAscent||t.size*0.86;
+  const tmL=ctx.measureText(t.lines[t.lines.length-1]||'中');
+  const tDesc=tmL.actualBoundingBoxDescent||t.size*0.12;
+  let sAsc=0,sDesc=0;
+  if(st){
+    ctx.font=F(600,st.size);
+    const sm=ctx.measureText(st.lines[0]);
+    sAsc=sm.actualBoundingBoxAscent||st.size*0.86;
+    sDesc=sm.actualBoundingBoxDescent||st.size*0.12;
+  }
+
+  const nLines=t.lines.length;
+  const lastBase=(b0)=> b0 + (nLines-1)*lh;              /* 标题最后一行的基线 */
+  const subBaseOf=(lb)=> lb + tDesc + gap + sAsc;         /* 副标题基线 = 标题墨迹底 + 净空隙 + 副标题上高 */
+
+  /* anchor top: o.y 是标题墨迹顶；anchor bottom: o.y 是整块墨迹底 */
+  let firstBase;
+  if(o.anchor==='bottom'){
+    const blockInkH = tAsc + (nLines-1)*lh + tDesc + (st? gap+sAsc+sDesc : 0);
+    firstBase = o.y - blockInkH + tAsc;
+  }else{
+    firstBase = o.y + tAsc;
+  }
+
   ctx.textAlign=align; ctx.textBaseline='alphabetic';
   ctx.font=F(900,t.size); ctx.fillStyle=o.color||'#000';
   let y=firstBase;
   t.lines.forEach(l=>{ ctx.fillText(l,drawX,y); y+=lh; });
-  const titleBottom = y-lh;
-  let subBottom = titleBottom;
+  const titleBottom = lastBase(firstBase);
+  const titleInkBottom = titleBottom + tDesc;
+  let subBottom = titleInkBottom;
   if(st){
-    const sb=titleBottom+gap+st.size*0.86;
+    const sb=subBaseOf(titleBottom);
     ctx.font=F(600,st.size); ctx.fillStyle=o.subColor||o.color||'#000';
     ctx.fillText(st.lines[0],drawX,sb);
-    subBottom=sb;
+    subBottom = sb + sDesc;
   }
   ctx.textAlign='left';
   return {
-    top: firstBase - t.size*0.86,
+    top: firstBase - tAsc,
     bottom: subBottom,
-    titleBottom: titleBottom,
-    size: t.size, subSize: st?st.size:0, lh:lh
+    titleBottom: titleInkBottom,
+    size: t.size, subSize: st?st.size:0, lh:lh, gap:gap
   };
 }
 /* 文字块高度预估（不落笔），用于先占位 */
@@ -484,7 +519,7 @@ B1(ctx,d,img,c,G){
   ctx.fillStyle=g; ctx.fillRect(0,G.H*0.40,G.W,G.H*0.60);
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:122,subSize:46,gap:30,k:G.k});
+    titleSize:122,subSize:46,gap:60,k:G.k});
 },
 
 /* B4 满图·顶部白字 */
@@ -497,7 +532,7 @@ B4(ctx,d,img,c,G){
   ctx.fillStyle=g; ctx.fillRect(0,0,G.W,G.H*0.52);
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.top,w:G.W-G.safe.left-G.safe.right,
     anchor:'top',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:122,subSize:46,gap:30,k:G.k});
+    titleSize:122,subSize:46,gap:60,k:G.k});
 },
 
 /* B7 满图·底部色条 */
@@ -511,7 +546,7 @@ B7(ctx,d,img,c,G){
   ctx.fillStyle=c.accent; ctx.fillRect(0,bandTop,G.W,Math.round(8*G.k));
   textBlock(ctx,d,{x:G.safe.left,y:G.H-Math.round(60*G.k),w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:112,subSize:44,gap:26,k:G.k});
+    titleSize:112,subSize:44,gap:56,k:G.k});
 },
 
 /* B12 满图·悬浮卡片 */
@@ -519,17 +554,24 @@ B12(ctx,d,img,c,G){
   drawCoverF(ctx,mainImg(img),0,0,G.W,G.H,0.12);
   ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(0,0,G.W,G.H);
   const mx=Math.round(G.safe.left*1.1), mw=G.W-mx*2;
-  const mh=Math.round(G.H*0.30);
-  const my=Math.round(G.H*0.58);
+  /* 卡片高度随文字块自适应，文字在卡内垂直居中 —— 字号/间距变化时不会偏上 */
+  const padX=Math.round(48*G.k), padY=Math.round(40*G.k);
+  const probeCtx=document.createElement('canvas').getContext('2d');
+  const probe=textBlock(probeCtx,d,{x:mx+padX,y:0,w:mw-padX*2,anchor:'top',align:'left',
+    color:'#000',subColor:'#000',titleSize:96,subSize:40,gap:48,k:G.k});
+  const inkH=probe.bottom-probe.top;
+  const mh=Math.round(Math.max(G.H*0.22, inkH+padY*2));
+  const my=Math.round(Math.min(G.H*0.66, G.H-mh-Math.round(G.H*0.10)));
   ctx.save();
   ctx.shadowColor='rgba(0,0,0,.34)'; ctx.shadowBlur=Math.round(46*G.k); ctx.shadowOffsetY=Math.round(16*G.k);
   ctx.fillStyle='rgba(0,0,0,.58)';
   roundRectPath(ctx,mx,my,mw,mh,Math.round(36*G.k)); ctx.fill();
   ctx.restore();
   ctx.fillStyle=c.accent; ctx.fillRect(mx,my,mw,Math.round(8*G.k));
-  textBlock(ctx,d,{x:mx+Math.round(48*G.k),y:my+mh-Math.round(56*G.k),
-    w:mw-Math.round(96*G.k),anchor:'bottom',align:'left',color:'#FFFFFF',
-    subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:40,gap:22,k:G.k});
+  /* 文字在卡片内垂直居中 */
+  const ty=my+Math.round((mh-inkH)/2);
+  textBlock(ctx,d,{x:mx+padX,y:ty,w:mw-padX*2,anchor:'top',align:'left',color:'#FFFFFF',
+    subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:40,gap:48,k:G.k});
 },
 
 /* ---- 族 B：分栏对切 ---- */
@@ -544,7 +586,7 @@ B5(ctx,d,img,c,G){
   const w=G.W-x-G.safe.right;
   textBlock(ctx,d,{x:x,y:G.safe.bottom-Math.round(G.H*0.06),w:w,
     anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:88,subSize:38,gap:26,k:G.k});
+    titleSize:88,subSize:38,gap:44,k:G.k});
   ctx.fillStyle=c.accent; ctx.fillRect(x,G.safe.top+Math.round(20*G.k),Math.round(84*G.k),Math.round(9*G.k));
 },
 
@@ -559,7 +601,7 @@ B6(ctx,d,img,c,G){
   ctx.fillStyle=g; ctx.fillRect(0,split-Math.round(80*G.k),G.W,Math.round(80*G.k));
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom-Math.round(50*G.k),
     w:G.W-G.safe.left-G.safe.right,anchor:'bottom',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:112,subSize:44,gap:28,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:112,subSize:44,gap:56,k:G.k});
 },
 
 /* B3 斜切·左文右图 */
@@ -571,7 +613,7 @@ B3(ctx,d,img,c,G){
   const tw=Math.min(G.W*0.40,G.W-tx-G.safe.right)-G.safe.left*0.2;
   textBlock(ctx,d,{x:tx,y:G.safe.top+Math.round(G.H*0.06),w:tw,
     anchor:'top',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:92,subSize:38,gap:24,k:G.k});
+    titleSize:92,subSize:38,gap:46,k:G.k});
   ctx.fillStyle=c.accent; ctx.fillRect(tx,G.safe.top,Math.round(84*G.k),Math.round(9*G.k));
 },
 
@@ -584,7 +626,7 @@ B9(ctx,d,img,c,G){
   ctx.fillStyle=g; ctx.fillRect(0,G.H*0.58,G.W,G.H*0.20);
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom-Math.round(G.H*0.05),
     w:G.W*0.66,anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:104,subSize:42,gap:26,k:G.k});
+    titleSize:104,subSize:42,gap:52,k:G.k});
 },
 
 /* ---- 族 C：卡片图形 ---- */
@@ -595,7 +637,7 @@ B2(ctx,d,img,c,G){
   const W=G.W;
   const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.03),
     w:W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:110,subSize:44,gap:26,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:110,subSize:44,gap:55,k:G.k});
   const gap=Math.round(G.H*0.055);
   const circleTop=t.bottom+gap;
   const maxR=Math.min((W-G.safe.left*2)/2, (G.H-circleTop-Math.round(G.H*0.06))/2);
@@ -612,7 +654,7 @@ B8(ctx,d,img,c,G){
   const mx=Math.round(G.safe.left*1.15), mw=G.W-mx*2;
   const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.03),
     w:G.W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:106,subSize:42,gap:24,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:106,subSize:42,gap:53,k:G.k});
   const top=t.bottom+Math.round(G.H*0.05);
   const h=Math.min(G.H-top-Math.round(G.H*0.07), mw*0.68);
   ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=Math.round(50*G.k); ctx.shadowOffsetY=Math.round(18*G.k);
@@ -624,7 +666,7 @@ B14(ctx,d,img,c,G){
   solidBg(ctx,c,G);
   const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.02),
     w:G.W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:98,subSize:40,gap:22,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:98,subSize:40,gap:49,k:G.k});
   const top=t.bottom+Math.round(G.H*0.035);
   const avail=G.H-top-Math.round(G.H*0.14);
   const ih=Math.max(200*G.k,avail), iw=Math.min(G.W*0.62, ih*0.66);
@@ -643,7 +685,7 @@ B10(ctx,d,img,c,G){
   coverRect(ctx,mainImg(img),sx,sy,side,side,Math.round(38*G.k),0.14); ctx.restore();
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom-Math.round(G.H*0.04),
     w:G.W-G.safe.left-G.safe.right,anchor:'bottom',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:98,subSize:40,gap:24,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:98,subSize:40,gap:49,k:G.k});
 },
 
 /* ---- 族 D：纯文字牌 ---- */
@@ -658,7 +700,7 @@ B11(ctx,d,img,c,G){
   ctx.fillStyle=g; ctx.fillRect(0,imgTop-Math.round(120*G.k),G.W,Math.round(160*G.k));
   textBlock(ctx,d,{x:G.safe.left,y:imgTop-Math.round(G.H*0.05),
     w:G.W-G.safe.left-G.safe.right,anchor:'bottom',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:120,subSize:46,gap:28,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:120,subSize:46,gap:60,k:G.k});
 },
 
 /* B13 大字左·右下方图 */
@@ -676,17 +718,20 @@ B13(ctx,d,img,c,G){
   coverRect(ctx,mainImg(img),ix,iy,side,side,Math.round(34*G.k),0.14); ctx.restore();
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.10),
     w:G.W-G.safe.left-G.safe.right-side*0.35,anchor:'top',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:104,subSize:42,gap:26,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:104,subSize:42,gap:52,k:G.k});
 },
 
 /* B16 大字左·右下小圆 */
 B16(ctx,d,img,c,G){
   gradBg(ctx,c,'d',G);
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.10),
+  const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.10),
     w:G.W-G.safe.left-G.safe.right,anchor:'top',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:118,subSize:46,gap:28,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:118,subSize:46,gap:59,k:G.k});
   const r=Math.min(G.W*0.15, G.H*0.11);
-  const cx=G.W-G.safe.right-r-Math.round(G.H*0.02), cy=G.H-G.safe.bottom*0.55-r;
+  const cx=G.W-G.safe.right-r-Math.round(G.H*0.02);
+  /* 小圆必须让开文字块底部：文字变高时不能被压住 */
+  const minTop=t.bottom+Math.round(30*G.k);
+  const cy=Math.max(G.H-G.safe.bottom*0.55-r, minTop+r);
   ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=Math.round(40*G.k); ctx.shadowOffsetY=Math.round(14*G.k);
   coverCircle(ctx,mainImg(img),cx,cy,r,0.16); ctx.restore();
   ring(ctx,cx,cy,r+Math.round(10*G.k),Math.round(9*G.k),c.accent);
@@ -704,7 +749,7 @@ B15(ctx,d,img,c,G){
   ctx.restore();
   textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.06),
     w:G.W-G.safe.left-G.safe.right-cw*0.35,anchor:'top',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:108,subSize:44,gap:26,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:108,subSize:44,gap:54,k:G.k});
 }
 
 };
