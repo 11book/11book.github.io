@@ -30,6 +30,26 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
 .drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
 .drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
+.cropbox{margin-top:11px;border:1px solid #e6e8eb;border-radius:10px;padding:11px;background:#fafbfc}
+.cropbox.hide{display:none}
+.cropbox .ct{font-size:12px;font-weight:700;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cropbox .ct .info{font-weight:400;color:#8a9099;font-size:11px}
+.cropcv{width:100%;max-width:300px;border-radius:8px;background:#222;display:block;touch-action:none;cursor:crosshair;margin-bottom:9px}
+.croprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.croprow .lb{font-size:11px;color:#8a9099;margin-right:2px}
+.sbtn{padding:4px 10px;border:1px solid #dcdfe4;border-radius:999px;font-size:11px;cursor:pointer;background:#fff;font-family:inherit}
+.sbtn.on{background:#111;border-color:#111;color:#fff;font-weight:700}
+.sbtn:hover{border-color:#111}
+.cropres{margin-top:8px;font-size:11px;color:#8a9099;line-height:1.55}
+.cropres b{color:#333}
+.cropres .warn{color:#c2410c;font-weight:700}
+.cropres .ok{color:#12a150;font-weight:700}
+.scalebox{margin-top:11px;border-top:1px solid #e6e8eb;padding-top:11px}
+.scalebox .st{font-size:12px;font-weight:700;color:#333;margin-bottom:7px}
+.scaleq{font-size:11px;color:#8a9099;margin-top:7px;line-height:1.55}
+.scaleq b{color:#333}
+.scaleq .warn{color:#c2410c;font-weight:700}
+.scaleq .ok{color:#12a150;font-weight:700}
 .famh{display:flex;align-items:baseline;gap:8px;margin:16px 0 8px;font-size:12px;color:#333;font-weight:700}
 .famh:first-child{margin-top:0}
 .famh span{font-weight:400;color:#9aa0a8;font-size:11px}
@@ -145,6 +165,27 @@ button.ghost b{float:right;color:#111}
         <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
         <input type="file" id="file" accept="image/*" hidden>
       </div>
+
+      <div class="cropbox hide" id="cropBox">
+        <div class="ct">✂️ 裁剪要显示的区域 <span class="info" id="cropSrcInfo"></span></div>
+        <canvas class="cropcv" id="cropCv" height="220"></canvas>
+        <div class="croprow">
+          <span class="lb">比例</span>
+          <span id="cropRatios"></span>
+        </div>
+        <div class="croprow">
+          <span class="lb">操作</span>
+          <button class="sbtn" id="cropReset">重置裁剪</button>
+          <button class="sbtn" id="cropFull">用整张图</button>
+        </div>
+        <div class="cropres" id="cropRes"></div>
+      </div>
+
+      <div class="scalebox">
+        <div class="st">导出清晰度</div>
+        <div class="chips" id="scales"></div>
+        <div class="scaleq" id="scaleQ"></div>
+      </div>
     </div>
 
     <div class="card">
@@ -211,11 +252,15 @@ const RATIOS = {
 const CW = 1080, CH = 1440;
 const SAFE = { top:72, bottom:1280, left:80, right:80 };
 
-function geo(id){
+function geo(id,scale){
   const r = RATIOS[id] || RATIOS['3x4'];
+  const sc=scale||1;
+  /* scale 用于高清导出：所有尺寸/字号/安全区整体等比放大，引擎无需改任何坐标 */
   return {
-    W:r.w, H:r.h, safe:r.safe,
-    k: Math.min(r.w/1080, r.h/1440)   /* 字号缩放：横向版按高度收 */
+    W: Math.round(r.w*sc), H: Math.round(r.h*sc),
+    safe:{top: Math.round(r.safe.top*sc), bottom: Math.round(r.safe.bottom*sc),
+          left: Math.round(r.safe.left*sc), right: Math.round(r.safe.right*sc)},
+    k: Math.min(r.w/1080, r.h/1440)*sc   /* 字号缩放：横向版按高度收 */
   };
 }
 
@@ -358,13 +403,31 @@ function gradBg(ctx,c,dir,G){
 }
 function solidBg(ctx,c,G){ ctx.fillStyle=c.g1; ctx.fillRect(0,0,G.W,G.H); }
 
+/* 裁剪源区域：裁剪挂在图片实例上（img.__crop），归一化矩形 {x,y,w,h} 相对原图 0~1
+   —— 用户框选的「要显示的部分」；16 款骨架共用同一份，容器各自再 cover 贴合
+   —— 挂在实例上而非全局，切换合集用示例图时不会被误裁 */
+function cropSrc(img){
+  const iw=img.width, ih=img.height;
+  const cr=(img&&img.__crop)||{x:0,y:0,w:1,h:1};
+  const sx=Math.max(0,Math.min(iw-1,Math.round(cr.x*iw)));
+  const sy=Math.max(0,Math.min(ih-1,Math.round(cr.y*ih)));
+  const sw=Math.max(1,Math.min(iw-sx,Math.round(cr.w*iw)));
+  const sh=Math.max(1,Math.min(ih-sy,Math.round(cr.h*ih)));
+  return {sx:sx,sy:sy,sw:sw,sh:sh};
+}
 /* 焦点裁切：fy=0 取源图顶部，fy=1 取底部。保证人脸不被裁掉 */
 function drawCoverF(ctx,img,x,y,w,h,fy){
   if(!img||!img.width){ ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(x,y,w,h); return; }
-  const iw=img.width, ih=img.height, s=Math.max(w/iw,h/ih);
-  const dw=iw*s, dh=ih*s;
+  const c=cropSrc(img);
+  const s=Math.max(w/c.sw,h/c.sh);
+  const dw=c.sw*s, dh=c.sh*s;
   const off=(dh-h)*(fy===undefined?0.30:fy);
-  ctx.drawImage(img,x+(w-dw)/2,y-off,dw,dh);
+  /* 大图缩到画布尺寸时用高质量重采样，否则细边缘会锯齿 */
+  ctx.imageSmoothingEnabled=true;
+  if('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,c.sx,c.sy,c.sw,c.sh,x+(w-dw)/2,y-off,dw,dh);
+  /* 记录本次放大倍率（>1 = 源像素不够，导出会糊） */
+  if(CURSTAT && s>(CURSTAT.up||0)) CURSTAT.up=s;
 }
 function coverRect(ctx,img,x,y,w,h,r,fy){
   ctx.save();
@@ -775,7 +838,13 @@ function drawGuides(ctx,G){
 
 
 /* ================= 状态与交互 ================= */
-const state={col:'play',layout:'B2',ratio:'3x4',title:'',sub:'',img:null};
+const state={col:'play',layout:'B2',ratio:'3x4',title:'',sub:'',img:null,
+  cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
+  objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
+  exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
+  srcInfo:null,                 /* 上传原图信息 {w,h,name,size} */
+  cropDrag:null};               /* 裁剪拖拽会话 */
+let CURSTAT=null;               /* 本次渲染统计（放大倍率等） */
 const imgs={};
 
 function D(){
@@ -786,14 +855,17 @@ function D(){
 }
 function G(){ return geo(state.ratio); }
 
-function drawDesign(ctx,id,guides,Gg){
+function drawDesign(ctx,id,guides,Gg,stat){
   const img=state.img||imgs[state.col]||null;
   const c=COLLECTIONS[state.col];
+  const prevStat=CURSTAT;
+  CURSTAT=stat||null;
   try{ RENDER[id](ctx,D(),img,c,Gg); }
   catch(e){ console.error('render',id,e);
     ctx.fillStyle='#3a1f1f';ctx.fillRect(0,0,Gg.W,Gg.H);
     ctx.fillStyle='#ffb4b4';ctx.font=F(700,44);ctx.textAlign='center';
     ctx.fillText('渲染出错：'+id,Gg.W/2,Gg.H/2);ctx.textAlign='left'; }
+  finally{ CURSTAT=prevStat; }
   if(guides) drawGuides(ctx,Gg);
 }
 
@@ -849,7 +921,19 @@ function buildRatios(){
     const b=document.createElement('div');
     b.className='chip'+(state.ratio===k?' on':'');
     b.innerHTML='<b>'+r.label+'</b><small>'+r.w+'×'+r.h+'</small>';
-    b.onclick=()=>{state.ratio=k;buildRatios();buildTpls();refresh();};
+    b.onclick=()=>{
+      state.ratio=k;buildRatios();buildTpls();buildScales();refresh();
+      /* 「跟随尺寸」时，选框比例要跟着当前尺寸走 */
+      if(state.cropLock==='ratio'&&state.img){
+        const r=RATIOS[k], asp=r.w/r.h;
+        const c=getCrop();
+        const cxp=c.x+c.w/2, cyp=c.y+c.h/2;
+        let nw=c.w, nh=c.h;
+        if(nw/nh>asp) nh=nw/asp; else nw=nh*asp;
+        setCrop({x:cxp-nw/2,y:cyp-nh/2,w:nw,h:nh});
+      }
+      drawCropUI(); updateCropRes();
+    };
     box.appendChild(b);
   });
   document.getElementById('ratioNote').innerHTML=
@@ -911,15 +995,309 @@ function buildHooks(){
     });
   });
 }
+/* ================= 上传 · 裁剪 · 高清导出 ================= */
+
+/* 比例锁：'ratio'=跟随当前尺寸；free=自由；'1:1'/'3:4'/'9:16'/'16:9'=固定 */
+const CROP_LOCKS=[{k:'ratio',t:'跟随尺寸'},{k:'free',t:'自由'},{k:'1:1',t:'1:1'},
+                  {k:'3:4',t:'3:4'},{k:'9:16',t:'9:16'},{k:'16:9',t:'16:9'}];
+
+function lockAspect(){
+  const k=state.cropLock;
+  if(k==='ratio'){ const r=RATIOS[state.ratio]; return r.w/r.h; }
+  if(k==='free') return null;
+  const p=k.split(':').map(Number); return p[0]/p[1];
+}
+
+/* 当前裁剪区（归一化）。没有上传图则返回整张 */
+function getCrop(){
+  const im=state.img;
+  if(!im||!im.width) return {x:0,y:0,w:1,h:1};
+  return im.__crop||{x:0,y:0,w:1,h:1};
+}
+function setCrop(c){
+  if(!state.img) return;
+  /* 夹紧在 0~1，且不小于最小比例 */
+  const MIN=0.06;
+  let w=Math.max(MIN,Math.min(1,c.w)), h=Math.max(MIN,Math.min(1,c.h));
+  let x=Math.max(0,Math.min(1-w,c.x)), y=Math.max(0,Math.min(1-h,c.y));
+  state.img.__crop={x:x,y:y,w:w,h:h};
+}
+
+/* 裁剪预览画布：显示原图 + 可拖拽的选框 */
+function drawCropUI(){
+  const box=document.getElementById('cropBox');
+  const im=state.img;
+  if(!im||!im.width){ box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  const cv=document.getElementById('cropCv');
+  const W=cv.clientWidth||300, H=220;
+  cv.width=W; cv.height=H;
+  const x=cv.getContext('2d');
+  const iw=im.width, ih=im.height;
+  /* contain：完整显示原图（用户要看到全部才能框选），四周留底色 */
+  const s=Math.min(W/iw,H/ih);
+  const dw=iw*s, dh=ih*s;
+  const ox=(W-dw)/2, oy=(H-dh)/2;
+  x.fillStyle='#1a1a1a'; x.fillRect(0,0,W,H);
+  x.drawImage(im,ox,oy,dw,dh);
+  /* 选框（归一化 → 画布像素） */
+  const c=getCrop();
+  const cx=ox+c.x*dw, cy=oy+c.y*dh, cw=c.w*dw, ch=c.h*dh;
+  /* 框外压暗 */
+  x.fillStyle='rgba(0,0,0,.55)';
+  x.fillRect(0,0,W,cy); x.fillRect(0,cy+ch,W,H-cy-ch);
+  x.fillRect(0,cy,cx,ch); x.fillRect(cx+cw,cy,W-cx-cw,ch);
+  x.strokeStyle='#fff'; x.lineWidth=2; x.strokeRect(cx,cy,cw,ch);
+  /* 三分线 */
+  x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=1;
+  for(let i=1;i<3;i++){
+    x.beginPath(); x.moveTo(cx+cw*i/3,cy); x.lineTo(cx+cw*i/3,cy+ch); x.stroke();
+    x.beginPath(); x.moveTo(cx,cy+ch*i/3); x.lineTo(cx+cw,cy+ch*i/3); x.stroke();
+  }
+  /* 角把手 */
+  x.fillStyle='#fff';
+  [[cx,cy],[cx+cw,cy],[cx,cy+ch],[cx+cw,cy+ch]].forEach(p=>{
+    x.fillRect(p[0]-4,p[1]-4,8,8);
+  });
+  cv._map={ox:ox,oy:oy,dw:dw,dh:dh,W:W,H:H};
+  /* 文字反馈 */
+  const info=document.getElementById('cropSrcInfo');
+  if(info) info.textContent='原图 '+iw+'×'+ih;
+  updateCropRes();
+}
+
+/* ---- 清晰度度量（唯一真源）----
+   引擎里 drawCoverF 用 cover 贴合：源选框 (sw,sh) 贴进容器 (w,h)
+   缩放系数 s = max(w/sw, h/sh)，s>1 即「被放大」= 源像素不够 = 会软。
+   CURSTAT.up 记录的就是这个 s（1× 画布下的值）。
+   导出倍率 sc 时容器整体放大 sc 倍 → 放大系数 = up * sc。 */
+var _measCv=null;
+function measureBlur(){
+  const im=state.img;
+  if(!im||!im.width) return null;
+  const Gg=G();
+  if(!_measCv) _measCv=document.createElement('canvas');
+  if(_measCv.width!==Gg.W||_measCv.height!==Gg.H){ _measCv.width=Gg.W; _measCv.height=Gg.H; }
+  const stat={up:0};
+  drawDesign(_measCv.getContext('2d'),state.layout,false,Gg,stat);
+  const c=getCrop();
+  return {
+    up:stat.up||1,
+    sw:Math.round(c.w*im.width),
+    sh:Math.round(c.h*im.height),
+    iw:im.width, ih:im.height,
+    W:Gg.W, H:Gg.H
+  };
+}
+/* 放大倍率的观感分级：
+   ≤1.10 肉眼几乎无差别；≤1.50 可接受；>1.50 明显发软 */
+function blurNote(blur){
+  if(blur>1.5) return '<span class="warn">⚠ 放大 '+blur.toFixed(2)+' 倍 —— 源像素明显不足，边缘会发软</span>';
+  if(blur>1.1)  return '<span style="color:#b45309;font-weight:700">● 放大 '+blur.toFixed(2)+' 倍 —— 尚可接受，细看略糊</span>';
+  return '<span class="ok">✓ 清晰</span> —— 源像素足够铺满画布（放大 '+blur.toFixed(2)+'×，肉眼无差）';
+}
+
+/* 裁剪区提示：选框源像素 + 当前倍率下的清晰度 */
+function updateCropRes(){
+  const el=document.getElementById('cropRes');
+  if(!el) return;
+  const m=measureBlur();
+  if(!m){ el.innerHTML=''; updateScaleQ(null); return; }
+  const sc=state.exportScale;
+  const blur=m.up*sc;
+  el.innerHTML='选框源像素 <b>'+m.sw+'×'+m.sh+'</b>（原图 '+m.iw+'×'+m.ih+'）<br>'+
+    '当前版式（'+state.layout+' · '+state.ratio+'）下：'+blurNote(blur);
+  updateScaleQ(m.up);
+}
+
+/* 导出倍率提示 */
+function updateScaleQ(up){
+  const el=document.getElementById('scaleQ');
+  if(!el) return;
+  const Gg=G(), sc=state.exportScale;
+  const needW=Math.round(Gg.W*sc), needH=Math.round(Gg.H*sc);
+  let q='导出 <b>'+needW+'×'+needH+'</b> px';
+  const im=state.img;
+  if(im&&im.width&&up){
+    const c=getCrop();
+    const sw=Math.round(c.w*im.width), sh=Math.round(c.h*im.height);
+    const blur=up*sc;
+    q+='<br>原图 '+im.width+'×'+im.height+' · 选框 '+sw+'×'+sh;
+    q+='<br>图片区域将放大 <b>'+blur.toFixed(2)+'</b> 倍 ';
+    q+= blur>1.5  ? '<span class="warn">→ 明显发软，建议换更大原图</span>'
+       : blur>1.1 ? '<span style="color:#b45309;font-weight:700">→ 略糊但可用</span>'
+                  : '<span class="ok">✓ 清晰</span>';
+  }else{
+    q+='<br>未上传图片时使用内置示例图';
+  }
+  el.innerHTML=q;
+}
+
+/* 裁剪交互：拖拽选框 / 角把手 */
+function cropPointer(ev){
+  const cv=document.getElementById('cropCv');
+  const m=cv._map; if(!m) return null;
+  const r=cv.getBoundingClientRect();
+  const px=(ev.clientX-r.left)*(cv.width/r.width);
+  const py=(ev.clientY-r.top)*(cv.height/r.height);
+  return {px:px,py:py,map:m};
+}
+function cropHit(pt){
+  const m=pt.map, c=getCrop();
+  const cx=m.ox+c.x*m.dw, cy=m.oy+c.y*m.dh, cw=c.w*m.dw, ch=c.h*m.dh;
+  const T=12;
+  if(Math.abs(pt.px-cx)<T&&Math.abs(pt.py-cy)<T) return 'nw';
+  if(Math.abs(pt.px-(cx+cw))<T&&Math.abs(pt.py-cy)<T) return 'ne';
+  if(Math.abs(pt.px-cx)<T&&Math.abs(pt.py-(cy+ch))<T) return 'sw';
+  if(Math.abs(pt.px-(cx+cw))<T&&Math.abs(pt.py-(cy+ch))<T) return 'se';
+  if(pt.px>=cx&&pt.px<=cx+cw&&pt.py>=cy&&pt.py<=cy+ch) return 'move';
+  return null;
+}
+function cropStart(ev){
+  const pt=cropPointer(ev); if(!pt) return;
+  const hit=cropHit(pt);
+  if(!hit){ /* 点框外 → 以该点为中心开新选框 */
+    const m=pt.map;
+    state.cropDrag={mode:'new',ox:m.ox,oy:m.oy,dw:m.dw,dh:m.dh,px:pt.px,py:pt.py,c:getCrop()};
+    cropApplyDrag(pt);
+    return;
+  }
+  /* 移动模式：在按下时就固定锚点，避免首次 pointermove 跳动 */
+  state.cropDrag={mode:hit,c:getCrop(),px0:pt.px,py0:pt.py};
+  ev.preventDefault();
+}
+function cropApplyDrag(pt){
+  const d=state.cropDrag; if(!d) return;
+  const m=pt.map;
+  const c=d.c;
+  let nx=c.x, ny=c.y, nw=c.w, nh=c.h;
+  if(d.mode==='move'){
+    nx=c.x+(pt.px-d.px0)/m.dw; ny=c.y+(pt.py-d.py0)/m.dh;
+  }else{
+    /* 角把手：以画布像素计算新框，再转归一化 */
+    const cx=m.ox+c.x*m.dw, cy=m.oy+c.y*m.dh, cw=c.w*m.dw, ch=c.h*m.dh;
+    let L=cx,Tp=cy,R=cx+cw,B=cy+ch;
+    if(d.mode==='nw'){ L=pt.px; Tp=pt.py; }
+    else if(d.mode==='ne'){ R=pt.px; Tp=pt.py; }
+    else if(d.mode==='sw'){ L=pt.px; B=pt.py; }
+    else if(d.mode==='se'){ R=pt.px; B=pt.py; }
+    else if(d.mode==='new'){ L=Math.min(d.px,pt.px); Tp=Math.min(d.py,pt.py); R=Math.max(d.px,pt.px); B=Math.max(d.py,pt.py); }
+    let aw=Math.max(1,R-L), ah=Math.max(1,B-Tp);
+    /* 比例锁：仅角把手与新建时生效，拖动内部时不改比例 */
+    const asp=lockAspect();
+    if(asp && d.mode!=='move'){
+      if(aw/ah > asp) ah=aw/asp; else aw=ah*asp;
+      /* 以拖动的角为锚点 */
+      if(d.mode==='nw'){ L=R-aw; Tp=B-ah; }
+      else if(d.mode==='ne'){ R=L+aw; Tp=B-ah; }
+      else if(d.mode==='sw'){ L=R-aw; B=Tp+ah; }
+      else if(d.mode==='se'){ R=L+aw; B=Tp+ah; }
+      else { const cxx=(L+R)/2, cyy=(Tp+B)/2; L=cxx-aw/2; R=cxx+aw/2; Tp=cyy-ah/2; B=cyy+ah/2; }
+    }
+    nx=(L-m.ox)/m.dw; ny=(Tp-m.oy)/m.dh; nw=aw/m.dw; nh=ah/m.dh;
+  }
+  setCrop({x:nx,y:ny,w:nw,h:nh});
+  drawCropUI();
+  refresh();
+  /* 清晰度提示较重（要跑一次渲染），节流到下一帧 */
+  if(!window.__cropRaf){
+    window.__cropRaf=requestAnimationFrame(function(){ window.__cropRaf=0; updateCropRes(); });
+  }
+}
+function cropMove(ev){
+  const d=state.cropDrag; if(!d) return;
+  const pt=cropPointer(ev); if(!pt) return;
+  cropApplyDrag(pt);
+}
+function cropEnd(){
+  if(!state.cropDrag) return;
+  state.cropDrag=null;
+  drawCropUI(); refresh();
+}
+
+/* 比例锁按钮 */
+function buildCropRatios(){
+  const box=document.getElementById('cropRatios');
+  if(!box) return;
+  box.innerHTML='';
+  CROP_LOCKS.forEach(l=>{
+    const b=document.createElement('button');
+    b.className='sbtn'+(state.cropLock===l.k?' on':'');
+    b.textContent=l.t;
+    b.onclick=()=>{
+      state.cropLock=l.k;
+      buildCropRatios();
+      /* 切换比例时，把当前选框调整为新比例（以中心为锚） */
+      const asp=lockAspect();
+      if(asp){
+        const c=getCrop();
+        const cxp=c.x+c.w/2, cyp=c.y+c.h/2;
+        let nw=c.w, nh=c.h;
+        if(nw/nh>asp) nh=nw/asp; else nw=nh*asp;
+        setCrop({x:cxp-nw/2,y:cyp-nh/2,w:nw,h:nh});
+      }
+      drawCropUI(); refresh();
+    };
+    box.appendChild(b);
+  });
+}
+
+/* 导出倍率按钮 */
+const SCALES=[{v:1,t:'1× 标准'},{v:2,t:'2× 超清'},{v:3,t:'3× 超高'}];
+function buildScales(){
+  const box=document.getElementById('scales');
+  if(!box) return;
+  box.innerHTML='';
+  SCALES.forEach(sc=>{
+    const b=document.createElement('div');
+    b.className='chip'+(state.exportScale===sc.v?' on':'');
+    b.innerHTML='<b>'+sc.t+'</b><small>'+Math.round(G().W*sc.v)+'×'+Math.round(G().H*sc.v)+'</small>';
+    b.onclick=()=>{ state.exportScale=sc.v; buildScales(); updateCropRes(); };
+    box.appendChild(b);
+  });
+  /* 不要在这里用固定值覆盖清晰度提示 —— 交给 updateCropRes 用实测倍率 */
+  updateCropRes();
+}
+
 function useFile(f){
-  const u=URL.createObjectURL(f);const im=new Image();
-  im.onload=()=>{state.img=im;
+  /* 释放上一张的 ObjectURL，避免内存泄漏 */
+  if(state.objUrl){ try{URL.revokeObjectURL(state.objUrl);}catch(e){} state.objUrl=null; }
+  const u=URL.createObjectURL(f); state.objUrl=u;
+  const im=new Image();
+  im.onload=()=>{
+    state.img=im;
+    im.__crop={x:0,y:0,w:1,h:1};
+    const kb=(f.size/1024).toFixed(0);
+    state.srcInfo={w:im.naturalWidth||im.width,h:im.naturalHeight||im.height,name:f.name,size:f.size};
     document.getElementById('dropTxt').innerHTML='<img src="'+u+'"><div style="font-size:12px;color:#12a150">已使用上传图片 · 再次点击可换</div>';
-    buildTpls();refresh();};
+    buildTpls(); buildCropRatios(); refresh();
+    /* 等布局稳定后画裁剪面板（clientWidth 需要元素已可见） */
+    setTimeout(()=>{ drawCropUI(); updateCropRes(); },30);
+  };
+  im.onerror=()=>{
+    document.getElementById('dropTxt').innerHTML=
+      '<div style="font-size:12px;color:#c2410c">无法读取该图片<br><span style="font-size:11px">可能是 HEIC/RAW 格式，请先转成 JPG/PNG</span></div>';
+  };
   im.src=u;
 }
 document.getElementById('drop').onclick=()=>document.getElementById('file').click();
 document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.target.files[0]);};
+/* 裁剪面板交互 */
+(function(){
+  const cv=document.getElementById('cropCv');
+  if(!cv) return;
+  cv.addEventListener('pointerdown',cropStart);
+  cv.addEventListener('pointermove',cropMove);
+  window.addEventListener('pointerup',cropEnd);
+  document.getElementById('cropReset').onclick=()=>{
+    if(!state.img) return;
+    setCrop({x:0,y:0,w:1,h:1}); drawCropUI(); refresh();
+  };
+  document.getElementById('cropFull').onclick=()=>{
+    if(!state.img) return;
+    setCrop({x:0,y:0,w:1,h:1}); drawCropUI(); refresh();
+  };
+})();
 ['dragover','dragenter'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.add('hot');}));
 ['dragleave','drop'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.remove('hot');}));
 document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))useFile(f);});
@@ -928,43 +1306,50 @@ document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransf
 });
 document.getElementById('guides').onchange=refresh;
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
-function renderFull(id,ratioId){
-  const Gg=geo(ratioId||state.ratio);
+function renderFull(id,ratioId,scale){
+  const Gg=geo(ratioId||state.ratio,scale||1);
   const t=document.createElement('canvas');t.width=Gg.W;t.height=Gg.H;
   drawDesign(t.getContext('2d'),id,false,Gg);return t;
 }
+/* 导出文件名字里带真实像素，避免 2×/3× 时仍写着 1080×1440 */
+function exportName(ext){
+  const Gg=geo(state.ratio,state.exportScale);
+  return 'cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.'+ext;
+}
 function exportNow(type,name){
-  const Gg=G();
-  const src=renderFull(state.layout);
-  src.toBlob(b=>dl(b,name),type||'image/png',0.92);
+  const src=renderFull(state.layout,null,state.exportScale);
+  src.toBlob(b=>dl(b,name),type||'image/png',0.95);
 }
 document.getElementById('expNow').onclick=()=>{
-  const Gg=G();
-  exportNow('image/png','cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png');
+  exportNow('image/png',exportName('png'));
 };
 document.getElementById('expJpg').onclick=()=>{
-  const Gg=G();
-  exportNow('image/jpeg','cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.jpg');
+  exportNow('image/jpeg',exportName('jpg'));
 };
 document.getElementById('expAll').onclick=()=>{
-  const Gg=G();
   const ids=LAYOUTS.map(l=>l.id);
   const cols=4, rows=Math.ceil(ids.length/cols);
+  /* 16 款拼图是大画布：限制总像素，避免 3× 时 canvas 撑爆内存 */
+  const MAXPX=40e6;
+  let sc=state.exportScale;
+  let Gg=geo(state.ratio,sc);
+  while(sc>1 && (Gg.W*cols)*(Gg.H*rows) > MAXPX){ sc--; Gg=geo(state.ratio,sc); }
+  if(sc!==state.exportScale){
+    alert('16 款拼图画布过大，倍率自动降为 '+sc+'×（'+Gg.W+'×'+Gg.H+'）。\n单张导出仍可用 '+state.exportScale+'×。');
+  }
   const c=document.createElement('canvas');c.width=Gg.W*cols;c.height=Gg.H*rows;const x=c.getContext('2d');
-  ids.forEach((id,i)=>{const s=renderFull(id);x.drawImage(s,(i%cols)*Gg.W,Math.floor(i/cols)*Gg.H);});
+  ids.forEach((id,i)=>{const s=renderFull(id,null,sc);x.drawImage(s,(i%cols)*Gg.W,Math.floor(i/cols)*Gg.H);});
   c.toBlob(b=>dl(b,'layouts-v4-16-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
 };
 document.getElementById('expThree').onclick=()=>{
-  const ids=LAYOUTS.map(l=>l.id);
-  const list=[];
   ['3x4','9x16','16x9'].forEach(r=>{
-    const Gg=geo(r);
+    const Gg=geo(r,state.exportScale);
     const c=document.createElement('canvas');c.width=Gg.W;c.height=Gg.H;
     drawDesign(c.getContext('2d'),state.layout,false,Gg);
     c.toBlob(b=>dl(b,'cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
   });
 };
-buildHooks();buildRatios();buildCols();buildTpls();
+buildHooks();buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
 let pending=Object.keys(COLLECTIONS).length;
 Object.keys(COLLECTIONS).forEach(k=>{
   const im=new Image();
@@ -1005,9 +1390,9 @@ refresh();
   var _refresh=refresh;
   refresh=function(){_refresh();syncTop();};
   mExport.onclick=function(){
-    var Gg=geo(state.ratio);
-    var src=renderFull(state.layout);
-    src.toBlob(function(b){dl(b,'cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png');},'image/png',0.92);
+    var Gg=geo(state.ratio,state.exportScale);
+    var src=renderFull(state.layout,null,state.exportScale);
+    src.toBlob(function(b){dl(b,'cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png');},'image/png',0.95);
   };
   mtBtn.onclick=function(){document.getElementById('pv').scrollIntoView({behavior:'smooth',block:'center'});};
   setTimeout(syncTop,100);
