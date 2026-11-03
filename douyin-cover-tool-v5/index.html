@@ -94,23 +94,16 @@ button.ghost b{float:right;color:#111}
 .ratiowrap .lb{font-size:11px;color:#8a9099;font-weight:700;letter-spacing:.5px}
 .ratiowrap .chip{padding:5px 12px;font-size:12px}
 .ratiowrap .chip small{display:inline;margin-left:6px;opacity:.7}
-/* ---------- v5：合集卡片（配色 + 形状 一眼可辨） ---------- */
-.colcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.colcard{text-align:center;cursor:pointer;font-family:inherit;border:1.5px solid #e6e8eb;
-  background:#fff;border-radius:11px;padding:9px 5px 8px;display:flex;flex-direction:column;
-  align-items:center;gap:5px;overflow:hidden}
-.colcard:hover{border-color:#c9ced6}
-.colcard.on{border-color:var(--acc);box-shadow:0 4px 13px rgba(0,0,0,.10);
-  background:linear-gradient(165deg,var(--c1) 0%,var(--c2) 100%)}
-.colcard .ccbadge{width:30px;height:30px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0}
-.colcard .ccbadge .ccsvg{display:block}
-.colcard .ccname{font-weight:700;font-size:13px;color:#222;line-height:1.2;white-space:nowrap}
-.colcard .ccrec{font-size:9.5px;color:var(--acc);font-weight:700;letter-spacing:.2px;white-space:nowrap}
-.colcard.on .ccname{color:#241c10}
-.colcard.on .ccrec{color:var(--acc)}
-.colcard.on .ccbadge{background:#fff;box-shadow:0 2px 7px rgba(0,0,0,.10)}
-.colcard .ccswatch{width:100%;height:5px;border-radius:3px;background:var(--acc);opacity:.9}
+/* ---------- v5：合集选择（并入预览卡，和「输出尺寸」同一排） ---------- */
+.colchips{gap:6px}
+.colchip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 5px;
+  border:1px solid #dcdfe4;border-radius:999px;background:#fff;cursor:pointer;
+  font-family:inherit;font-size:12px;color:#333;line-height:1;white-space:nowrap}
+.colchip:hover{border-color:#c2c7cf}
+.colchip .ccsvg{display:block;flex:0 0 auto}
+.colchip.on{border-color:var(--acc);background:var(--c1);color:#241c10;font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.colnote{font-size:11px;color:#8a9099;line-height:1.7;margin:-2px 0 10px}
 /* ---------- v5：尺寸说明（折叠置底） ---------- */
 details.sumcard{border:1px solid #e6e8eb;border-radius:12px;background:#fff;padding:13px 15px;margin-bottom:6px}
 details.sumcard>summary{cursor:pointer;font-size:12px;color:#8a9099;font-weight:700;letter-spacing:.6px;list-style:none}
@@ -139,9 +132,8 @@ details.sumcard .note{margin:11px 0 0}
   .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
   .colL,.colR{display:contents}
   .sumcard{grid-column:1;grid-row:auto}
-  #cardPv{order:1}#cardCol{order:2}#cardText{order:3}
-  #cardTpl{order:4}#cardImg{order:5}#cardSize{order:6}
-  .colcards{gap:7px}
+  #cardPv{order:1}#cardText{order:2}
+  #cardTpl{order:3}#cardImg{order:4}#cardSize{order:5}
   .pv.mini{display:none}
   .pv.main canvas{width:min(52vw,230px)}
   body{font-size:15px}
@@ -171,14 +163,14 @@ details.sumcard .note{margin:11px 0 0}
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v5 合集视觉指纹</span>
-  <span>① 选合集 → ② 写文字 → ③ 传主图 → ④ 选版式 · 选完即见预览</span>
+  <span>选合集 → 写文字 → 传主图 → 选版式 · 写完即见预览</span>
   <a href="../douyin-cover-tool-v4/">← v4</a>
 </header>
 <div class="wrap">
   <div class="colL">
 
     <div class="card" id="cardText">
-      <h2>② 文字（只保留两级）</h2>
+      <h2>① 文字（只保留两级）</h2>
       <div class="note"><b>v5 铁律：</b>封面只有主标题 + 副标题两级文字；先排文字、再按剩余空间放图，<b>文字和图片物理上不可能重叠</b>。</div>
       <label>主标题 <span class="hint">建议 4–8 字，手机上一眼能读完</span>
         <input id="title" placeholder="例：纸杯塔能有多高"></label>
@@ -189,7 +181,7 @@ details.sumcard .note{margin:11px 0 0}
 
 
     <div class="card" id="cardImg">
-      <h2>③ 主图</h2>
+      <h2>② 主图</h2>
       <div class="drop" id="drop">
         <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
         <input type="file" id="file" accept="image/*" hidden>
@@ -221,18 +213,17 @@ details.sumcard .note{margin:11px 0 0}
 
   <div class="colR">
 
-    <div class="card" id="cardCol">
-      <h2>① 合集（决定配色与形状，选完立即预览）</h2>
-      <div class="colcards" id="cols"></div>
-      <div class="note" id="colNote" style="margin:11px 0 0"></div>
-    </div>
-
     <div class="card" id="cardPv">
       <h2>预览与导出</h2>
       <div class="ratiowrap">
         <span class="lb">输出尺寸</span>
         <div class="chips" id="ratiosMini"></div>
       </div>
+      <div class="ratiowrap" style="margin:-2px 0 8px">
+        <span class="lb">合集</span>
+        <div class="chips colchips" id="cols"></div>
+      </div>
+      <div class="colnote" id="colNote"></div>
       <div class="stage">
         <div class="pv main">
           <h4 id="pvTitle">封面 1080×1440</h4>
@@ -255,14 +246,14 @@ details.sumcard .note{margin:11px 0 0}
     </div>
 
     <div class="card" id="cardTpl">
-      <h2>④ 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
+      <h2>③ 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
       <div id="fams"></div>
     </div>
 
   </div>
 
   <details class="sumcard" id="cardSize">
-    <summary><b>⑤ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
+    <summary><b>④ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
     <div class="note" id="ratioNote" style="margin:11px 0 0"></div>
   </details>
 </div>
@@ -1131,13 +1122,10 @@ function buildCols(){
   Object.keys(COLLECTIONS).forEach(k=>{
     const c=COLLECTIONS[k];
     const b=document.createElement('button');
-    b.className='colcard'+(state.col===k?' on':'');
+    b.className='colchip'+(state.col===k?' on':'');
     b.style.setProperty('--c1',c.g1); b.style.setProperty('--c2',c.g2); b.style.setProperty('--acc',c.accent);
     b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
-    b.innerHTML='<span class="ccbadge">'+colBadgeSVG(c,26)+'</span>'+
-                '<span class="ccname">'+c.short+'</span>'+
-                '<span class="ccrec">统一 '+c.rec[0]+' 骨架</span>'+
-                '<span class="ccswatch"></span>';
+    b.innerHTML=colBadgeSVG(c,17)+'<span>'+c.short+'</span>';
     b.onclick=()=>{
       state.col=k; state.layout=c.rec[0];
       /* 标题还是"合集自带示例文案"时，跟随合集自动换；用户自己写过的一律不动 */
@@ -1154,11 +1142,10 @@ function buildCols(){
   });
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
-  if(note) note.innerHTML='<b>当前合集：</b>'+colBadgeSVG(cur,20)+' '+cur.name+
-    '<br>'+cur.desc+'。四个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
-    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
-    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清四个合集的关键。'+
-    '<br><b>点合集卡片</b>：配色 + 徽标 + 示例文案一起换，下面预览立刻变；你自己写过标题后，系统就不再替你改文案了。';
+  if(note) note.innerHTML='<b style="color:'+cur.accent+'">'+cur.short+'</b> · '+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 徽标 '+cur.badge+
+    ' · 同一套骨架只换配色与形状，九宫格里一眼分清。<br>'+
+    '点合集会连示例文案一起换；你自己写过标题后，系统就不再替你改。';
 }
 function buildTpls(){
   const host=document.getElementById('fams');host.innerHTML='';
