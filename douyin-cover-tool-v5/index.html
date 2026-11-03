@@ -98,7 +98,7 @@ button.ghost b{float:right;color:#111}
 .ratiowrap .chip{padding:5px 12px;font-size:12px}
 .ratiowrap .chip small{display:inline;margin-left:6px;opacity:.7}
 /* ---------- v5：合集卡片（配色 + 形状 一眼可辨） ---------- */
-.colcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.colcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .colcard{text-align:center;cursor:pointer;font-family:inherit;border:1.5px solid #e6e8eb;
   background:#fff;border-radius:11px;padding:9px 5px 8px;display:flex;flex-direction:column;
   align-items:center;gap:5px;overflow:hidden}
@@ -108,7 +108,7 @@ button.ghost b{float:right;color:#111}
 .colcard .ccbadge{width:30px;height:30px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0}
 .colcard .ccbadge .ccsvg{display:block}
-.colcard .ccname{font-weight:700;font-size:12.5px;color:#222;line-height:1.2;white-space:nowrap}
+.colcard .ccname{font-weight:700;font-size:13px;color:#222;line-height:1.2;white-space:nowrap}
 .colcard .ccrec{font-size:9.5px;color:var(--acc);font-weight:700;letter-spacing:.2px;white-space:nowrap}
 .colcard.on .ccname{color:#241c10}
 .colcard.on .ccrec{color:var(--acc)}
@@ -274,7 +274,7 @@ details.sumcard .note{margin:11px 0 0}
 <script>
 /* =========================================================
    乐小侠 · 抖音封面工作台 v5.0 引擎
-   —— 先写文字即见预览 · 三合集视觉指纹（配色+形状）· 文字图片零重叠 ——
+   —— 先写文字即见预览 · 四合集视觉指纹（配色+形状）· 文字图片零重叠 ——
 
    v5 铁律
    1. 每张封面只有两级文字：主标题 + 副标题
@@ -329,33 +329,51 @@ const LAYOUTS = [
   {id:'B5', fam:'C', name:'大圆图·上文字',  desc:'纯色底，大圆图居中，标题在上'}
 ];
 
-/* ---------- v5 合集视觉系统：每个合集 = 独立配色 + 独立形状 + 独立推荐版式 ---------- */
+/* ---------- v5 合集视觉系统 ----------
+   设计原则（大哥要求：四个集合放一起要「成套有渐变」但仍能分辨，手机里不能花花绿绿）
+   1) 主色取色相环【严格四等分】：30° 杏橘 / 120° 豆绿 / 210° 雾蓝 / 300° 藕紫
+      —— 等分 = 并排时是一条连续的色相渐变；间隔 90° = 每个封面单独看仍一眼可辨
+   2) 饱和度锁在 26~46、明度锁在 50~58 —— 同亮度档是「不花」的关键，
+      高饱和色并排必然炸眼（原来橙/紫/绿就是这个问题）
+   3) 背景【统一奶油纸底 + 主色淡淡染色】：不再每个合集换底色，
+      底色统一后，四张封面并排是一套纸，只靠主色和徽标形状区分
+   4) 文字墨色【全局统一】—— 标题、副标题不再各配一套黑，避免紫字绿字混排的杂乱
+*/
 const COLLECTIONS = {
   play: {
-    id:'play', name:'试过的好玩法子，挑战一下', short:'好玩法子', icon:'🎮',
+    id:'play', name:'试过的好玩法子，挑战一下', short:'好玩法子',
     desc:'室内外的亲子游戏 · 各种好玩的挑战',
-    g1:'#FFF4E2', g2:'#FFD9A3', ink:'#2B1D0E', ink2:'#7A6244',
-    accent:'#E8871E', accent2:'#FFB25C', card:'#FFFFFF',
+    g1:'#F6EEE1', g2:'#EBDCC6', ink:'#2C2721', ink2:'#6E6458',
+    accent:'#C59463', accent2:'#D6BDA4', card:'#FFFFFF',
     badge:'dice',                       /* 形状指纹：圆牌 + 骰子点 */
     img:'assets/cover-play.jpg',
-    rec:['B5']                         /* 统一骨架：三个合集一律 B5 打底，只换配色 */
+    rec:['B5']                         /* 统一骨架：四个合集一律 B5 打底，只换配色 */
   },
   craft: {
-    id:'craft', name:'捣鼓过的手工，你也能整', short:'手工', icon:'✂️',
+    id:'craft', name:'捣鼓过的手工，你也能整', short:'手工',
     desc:'各种手工制作 · 零成本也能做',
-    g1:'#F3EFFB', g2:'#D7C9F0', ink:'#241A3D', ink2:'#6B5A93',
-    accent:'#7B5EA7', accent2:'#B49BE8', card:'#FFFFFF',
+    g1:'#F1E9E6', g2:'#E0D0DA', ink:'#2C2721', ink2:'#6E6458',
+    accent:'#9E6EAA', accent2:'#BDA8C2', card:'#FFFFFF',
     badge:'scissors',                   /* 形状指纹：方牌 + 剪刀 */
     img:'assets/cover-craft.jpg',
     rec:['B5']
   },
   travel: {
-    id:'travel', name:'踩过点的好去处，玩着不烧心', short:'好去处', icon:'🗺️',
+    id:'travel', name:'踩过点的好去处，玩着不烧心', short:'好去处',
     desc:'出去逛的攻略 · 游山玩水不踩坑',
-    g1:'#EDF7EE', g2:'#C2E7C6', ink:'#0F2714', ink2:'#4C7A55',
-    accent:'#2E9E4F', accent2:'#84D18C', card:'#FFFFFF',
-    badge:'mountain',                   /* 形状指纹：旗标 + 山形 */
+    g1:'#EDEEE0', g2:'#D5DDC6', ink:'#2C2721', ink2:'#6E6458',
+    accent:'#74A15E', accent2:'#A3B899', card:'#FFFFFF',
+    badge:'mountain',                   /* 形状指纹：旗牌 + 山形 */
     img:'assets/cover-travel.jpg',
+    rec:['B5']
+  },
+  daily: {
+    id:'daily', name:'带娃日常里的小经验，抄走就行', short:'带娃日常',
+    desc:'碎碎念的经验 · 省事不踩坑',
+    g1:'#EAEBE7', g2:'#CFD6D8', ink:'#2C2721', ink2:'#6E6458',
+    accent:'#608BA9', accent2:'#9BB0BF', card:'#FFFFFF',
+    badge:'bubble',                     /* 形状指纹：气泡牌 + 对话点 */
+    img:'assets/cover-daily.jpg',
     rec:['B5']
   }
 };
@@ -378,6 +396,14 @@ const PRESETS = {
     B4:{title:'纸箱变身小汽车', sub:'垃圾袋 + 快递纸箱'},
     B5:{title:'纸箱变身小汽车', sub:'垃圾袋 + 快递纸箱'}
   },
+  daily:{
+    title:'带娃这事我踩过的坑', sub:'省事心得 · 抄走就行',
+    B1:{title:'带娃这事我踩过的坑', sub:'省事心得 · 抄走就行'},
+    B2:{title:'带娃这事我踩过的坑', sub:'省事心得 · 抄走就行'},
+    B3:{title:'带娃这事我踩过的坑', sub:'碎碎念 · 经验贴'},
+    B4:{title:'带娃这事我踩过的坑', sub:'省事心得 · 抄走就行'},
+    B5:{title:'带娃这事我踩过的坑', sub:'碎碎念 · 经验贴'}
+  },
   travel:{
     title:'这地方娃能疯一下午', sub:'不晒不累 · 推车能到',
     B1:{title:'这地方娃能疯一下午', sub:'不晒不累 · 推车能到'},
@@ -396,7 +422,9 @@ function colBadgeSVG(c,size){
     ? '<circle cx="'+h+'" cy="'+h+'" r="'+(h-1.5)+'"/>'
     : (c.badge==='scissors'
       ? '<rect x="1.5" y="1.5" width="'+(s-3)+'" height="'+(s-3)+'" rx="'+(s*0.26)+'"/>'
-      : '<path d="M1.5 1.5 H'+(s-1.5)+' V'+(s-1.5)+' L1.5 '+(s+s*0.20-1.5)+' Z"/>');
+      : (c.badge==='mountain'
+        ? '<path d="M1.5 1.5 H'+(s-1.5)+' V'+(s-1.5)+' L1.5 '+(s+s*0.20-1.5)+' Z"/>'
+        : '<path d="M'+(s*0.08)+' '+(s*0.08)+' H'+(s*0.92)+' V'+(s*0.78)+' H'+(s*0.44)+' L'+(s*0.26)+' '+(s*0.94)+' V'+(s*0.78)+' H'+(s*0.08)+' Z"/>'));
   let glyph='';
   if(c.badge==='dice'){
     const r=s*0.085, pts=[[-0.19,-0.19],[0.19,0.19],[0,0]];
@@ -407,11 +435,15 @@ function colBadgeSVG(c,size){
       '<path d="M'+(h+s*0.20)+' '+(h-s*0.18)+' L'+(h-s*0.22)+' '+(h+s*0.18)+'"/>'+
       '<circle cx="'+(h-s*0.24)+'" cy="'+(h+s*0.24)+'" r="'+(s*0.095)+'"/>'+
       '<circle cx="'+(h+s*0.24)+'" cy="'+(h+s*0.24)+'" r="'+(s*0.095)+'"/></g>';
-  }else{
+  }else if(c.badge==='mountain'){
     glyph='<g stroke="'+c.accent+'" stroke-width="'+sw+'" fill="none" stroke-linejoin="round">'+
       '<path d="M'+(h-s*0.32)+' '+(h+s*0.26)+' L'+(h-s*0.06)+' '+(h-s*0.18)+' L'+(h+s*0.15)+' '+(h+s*0.26)+' Z"/>'+
       '<path d="M'+(h-s*0.03)+' '+(h+s*0.26)+' L'+(h+s*0.20)+' '+(h-s*0.02)+' L'+(h+s*0.38)+' '+(h+s*0.26)+' Z"/></g>'+
       '<circle cx="'+(h+s*0.25)+'" cy="'+(h-s*0.24)+'" r="'+(s*0.075)+'" fill="'+c.accent+'"/>';
+  }else{
+    glyph='<g stroke="'+c.accent+'" stroke-linecap="round" fill="none">'+
+      '<path d="M'+(h-s*0.20)+' '+(h-s*0.09)+' H'+(h+s*0.20)+'" stroke-width="'+(s*0.072)+'"/>'+
+      '<path d="M'+(h-s*0.20)+' '+(h+s*0.12)+' H'+(h+s*0.06)+'" stroke-width="'+(s*0.058)+'"/></g>';
   }
   return '<svg class="ccsvg" viewBox="0 0 '+s+' '+s+'" width="'+s+'" height="'+s+'" aria-hidden="true">'+
     '<g fill="'+c.accent+'" fill-opacity="0.13" stroke="'+c.accent+'" stroke-opacity="0.55" stroke-width="2">'+shape+'</g>'+
@@ -918,7 +950,7 @@ function drawGuides(ctx,G){
 
 /* ---------------------------------------------------------------
    v5 合集徽标：满图版式下背景色看不见，靠徽标形状 + 主色区分合集
-   —— 三个合集共用同一套「位置/尺寸/阴影」规则，只换形状与颜色，整体协调
+   —— 四个合集共用同一套「位置/尺寸/阴影」规则，只换形状与颜色，整体协调
    --------------------------------------------------------------- */
 function drawColBadge(ctx,c,G,pos){
   const k=G.k, sz=Math.round(74*k), pad=Math.round(34*k);
@@ -934,9 +966,12 @@ function drawColBadge(ctx,c,G,pos){
       ctx.beginPath(); ctx.arc(cx,cy,half,0,Math.PI*2);
     }else if(c.badge==='scissors'){
       roundRectPath(ctx,cx-half,cy-half,sz,sz,Math.round(sz*0.26));
-    }else{
+    }else if(c.badge==='mountain'){
       /* 旗标：右下斜切，像路标小旗 */
       polyPath(ctx,[[cx-half,cy-half],[cx+half,cy-half],[cx+half,cy+half],[cx-half,cy+half+sz*0.20]]);
+    }else{
+      /* 气泡牌：圆角方 + 左下小尾巴，像一句对话 */
+      roundRectPath(ctx,cx-half,cy-half*0.92,sz,sz*0.94,Math.round(sz*0.28));
     }
   };
   ctx.save();
@@ -956,6 +991,7 @@ function drawColBadge(ctx,c,G,pos){
     [[-0.19,-0.19],[0.19,0.19],[0,0]].forEach(p=>{
       ctx.beginPath(); ctx.arc(cx+p[0]*sz, cy+p[1]*sz, r, 0, Math.PI*2); ctx.fill();
     });
+    /* 斜向三点 = 骰子的经典排布；再加一道细分割线强化「骰面」感 */
   }else if(c.badge==='scissors'){
     ctx.lineWidth=Math.round(sz*0.065);
     ctx.beginPath();
@@ -965,7 +1001,7 @@ function drawColBadge(ctx,c,G,pos){
     ctx.lineWidth=Math.round(sz*0.055);
     ctx.beginPath(); ctx.arc(cx-sz*0.24,cy+sz*0.24,sz*0.095,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(cx+sz*0.24,cy+sz*0.24,sz*0.095,0,Math.PI*2); ctx.stroke();
-  }else{
+  }else if(c.badge==='mountain'){
     /* 山形：两座山 + 一轮太阳 */
     ctx.lineWidth=Math.round(sz*0.062);
     ctx.beginPath();
@@ -975,6 +1011,13 @@ function drawColBadge(ctx,c,G,pos){
     ctx.moveTo(cx-sz*0.03,cy+sz*0.26); ctx.lineTo(cx+sz*0.20,cy-sz*0.02); ctx.lineTo(cx+sz*0.38,cy+sz*0.26);
     ctx.closePath(); ctx.stroke();
     ctx.beginPath(); ctx.arc(cx+sz*0.25,cy-sz*0.24,sz*0.075,0,Math.PI*2); ctx.fill();
+  }else{
+    /* 对话：两条消息条（不用圆点 —— 圆点会和骰子牌的三个点撞，缩略图上分不开） */
+    ctx.lineCap='round';
+    ctx.lineWidth=Math.round(sz*0.072);
+    ctx.beginPath(); ctx.moveTo(cx-sz*0.20,cy-sz*0.09); ctx.lineTo(cx+sz*0.20,cy-sz*0.09); ctx.stroke();
+    ctx.lineWidth=Math.round(sz*0.058);
+    ctx.beginPath(); ctx.moveTo(cx-sz*0.20,cy+sz*0.12); ctx.lineTo(cx+sz*0.06,cy+sz*0.12); ctx.stroke();
   }
   ctx.restore();
 }
@@ -1107,9 +1150,9 @@ function buildCols(){
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
   if(note) note.innerHTML='<b>当前合集：</b>'+colBadgeSVG(cur,20)+' '+cur.name+
-    '<br>'+cur.desc+'。三个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
+    '<br>'+cur.desc+'。四个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
     '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
-    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清三个合集的关键。';
+    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清四个合集的关键。';
 }
 function buildTpls(){
   const host=document.getElementById('fams');host.innerHTML='';
@@ -1154,6 +1197,11 @@ const HOOKS={
     '数字挑战':['3 小时来回不累','第 6 个踩过点的地方','推车能到的 5 个地方'],
     '悬念提问':['这地方娃能疯一下午','你会带娃去哪','树荫下面有惊喜'],
     '结果反差':['不晒不累还凉快','娃赖着不肯走','不用排队的地方']
+  },
+  daily:{
+    '数字挑战':['带娃 3 年踩过的 7 个坑','一天能省 2 小时的 5 个办法','娃出生第 1 年我买错的 6 样'],
+    '悬念提问':['带娃这事你干过吗','为什么娃睡前非要喝奶','一句话娃就不哭了'],
+    '结果反差':['带娃其实没那么难','娃自己把饭吃完','娃反而主动去刷牙']
   }
 };
 function buildHooks(){
