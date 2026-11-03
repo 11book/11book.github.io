@@ -1573,7 +1573,8 @@ function drawPvBadge(ctx,Gg){
   const sc=state.exportScale;
   const p=blurProfile();
   const blur=p?p.blur:1;
-  const t1=sc+'× 导出 · '+Math.round(Gg.W*sc)+'×'+Math.round(Gg.H*sc);
+  /* 预览上不标导出尺寸（尺寸在倍率 chip 和提示区看） */
+  const t1='导出 '+sc+'×';
   const t2= blur>1.5 ? ('⚠ 放大'+blur.toFixed(2)+'× · 会发软')
             : blur>1.1 ? ('● 放大'+blur.toFixed(2)+'× · 略糊')
             : ('✓ 放大'+blur.toFixed(2)+'× · 清晰');
