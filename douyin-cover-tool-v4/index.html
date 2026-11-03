@@ -432,16 +432,19 @@ function textBlock(ctx,d,o){
   const firstBase = (o.anchor==='bottom')
     ? o.y - blockH + t.size*0.86
     : o.y + t.size*0.86;
-  ctx.textAlign=o.align||'left'; ctx.textBaseline='alphabetic';
+  /* 居中时落笔点必须是「框中心」而不是框左边界，否则整块文字往左溢出画布 */
+  const align=o.align||'left';
+  const drawX = (align==='center') ? o.x + w/2 : o.x;
+  ctx.textAlign=align; ctx.textBaseline='alphabetic';
   ctx.font=F(900,t.size); ctx.fillStyle=o.color||'#000';
   let y=firstBase;
-  t.lines.forEach(l=>{ ctx.fillText(l,o.x,y); y+=lh; });
+  t.lines.forEach(l=>{ ctx.fillText(l,drawX,y); y+=lh; });
   const titleBottom = y-lh;
   let subBottom = titleBottom;
   if(st){
     const sb=titleBottom+gap+st.size*0.86;
     ctx.font=F(600,st.size); ctx.fillStyle=o.subColor||o.color||'#000';
-    ctx.fillText(st.lines[0],o.x,sb);
+    ctx.fillText(st.lines[0],drawX,sb);
     subBottom=sb;
   }
   ctx.textAlign='left';
