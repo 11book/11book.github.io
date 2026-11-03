@@ -30,6 +30,10 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
 .drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
 .drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
+.drop.mini{border-width:1.5px;padding:0;height:40px;border-radius:9px;font-size:12px;
+  display:flex;align-items:center;justify-content:center;flex:1;min-width:190px}
+.drop.mini #dropTxt{display:flex;align-items:center;gap:8px;line-height:1.2}
+.drop.mini img{max-width:96px;max-height:26px;border-radius:5px;margin:0;flex:0 0 auto}
 .cropbox{margin-top:11px;border:1px solid #e6e8eb;border-radius:10px;padding:11px;background:#fafbfc}
 .cropbox.hide{display:none}
 .cropbox .ct{font-size:12px;font-weight:700;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:6px}
@@ -85,10 +89,7 @@ button.ghost b{float:right;color:#111}
 /* ---------- v5：左控制列 / 右工作列 ---------- */
 .colL{grid-column:1;grid-row:1;min-width:0}
 .colR{grid-column:2;grid-row:1;min-width:0}
-/* 桌面端：预览卡片吸顶 —— 左边写文字时，封面一直在眼前 */
-@media(min-width:901px){
-  #cardPv{position:sticky;top:12px;z-index:5;box-shadow:0 6px 22px rgba(0,0,0,.07)}
-}
+/* 桌面端：预览卡现在装着 主图/裁剪/导出，内容高，不再吸顶 */
 .sumcard{grid-column:1/-1;grid-row:2}
 .ratiowrap{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:-2px 0 12px}
 .ratiowrap .lb{font-size:11px;color:#8a9099;font-weight:700;letter-spacing:.5px}
@@ -133,7 +134,7 @@ details.sumcard .note{margin:11px 0 0}
   .colL,.colR{display:contents}
   .sumcard{grid-column:1;grid-row:auto}
   #cardPv{order:1}#cardText{order:2}
-  #cardTpl{order:3}#cardImg{order:4}#cardSize{order:5}
+  #cardTpl{order:3}#cardSize{order:4}
   .pv.mini{display:none}
   .pv.main canvas{width:min(52vw,230px)}
   body{font-size:15px}
@@ -163,7 +164,7 @@ details.sumcard .note{margin:11px 0 0}
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v5 合集视觉指纹</span>
-  <span>选合集 → 写文字 → 传主图 → 选版式 · 写完即见预览</span>
+  <span>选合集 → 传主图 → 写文字 → 选版式 · 全部就位在预览里，改一处即时见效</span>
   <a href="../douyin-cover-tool-v4/">← v4</a>
 </header>
 <div class="wrap">
@@ -179,14 +180,35 @@ details.sumcard .note{margin:11px 0 0}
       <div style="font-size:11.5px;color:#8a9099;margin:-2px 0 4px">每个合集都预置了一组示例文案，切合集会自动带上；你一旦手改，就永远以你写的为准。</div>
     </div>
 
+    <div class="card" id="cardTpl">
+      <h2>② 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
+      <div id="fams"></div>
+    </div>
 
-    <div class="card" id="cardImg">
-      <h2>② 主图</h2>
-      <div class="drop" id="drop">
-        <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
-        <input type="file" id="file" accept="image/*" hidden>
+
+
+  </div>
+
+  <div class="colR">
+
+    <div class="card" id="cardPv">
+      <h2>预览 · 主图 · 导出</h2>
+      <div class="ratiowrap">
+        <span class="lb">输出尺寸</span>
+        <div class="chips" id="ratiosMini"></div>
       </div>
-
+      <div class="ratiowrap" style="margin:-2px 0 8px">
+        <span class="lb">合集</span>
+        <div class="chips colchips" id="cols"></div>
+      </div>
+      <div class="colnote" id="colNote"></div>
+      <div class="ratiowrap" style="margin:0 0 8px">
+        <span class="lb">主图</span>
+        <div class="drop mini" id="drop">
+          <div id="dropTxt">点击选图 · 或拖进来 · 不传则用合集示例图</div>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+      </div>
       <div class="cropbox hide" id="cropBox">
         <div class="ct">✂️ 裁剪要显示的区域 <span class="info" id="cropSrcInfo"></span></div>
         <canvas class="cropcv" id="cropCv" height="220"></canvas>
@@ -201,29 +223,6 @@ details.sumcard .note{margin:11px 0 0}
         </div>
         <div class="cropres" id="cropRes"></div>
       </div>
-
-      <div class="scalebox">
-        <div class="st">导出清晰度</div>
-        <div class="chips" id="scales"></div>
-        <div class="scaleq" id="scaleQ"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="colR">
-
-    <div class="card" id="cardPv">
-      <h2>预览与导出</h2>
-      <div class="ratiowrap">
-        <span class="lb">输出尺寸</span>
-        <div class="chips" id="ratiosMini"></div>
-      </div>
-      <div class="ratiowrap" style="margin:-2px 0 8px">
-        <span class="lb">合集</span>
-        <div class="chips colchips" id="cols"></div>
-      </div>
-      <div class="colnote" id="colNote"></div>
       <div class="stage">
         <div class="pv main">
           <h4 id="pvTitle">封面 1080×1440</h4>
@@ -240,15 +239,16 @@ details.sumcard .note{margin:11px 0 0}
           <button class="ghost" id="expJpg">导出当前尺寸 JPG<b>小体积</b></button>
           <button class="ghost" id="expAll">导出 5 款拼图<b>当前尺寸</b></button>
           <button class="ghost" id="expThree">导出三尺寸各一张<b>3:4 / 9:16 / 16:9</b></button>
+          <div class="scalebox">
+            <div class="st">导出清晰度</div>
+            <div class="chips" id="scales"></div>
+            <div class="scaleq" id="scaleQ"></div>
+          </div>
           <div class="tips" id="check"></div>
         </div>
       </div>
     </div>
 
-    <div class="card" id="cardTpl">
-      <h2>③ 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
-      <div id="fams"></div>
-    </div>
 
   </div>
 
