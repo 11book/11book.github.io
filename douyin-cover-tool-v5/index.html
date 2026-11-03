@@ -61,6 +61,9 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .cropbox.locked .cropcv{opacity:.5;cursor:not-allowed}
 .cropbox.locked #cropRatios,.cropbox.locked .croprow .sbtn{opacity:.45;pointer-events:none}
 .sbtn.cropon{margin-left:auto;font-weight:700}
+.cropmodes{display:flex;gap:5px;margin:-2px 0 8px}
+.cropmodes .sbtn{flex:1 1 0;text-align:center}
+.cropmodes .sbtn.on{background:#111;border-color:#111;color:#fff;font-weight:700}
 .sbtn.cropon.on{background:#111;border-color:#111;color:#fff}
 .cropcv{user-select:none;-webkit-user-drag:none}
 .croprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
@@ -167,12 +170,23 @@ details.sumcard .note{margin:11px 0 0}
   label input{font-size:16px;padding:10px 12px}
   .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:100%}
   .t .n{padding:5px 6px;font-size:11px}
-  .pv.main{position:sticky;top:44px;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
+  .pv.main{position:static;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
   .pv.main canvas{width:min(46vw,200px);margin:0 auto}
   .pv.main h4{margin-bottom:6px;font-size:10px;text-align:center}
   .pv.main label{margin-top:6px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px}
   .pv.main label input{width:auto;margin:0}
   .stage{gap:10px}
+  /* 手机上：裁剪画布与封面预览并排一行，比例/按钮/说明另起整行铺满 */
+  .workbench{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 8px;align-items:start}
+  .workbench .cropbox{display:contents}
+  .workbench .cropbox .ct{grid-column:1/-1;grid-row:1;font-size:11px;gap:4px;margin:0}
+  .workbench .cropwrap{grid-column:1;grid-row:2;border:1px solid #e6e8eb;border-radius:10px;padding:6px;background:#fafbfc}
+  .workbench .cropcv{width:100%;display:block}
+  .workbench .cropbox .croprow{grid-column:1/-1;gap:5px;margin:0}
+  .workbench .cropbox .cropres{grid-column:1/-1;font-size:10.5px}
+  .workbench .pv.main{grid-column:2;grid-row:2;padding:6px;width:auto}
+  .pv.main canvas{width:min(40vw,146px)!important;margin:0 auto}
+  .pv.main h4{font-size:9.5px}
   .btns{min-width:100%;flex-direction:row;flex-wrap:wrap;gap:8px}
   .btns button.big{flex:1 1 100%}
   .btns button.ghost{flex:1 1 calc(50% - 4px);text-align:center;padding:11px 8px;font-size:12.5px}
@@ -181,7 +195,13 @@ details.sumcard .note{margin:11px 0 0}
 }
 @media(max-width:560px){
   .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-  .pv.main canvas{width:min(52vw,190px)}
+  .workbench{gap:6px}
+  .workbench .cropwrap{padding:5px}
+  .workbench .pv.main{padding:5px}
+  .pv.main canvas{width:min(38vw,136px)!important}
+  .cropbox .ct{font-size:10.5px}
+  .cropbox .ct .info{display:none}
+  .sbtn{padding:3px 7px;font-size:10.5px}
 }
 </style>
 </head>
@@ -239,6 +259,10 @@ details.sumcard .note{margin:11px 0 0}
             <div class="ct">✂️ 裁剪要显示的区域
               <span class="info" id="cropSrcInfo"></span>
               <button class="sbtn cropon" id="cropBtn" type="button">🔒 启用裁剪</button>
+            </div>
+            <div class="cropmodes" id="cropModes">
+              <button class="sbtn" id="cropFitFull" type="button">看全图</button>
+              <button class="sbtn on" id="cropFitWide" type="button">按宽取景</button>
             </div>
             <div class="cropwrap">
               <canvas class="cropcv" id="cropCv" height="220" draggable="false"></canvas>
@@ -1045,6 +1069,8 @@ function drawColBadge(ctx,c,G,pos){
 const state={col:'play',layout:'B5',ratio:'3x4',title:'',sub:'',img:null,
   autoText:true,               /* true=标题还是合集自带示例文案，切合集时自动跟着换；用户一旦手改就置 false */
   cropOn:false,                /* 裁剪开关：默认锁住，防止手滑拖坏图；要裁先点「启用裁剪」 */
+  cropFit:'wide',              /* 取景模式：wide=按宽度取景（竖图可上下拖动），full=看全图 */
+  cropPan:0,                   /* 按宽取景时的纵向滚动偏移（画布像素） */
   cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
   objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
   exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
@@ -1237,20 +1263,56 @@ function setCrop(c){
 }
 
 /* 裁剪预览画布：显示原图 + 可拖拽的选框 */
+/* 宽取景：选区最多一屏高，并始终完整可见；上下移动选区 = 在长图里找位置 */
+function cropVH(){
+  const cv=document.getElementById('cropCv');
+  const W=cv.clientWidth||300;
+  const mob=window.innerWidth<=900;
+  const H=mob?Math.max(220,Math.min(430,Math.round(window.innerHeight*0.46)))
+             :Math.max(120,Math.min(220,Math.round(W*0.72)));
+  return {W:W,H:H,dh:state.img?Math.round(W*state.img.height/state.img.width):H};
+}
+function clampCropWide(){
+  if(!state.img) return;
+  const V=cropVH();
+  const c=getCrop();
+  let w=Math.max(0.06,Math.min(1,c.w));
+  let h=Math.max(0.06,Math.min(c.h, V.H*0.88/Math.max(1,V.dh)));
+  let y=Math.max(0,Math.min(1-h,c.y));
+  let x=Math.max(0,Math.min(1-w,c.x));
+  setCrop({x:x,y:y,w:w,h:h});
+}
 function drawCropUI(){
   const box=document.getElementById('cropBox');
   const im=state.img;
   if(!im||!im.width){ box.classList.add('hide'); return; }
   box.classList.remove('hide');
   const cv=document.getElementById('cropCv');
-  const W=cv.clientWidth||300, H=220;
+  const W=cv.clientWidth||300;
+  /* 画布高度：桌面按宽度比例；手机竖屏时给足高度，方便框选竖图 */
+  const mob=window.innerWidth<=900;
+  const H=mob?Math.max(220,Math.min(430,Math.round(window.innerHeight*0.46)))
+             :Math.max(120,Math.min(220,Math.round(W*0.72)));
   cv.width=W; cv.height=H;
   const x=cv.getContext('2d');
   const iw=im.width, ih=im.height;
-  /* contain：完整显示原图（用户要看到全部才能框选），四周留底色 */
-  const s=Math.min(W/iw,H/ih);
-  const dw=iw*s, dh=ih*s;
-  const ox=(W-dw)/2, oy=(H-dh)/2;
+  let dw,dh,ox,oy;
+  const wideFit = state.cropFit==='wide' && (ih/iw) > (H/W)*1.15;
+  if(wideFit){
+    /* 按宽度取景：竖图按真实宽度铺满，选区居中显示，可在长图里上下移动 */
+    clampCropWide();
+    dw=W; dh=Math.round(W*ih/iw); ox=0;
+    const maxPan=Math.max(0,dh-H);
+    const c0=getCrop();
+    const center=c0.y*dh+c0.h*dh/2;
+    state.cropPan=Math.max(0,Math.min(maxPan, center-H/2));
+    oy=-state.cropPan;
+  }else{
+    /* 看全图：完整显示原图，四周留底色 */
+    const s=Math.min(W/iw,H/ih);
+    dw=iw*s; dh=ih*s; ox=(W-dw)/2; oy=(H-dh)/2;
+    state.cropPan=0;
+  }
   x.fillStyle='#1a1a1a'; x.fillRect(0,0,W,H);
   x.drawImage(im,ox,oy,dw,dh);
   /* 选框（归一化 → 画布像素） */
@@ -1258,9 +1320,11 @@ function drawCropUI(){
   const cx=ox+c.x*dw, cy=oy+c.y*dh, cw=c.w*dw, ch=c.h*dh;
   /* 框外压暗 */
   x.fillStyle='rgba(0,0,0,.55)';
-  x.fillRect(0,0,W,cy); x.fillRect(0,cy+ch,W,H-cy-ch);
-  x.fillRect(0,cy,cx,ch); x.fillRect(cx+cw,cy,W-cx-cw,ch);
+  x.fillRect(0,0,W,Math.max(0,cy)); x.fillRect(0,cy+ch,W,Math.max(0,H-(cy+ch)));
+  x.fillRect(0,cy,Math.max(0,cx),ch); x.fillRect(cx+cw,cy,Math.max(0,W-(cx+cw)),ch);
   x.strokeStyle='#fff'; x.lineWidth=2; x.strokeRect(cx,cy,cw,ch);
+  /* 画布外的选框部分补一条视口边界线，提示还能往下拖 */
+  if(cy+ch>H){ x.strokeStyle='rgba(255,255,255,.6)'; x.setLineDash([4,4]); x.beginPath(); x.moveTo(cx,H); x.lineTo(cx+cw,H); x.stroke(); x.setLineDash([]); }
   /* 三分线 */
   x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=1;
   for(let i=1;i<3;i++){
@@ -1270,9 +1334,20 @@ function drawCropUI(){
   /* 角把手 */
   x.fillStyle='#fff';
   [[cx,cy],[cx+cw,cy],[cx,cy+ch],[cx+cw,cy+ch]].forEach(p=>{
+    if(p[0]<-4||p[0]>W+4||p[1]<-4||p[1]>H+4) return;
     x.fillRect(p[0]-4,p[1]-4,8,8);
   });
-  cv._map={ox:ox,oy:oy,dw:dw,dh:dh,W:W,H:H};
+  if(wideFit && dh>H+4){
+    const barW=6, bx=W-barW-3;
+    const trackH=H-8;
+    const th=Math.max(24,Math.round(trackH*(H/dh)));
+    const tp=Math.round((trackH-th)*(state.cropPan/Math.max(1,dh-H)));
+    x.fillStyle='rgba(255,255,255,.22)';
+    x.fillRect(bx,4,barW,trackH);
+    x.fillStyle='rgba(255,255,255,.85)';
+    x.fillRect(bx,4+tp,barW,th);
+  }
+  cv._map={ox:ox,oy:oy,dw:dw,dh:dh,W:W,H:H,wide:wideFit,barW:wideFit?9:0};
   /* 文字反馈 */
   const info=document.getElementById('cropSrcInfo');
   if(info) info.textContent='原图 '+iw+'×'+ih;
@@ -1354,7 +1429,7 @@ function cropPointer(ev){
   const r=cv.getBoundingClientRect();
   const px=(ev.clientX-r.left)*(cv.width/r.width);
   const py=(ev.clientY-r.top)*(cv.height/r.height);
-  return {px:px,py:py,map:m};
+  return {px:px,py:py,clientY:ev.clientY,map:m};
 }
 function cropHit(pt){
   const m=pt.map, c=getCrop();
@@ -1371,6 +1446,18 @@ function cropStart(ev){
   if(!state.cropOn) return;          /* 未启用裁剪 → 不响应，防止误拖 */
   const pt=cropPointer(ev); if(!pt) return;
   const hit=cropHit(pt);
+  const wide=pt.map.wide;
+  if(wide && pt.px>pt.map.W-(pt.map.barW||0)){
+    state.cropDrag={mode:'pan',py0:ev.clientY,pan0:state.cropPan,bar:true};
+    ev.preventDefault();
+    return;
+  }
+  if(!hit && wide){
+    /* 按宽取景时，点框外 = 上下平移取景器（不是新建选框） */
+    state.cropDrag={mode:'pan',py0:ev.clientY,pan0:state.cropPan};
+    ev.preventDefault();
+    return;
+  }
   if(!hit){ /* 点框外 → 以该点为中心开新选框 */
     const m=pt.map;
     state.cropDrag={mode:'new',ox:m.ox,oy:m.oy,dw:m.dw,dh:m.dh,px:pt.px,py:pt.py,c:getCrop()};
@@ -1386,6 +1473,25 @@ function cropApplyDrag(pt){
   const m=pt.map;
   const c=d.c;
   let nx=c.x, ny=c.y, nw=c.w, nh=c.h;
+  if(d.mode==='pan'){
+    const maxPan=Math.max(0,m.dh-m.H);
+    if(d.bar){
+      /* 右侧滚动条：直接定位选区中心 */
+      const track=m.H-8;
+      const frac=Math.max(0,Math.min(1,(pt.clientY-4)/Math.max(1,track-24)));
+      const c=getCrop();
+      const target=(frac*maxPan+m.H/2)/m.dh - c.h/2;
+      setCrop({x:c.x,y:Math.max(0,Math.min(1-c.h,target)),w:c.w,h:c.h});
+    }else{
+      /* 空白处拖动 = 在长图里上下移动选区 */
+      const c=getCrop();
+      const dy=(d.py0-pt.clientY)/m.dh;
+      setCrop({x:c.x,y:Math.max(0,Math.min(1-c.h,c.y+dy)),w:c.w,h:c.h});
+    }
+    drawCropUI();
+    refresh();
+    return;
+  }
   if(d.mode==='move'){
     nx=c.x+(pt.px-d.px0)/m.dw; ny=c.y+(pt.py-d.py0)/m.dh;
   }else{
@@ -1506,6 +1612,16 @@ document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.targ
   /* 裁剪开关：默认锁住，避免手滑把图拖坏；要裁先点按钮 */
   const cbtn=document.getElementById('cropBtn');
   const cbox=document.getElementById('cropBox');
+  /* 取景模式：看全图 / 按宽取景 */
+  const fFull=document.getElementById('cropFitFull'), fWide=document.getElementById('cropFitWide');
+  function setFit(v){
+    state.cropFit=v; state.cropPan=0;
+    if(fFull) fFull.classList.toggle('on',v==='full');
+    if(fWide) fWide.classList.toggle('on',v==='wide');
+    drawCropUI();
+  }
+  if(fFull) fFull.onclick=()=>setFit('full');
+  if(fWide) fWide.onclick=()=>setFit('wide');
   if(cbtn){
     cbtn.onclick=()=>{
       state.cropOn=!state.cropOn;
