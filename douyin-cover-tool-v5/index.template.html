@@ -388,7 +388,7 @@ function buildCols(){
     b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
     b.innerHTML='<span class="ccbadge">'+c.icon+'</span>'+
                 '<span class="ccname">'+c.short+'</span>'+
-                '<span class="ccrec">'+c.rec[0]+' 优先</span>'+
+                '<span class="ccrec">统一 '+c.rec[0]+' 骨架</span>'+
                 '<span class="ccswatch"></span>';
     b.onclick=()=>{
       state.col=k; state.layout=c.rec[0];
@@ -399,8 +399,9 @@ function buildCols(){
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
   if(note) note.innerHTML='<b>当前合集：</b>'+cur.icon+' '+cur.name+
-    '<br>'+cur.desc+'。主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
-    '封面角落的合集徽标形状也随合集切换 —— 这是放进主页九宫格后能一眼分清三个合集的关键。';
+    '<br>'+cur.desc+'。三个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
+    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清三个合集的关键。';
 }
 function buildTpls(){
   const host=document.getElementById('fams');host.innerHTML='';

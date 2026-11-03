@@ -337,7 +337,7 @@ const COLLECTIONS = {
     accent:'#E8871E', accent2:'#FFB25C', card:'#FFFFFF',
     badge:'dice',                       /* 形状指纹：圆牌 + 骰子点 */
     img:'assets/cover-play.jpg',
-    rec:['B5','B1','B4']
+    rec:['B5']                         /* 统一骨架：三个合集一律 B5 打底，只换配色 */
   },
   craft: {
     id:'craft', name:'捣鼓过的手工，你也能整', short:'手工', icon:'✂️',
@@ -346,7 +346,7 @@ const COLLECTIONS = {
     accent:'#12A47C', accent2:'#4FD3A9', card:'#FFFFFF',
     badge:'scissors',                   /* 形状指纹：方牌 + 剪刀 */
     img:'assets/cover-craft.jpg',
-    rec:['B4','B3','B1']
+    rec:['B5']
   },
   travel: {
     id:'travel', name:'踩过点的好去处，玩着不烧心', short:'好去处', icon:'🗺️',
@@ -355,7 +355,7 @@ const COLLECTIONS = {
     accent:'#2F72C8', accent2:'#7FB0EE', card:'#FFFFFF',
     badge:'mountain',                   /* 形状指纹：旗标 + 山形 */
     img:'assets/cover-travel.jpg',
-    rec:['B2','B3','B5']
+    rec:['B5']
   }
 };
 
@@ -447,10 +447,35 @@ function coverCircle(ctx,img,cx,cy,r,fy){
   drawCoverF(ctx,img,cx-r,cy-r,r*2,r*2,fy===undefined?0.28:fy);
   ctx.restore();
 }
-function ring(ctx,cx,cy,r,w,color){
+/* 圆环描边：实色硬边太突兀、抢戏 —— 改成「锥形渐变 + 半透明」的柔光环
+   —— 亮色在正上方、暗色在正下方，转动时有光感，又不会把大圆图的轮廓压死 */
+function ring(ctx,cx,cy,r,w,c1,c2,alpha){
   ctx.save();
   ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.lineWidth=w; ctx.strokeStyle=color; ctx.stroke();
+  ctx.lineWidth=w;
+  let g=null;
+  if(ctx.createConicGradient){
+    g=ctx.createConicGradient(-Math.PI/2,cx,cy);          /* 起点在正上方 */
+    g.addColorStop(0,   c1);
+    g.addColorStop(0.5, c2);
+    g.addColorStop(1,   c1);
+  }else{
+    g=ctx.createLinearGradient(cx-r,cy-r,cx+r,cy+r);
+    g.addColorStop(0,c1); g.addColorStop(1,c2);
+  }
+  ctx.globalAlpha=(alpha===undefined?0.82:alpha);
+  ctx.strokeStyle=g; ctx.stroke();
+  ctx.globalAlpha=1;
+  ctx.restore();
+}
+/* 外圈再加一道极淡的光晕，把「圈」和底色过渡开，而不是硬贴上去 */
+function ringGlow(ctx,cx,cy,r,w,color,alpha){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.lineWidth=w; ctx.strokeStyle=color;
+  ctx.globalAlpha=(alpha===undefined?0.22:alpha);
+  ctx.shadowColor=color; ctx.shadowBlur=w*1.6;
+  ctx.stroke();
   ctx.restore();
 }
 function fitText(ctx,text,maxW,maxSize,minSize,weight,maxLines){
@@ -562,7 +587,27 @@ function textBlock(ctx,d,o){
   const w=o.w;
   const prevLS=ctx.letterSpacing;
   ctx.letterSpacing='0px';
-  const t=fitText(ctx,d.title,w,maxT,minT,900,o.lines||2);
+  /* oneLine：优先排成一行（抖音封面上标题折行会明显掉档次）
+     —— 先按「整句塞进一行」求最大字号；实在放不下（标题过长）再退回两行 */
+  let t;
+  if(o.oneLine){
+    ctx.font=F(900,maxT);
+    const oneW=ctx.measureText((d.title||'').trim()).width;
+    if(oneW<=w){
+      t=fitText(ctx,d.title,w,maxT,minT,900,1);
+    }else{
+      /* 一行放不下：先试试压到 minT 能不能一行塞进去 */
+      let oneOK=false;
+      for(let s=maxT;s>=minT;s-=2){
+        ctx.font=F(900,s);
+        if(ctx.measureText((d.title||'').trim()).width<=w){ oneOK=true; break; }
+      }
+      t=oneOK?fitText(ctx,d.title,w,maxT,minT,900,1)
+             :fitText(ctx,d.title,w,maxT,minT,900,o.lines||2);
+    }
+  }else{
+    t=fitText(ctx,d.title,w,maxT,minT,900,o.lines||2);
+  }
   const lh=Math.round(t.size*(o.lh||1.30));
   const hasSub=!!(d.sub&&d.sub.trim()) && !o.noSub;
   /* 副标题字号必须跟随「实际渲染出的标题字号」：
@@ -785,22 +830,31 @@ B4(ctx,d,img,c,G){
 /* B5 大圆图·上文字 —— 先排字，再按剩余空间放圆，绝不重叠 */
 B5(ctx,d,img,c,G){
   gradBg(ctx,c,'v',G);
-  const W=G.W;
-  const tw=Math.round((W-G.safe.left-G.safe.right)*0.72);
-  const tx=G.safe.left+Math.round((W-G.safe.left-G.safe.right-tw)/2);
-  const t=textBlock(ctx,d,{x:tx,y:Math.round(G.H*0.08),
+  const W=G.W, k=G.k;
+  /* 合集徽标独占左上角，标题整块下移到徽标下方 ——
+     这样标题可以吃满整幅宽度做「一行标题」，不必再为徽标让出半边 */
+  const badgeSz=Math.round(92*k), badgePad=Math.round(36*k);
+  const badgeBottom=G.safe.top+badgePad+badgeSz;
+  const titleTop=badgeBottom+Math.round(26*k);
+  const safeW=W-G.safe.left-G.safe.right;
+  const tw=Math.round(safeW*0.94);
+  const tx=G.safe.left+Math.round((safeW-tw)/2);
+  const t=textBlock(ctx,d,{x:tx,y:titleTop,
     w:tw,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:110,subSize:58,gap:62,k:G.k,
-    subSpacing:0.06,
+    color:c.ink,subColor:c.ink2,titleSize:110,subSize:58,gap:62,k:k,
+    subSpacing:0.06, oneLine:true,
     sep:{ratio:0.52,h:10,color:c.accent,core:false,alpha:.55}});
-  const gap=Math.round(G.H*0.055);
+  const gap=Math.round(G.H*0.045);
   const circleTop=t.bottom+gap;
   const maxR=Math.min((W-G.safe.left*2)/2, (G.H-circleTop-Math.round(G.H*0.06))/2);
-  const rad=Math.max(120*G.k,maxR);
+  const rad=Math.max(120*k,maxR);
   const cy=circleTop+rad;
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=Math.round(52*G.k); ctx.shadowOffsetY=Math.round(18*G.k);
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.16)'; ctx.shadowBlur=Math.round(46*k); ctx.shadowOffsetY=Math.round(14*k);
   coverCircle(ctx,mainImg(img),W/2,cy,rad,0.16); ctx.restore();
-  ring(ctx,W/2,cy,rad+Math.round(12*G.k),Math.round(10*G.k),c.accent);
+  /* 圆环：柔光晕 + 渐变描边，替代原来的实色硬圈 */
+  const rr=rad+Math.round(12*k), rw=Math.round(8*k);
+  ringGlow(ctx,W/2,cy,rr+Math.round(5*k),Math.round(3*k),c.accent2,0.20);
+  ring(ctx,W/2,cy,rr,rw,c.accent2,c.accent,0.80);
   drawColBadge(ctx,c,G,'tl');
 },
 
@@ -1001,7 +1055,7 @@ function buildCols(){
     b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
     b.innerHTML='<span class="ccbadge">'+c.icon+'</span>'+
                 '<span class="ccname">'+c.short+'</span>'+
-                '<span class="ccrec">'+c.rec[0]+' 优先</span>'+
+                '<span class="ccrec">统一 '+c.rec[0]+' 骨架</span>'+
                 '<span class="ccswatch"></span>';
     b.onclick=()=>{
       state.col=k; state.layout=c.rec[0];
@@ -1012,8 +1066,9 @@ function buildCols(){
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
   if(note) note.innerHTML='<b>当前合集：</b>'+cur.icon+' '+cur.name+
-    '<br>'+cur.desc+'。主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
-    '封面角落的合集徽标形状也随合集切换 —— 这是放进主页九宫格后能一眼分清三个合集的关键。';
+    '<br>'+cur.desc+'。三个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
+    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清三个合集的关键。';
 }
 function buildTpls(){
   const host=document.getElementById('fams');host.innerHTML='';
