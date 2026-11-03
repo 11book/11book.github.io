@@ -34,7 +34,19 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
   display:flex;align-items:center;justify-content:center;flex:1;min-width:190px}
 .drop.mini #dropTxt{display:flex;align-items:center;gap:8px;line-height:1.2}
 .drop.mini img{max-width:96px;max-height:26px;border-radius:5px;margin:0;flex:0 0 auto}
-.cropbox{margin-top:11px;border:1px solid #e6e8eb;border-radius:10px;padding:11px;background:#fafbfc}
+.cropbox{border:1px solid #e6e8eb;border-radius:10px;padding:11px;background:#fafbfc}
+.workbench{display:flex;gap:14px;align-items:flex-start;flex:1 1 auto;min-width:0}
+.workbench .cropbox{flex:1 1 300px;min-width:270px;max-width:460px}
+.workbench .pv.main{flex:0 0 auto}
+#pv{cursor:zoom-in}
+.zoomhint{font-size:10px;color:#a9b0b8;font-weight:400;margin-left:6px}
+.pv.main:hover .zoomhint{color:#111}
+#lb{position:fixed;inset:0;z-index:60;background:rgba(10,10,12,.94);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px}
+#lb.hide{display:none}
+#lb img{max-width:94vw;max-height:86vh;object-fit:contain;border-radius:8px;
+  box-shadow:0 12px 50px rgba(0,0,0,.7)}
+#lb .lbclose{color:#fff;font-size:12px;opacity:.7}
 .cropbox.hide{display:none}
 .cropbox .ct{font-size:12px;font-weight:700;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .cropbox .ct .info{font-weight:400;color:#8a9099;font-size:11px}
@@ -209,25 +221,27 @@ details.sumcard .note{margin:11px 0 0}
           <input type="file" id="file" accept="image/*" hidden>
         </div>
       </div>
-      <div class="cropbox hide" id="cropBox">
-        <div class="ct">✂️ 裁剪要显示的区域 <span class="info" id="cropSrcInfo"></span></div>
-        <canvas class="cropcv" id="cropCv" height="220"></canvas>
-        <div class="croprow">
-          <span class="lb">比例</span>
-          <span id="cropRatios"></span>
-        </div>
-        <div class="croprow">
-          <span class="lb">操作</span>
-          <button class="sbtn" id="cropReset">重置裁剪</button>
-          <button class="sbtn" id="cropFull">用整张图</button>
-        </div>
-        <div class="cropres" id="cropRes"></div>
-      </div>
       <div class="stage">
-        <div class="pv main">
-          <h4 id="pvTitle">封面 1080×1440</h4>
-          <canvas id="pv" width="1080" height="1440"></canvas>
-          <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
+        <div class="workbench">
+          <div class="cropbox hide" id="cropBox">
+            <div class="ct">✂️ 裁剪要显示的区域 <span class="info" id="cropSrcInfo"></span></div>
+            <canvas class="cropcv" id="cropCv" height="220"></canvas>
+            <div class="croprow">
+              <span class="lb">比例</span>
+              <span id="cropRatios"></span>
+            </div>
+            <div class="croprow">
+              <span class="lb">操作</span>
+              <button class="sbtn" id="cropReset">重置裁剪</button>
+              <button class="sbtn" id="cropFull">用整张图</button>
+            </div>
+            <div class="cropres" id="cropRes"></div>
+          </div>
+          <div class="pv main" id="pvMain">
+            <h4 id="pvTitle">封面 1080×1440 <span class="zoomhint" id="zoomHint">🔍 点击放大</span></h4>
+            <canvas id="pv" width="1080" height="1440"></canvas>
+            <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
+          </div>
         </div>
         <div class="pv mini">
           <h4>信息流缩略图实际大小</h4>
@@ -1541,6 +1555,24 @@ Object.keys(COLLECTIONS).forEach(k=>{
 refresh();
 </script>
 
+<div id="lb" class="hide">
+  <img id="lbImg" alt="封面放大预览">
+  <div class="lbclose">点击任意处关闭 · 按 ESC 退出</div>
+</div>
+<script>
+/* 点击预览图 → 全屏放大查看 */
+(function(){
+  var lb=document.getElementById('lb'), img=document.getElementById('lbImg');
+  var pv=document.getElementById('pv');
+  if(!lb||!img||!pv) return;
+  function open(){ try{ img.src=pv.toDataURL('image/png'); }catch(e){ return; } lb.classList.remove('hide'); }
+  function close(){ lb.classList.add('hide'); }
+  pv.addEventListener('click',open);
+  pv.setAttribute('title','点击放大查看');
+  lb.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+</script>
 <div id="mtop">
   <div class="mtp"></div>
   <div class="mti"><b id="mtName">B2 大圆图·上文字</b><span id="mtCol">你带娃在玩啥呢？</span></div>
