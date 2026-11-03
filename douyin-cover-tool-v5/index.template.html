@@ -105,13 +105,14 @@ button.ghost b{float:right;color:#111}
 .colcard:hover{border-color:#c9ced6}
 .colcard.on{border-color:var(--acc);box-shadow:0 4px 13px rgba(0,0,0,.10);
   background:linear-gradient(165deg,var(--c1) 0%,var(--c2) 100%)}
-.colcard .ccbadge{width:34px;height:34px;border-radius:50%;background:var(--acc);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;flex:0 0 auto}
+.colcard .ccbadge{width:30px;height:30px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0}
+.colcard .ccbadge .ccsvg{display:block}
 .colcard .ccname{font-weight:700;font-size:12.5px;color:#222;line-height:1.2;white-space:nowrap}
 .colcard .ccrec{font-size:9.5px;color:var(--acc);font-weight:700;letter-spacing:.2px;white-space:nowrap}
 .colcard.on .ccname{color:#241c10}
 .colcard.on .ccrec{color:var(--acc)}
-.colcard.on .ccbadge{background:#fff;color:var(--acc);box-shadow:0 2px 7px rgba(0,0,0,.16)}
+.colcard.on .ccbadge{background:#fff;box-shadow:0 2px 7px rgba(0,0,0,.10)}
 .colcard .ccswatch{width:100%;height:5px;border-radius:3px;background:var(--acc);opacity:.9}
 /* ---------- v5：尺寸说明（折叠置底） ---------- */
 details.sumcard{border:1px solid #e6e8eb;border-radius:12px;background:#fff;padding:13px 15px;margin-bottom:6px}
@@ -386,7 +387,7 @@ function buildCols(){
     b.className='colcard'+(state.col===k?' on':'');
     b.style.setProperty('--c1',c.g1); b.style.setProperty('--c2',c.g2); b.style.setProperty('--acc',c.accent);
     b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
-    b.innerHTML='<span class="ccbadge">'+c.icon+'</span>'+
+    b.innerHTML='<span class="ccbadge">'+colBadgeSVG(c,26)+'</span>'+
                 '<span class="ccname">'+c.short+'</span>'+
                 '<span class="ccrec">统一 '+c.rec[0]+' 骨架</span>'+
                 '<span class="ccswatch"></span>';
@@ -398,7 +399,7 @@ function buildCols(){
   });
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
-  if(note) note.innerHTML='<b>当前合集：</b>'+cur.icon+' '+cur.name+
+  if(note) note.innerHTML='<b>当前合集：</b>'+colBadgeSVG(cur,20)+' '+cur.name+
     '<br>'+cur.desc+'。三个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
     '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
     '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清三个合集的关键。';

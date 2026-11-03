@@ -105,13 +105,14 @@ button.ghost b{float:right;color:#111}
 .colcard:hover{border-color:#c9ced6}
 .colcard.on{border-color:var(--acc);box-shadow:0 4px 13px rgba(0,0,0,.10);
   background:linear-gradient(165deg,var(--c1) 0%,var(--c2) 100%)}
-.colcard .ccbadge{width:34px;height:34px;border-radius:50%;background:var(--acc);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;flex:0 0 auto}
+.colcard .ccbadge{width:30px;height:30px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0}
+.colcard .ccbadge .ccsvg{display:block}
 .colcard .ccname{font-weight:700;font-size:12.5px;color:#222;line-height:1.2;white-space:nowrap}
 .colcard .ccrec{font-size:9.5px;color:var(--acc);font-weight:700;letter-spacing:.2px;white-space:nowrap}
 .colcard.on .ccname{color:#241c10}
 .colcard.on .ccrec{color:var(--acc)}
-.colcard.on .ccbadge{background:#fff;color:var(--acc);box-shadow:0 2px 7px rgba(0,0,0,.16)}
+.colcard.on .ccbadge{background:#fff;box-shadow:0 2px 7px rgba(0,0,0,.10)}
 .colcard .ccswatch{width:100%;height:5px;border-radius:3px;background:var(--acc);opacity:.9}
 /* ---------- v5：尺寸说明（折叠置底） ---------- */
 details.sumcard{border:1px solid #e6e8eb;border-radius:12px;background:#fff;padding:13px 15px;margin-bottom:6px}
@@ -342,8 +343,8 @@ const COLLECTIONS = {
   craft: {
     id:'craft', name:'捣鼓过的手工，你也能整', short:'手工', icon:'✂️',
     desc:'各种手工制作 · 零成本也能做',
-    g1:'#EAF7F1', g2:'#BFE8D8', ink:'#0F2E26', ink2:'#4B7A6C',
-    accent:'#12A47C', accent2:'#4FD3A9', card:'#FFFFFF',
+    g1:'#F3EFFB', g2:'#D7C9F0', ink:'#241A3D', ink2:'#6B5A93',
+    accent:'#7B5EA7', accent2:'#B49BE8', card:'#FFFFFF',
     badge:'scissors',                   /* 形状指纹：方牌 + 剪刀 */
     img:'assets/cover-craft.jpg',
     rec:['B5']
@@ -351,8 +352,8 @@ const COLLECTIONS = {
   travel: {
     id:'travel', name:'踩过点的好去处，玩着不烧心', short:'好去处', icon:'🗺️',
     desc:'出去逛的攻略 · 游山玩水不踩坑',
-    g1:'#EFF4FC', g2:'#C7DBF5', ink:'#10233C', ink2:'#4E6C8D',
-    accent:'#2F72C8', accent2:'#7FB0EE', card:'#FFFFFF',
+    g1:'#EDF7EE', g2:'#C2E7C6', ink:'#0F2714', ink2:'#4C7A55',
+    accent:'#2E9E4F', accent2:'#84D18C', card:'#FFFFFF',
     badge:'mountain',                   /* 形状指纹：旗标 + 山形 */
     img:'assets/cover-travel.jpg',
     rec:['B5']
@@ -386,6 +387,36 @@ const PRESETS = {
     B5:{title:'这地方娃能疯一下午', sub:'今年第 6 个地方'}
   }
 };
+
+/* 合集徽标的 SVG 版本（UI 用）—— 与封面 drawColBadge 同形同色
+   —— 原来这里用的是 emoji，不同机器字体不同、渲染不一致，且和封面徽标长得不一样 */
+function colBadgeSVG(c,size){
+  const s=size||34, h=s/2, sw=Math.max(1.6,s*0.075);
+  const shape= c.badge==='dice'
+    ? '<circle cx="'+h+'" cy="'+h+'" r="'+(h-1.5)+'"/>'
+    : (c.badge==='scissors'
+      ? '<rect x="1.5" y="1.5" width="'+(s-3)+'" height="'+(s-3)+'" rx="'+(s*0.26)+'"/>'
+      : '<path d="M1.5 1.5 H'+(s-1.5)+' V'+(s-1.5)+' L1.5 '+(s+s*0.20-1.5)+' Z"/>');
+  let glyph='';
+  if(c.badge==='dice'){
+    const r=s*0.085, pts=[[-0.19,-0.19],[0.19,0.19],[0,0]];
+    glyph=pts.map(p=>'<circle cx="'+(h+p[0]*s)+'" cy="'+(h+p[1]*s)+'" r="'+r+'" fill="'+c.accent+'"/>').join('');
+  }else if(c.badge==='scissors'){
+    glyph='<g stroke="'+c.accent+'" stroke-width="'+sw+'" fill="none" stroke-linecap="round">'+
+      '<path d="M'+(h-s*0.20)+' '+(h-s*0.18)+' L'+(h+s*0.22)+' '+(h+s*0.18)+'"/>'+
+      '<path d="M'+(h+s*0.20)+' '+(h-s*0.18)+' L'+(h-s*0.22)+' '+(h+s*0.18)+'"/>'+
+      '<circle cx="'+(h-s*0.24)+'" cy="'+(h+s*0.24)+'" r="'+(s*0.095)+'"/>'+
+      '<circle cx="'+(h+s*0.24)+'" cy="'+(h+s*0.24)+'" r="'+(s*0.095)+'"/></g>';
+  }else{
+    glyph='<g stroke="'+c.accent+'" stroke-width="'+sw+'" fill="none" stroke-linejoin="round">'+
+      '<path d="M'+(h-s*0.32)+' '+(h+s*0.26)+' L'+(h-s*0.06)+' '+(h-s*0.18)+' L'+(h+s*0.15)+' '+(h+s*0.26)+' Z"/>'+
+      '<path d="M'+(h-s*0.03)+' '+(h+s*0.26)+' L'+(h+s*0.20)+' '+(h-s*0.02)+' L'+(h+s*0.38)+' '+(h+s*0.26)+' Z"/></g>'+
+      '<circle cx="'+(h+s*0.25)+'" cy="'+(h-s*0.24)+'" r="'+(s*0.075)+'" fill="'+c.accent+'"/>';
+  }
+  return '<svg class="ccsvg" viewBox="0 0 '+s+' '+s+'" width="'+s+'" height="'+s+'" aria-hidden="true">'+
+    '<g fill="'+c.accent+'" fill-opacity="0.13" stroke="'+c.accent+'" stroke-opacity="0.55" stroke-width="2">'+shape+'</g>'+
+    glyph+'</svg>';
+}
 
 /* ================= 通用绘制工具 ================= */
 function F(w,s){ return w+' '+s+'px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif'; }
@@ -833,7 +864,7 @@ B5(ctx,d,img,c,G){
   const W=G.W, k=G.k;
   /* 合集徽标独占左上角，标题整块下移到徽标下方 ——
      这样标题可以吃满整幅宽度做「一行标题」，不必再为徽标让出半边 */
-  const badgeSz=Math.round(92*k), badgePad=Math.round(36*k);
+  const badgeSz=Math.round(74*k), badgePad=Math.round(34*k);
   const badgeBottom=G.safe.top+badgePad+badgeSz;
   const titleTop=badgeBottom+Math.round(26*k);
   const safeW=W-G.safe.left-G.safe.right;
@@ -890,50 +921,60 @@ function drawGuides(ctx,G){
    —— 三个合集共用同一套「位置/尺寸/阴影」规则，只换形状与颜色，整体协调
    --------------------------------------------------------------- */
 function drawColBadge(ctx,c,G,pos){
-  const k=G.k, sz=Math.round(92*k), pad=Math.round(36*k);
+  const k=G.k, sz=Math.round(74*k), pad=Math.round(34*k);
   const half=sz/2;
   const cx=(pos==='tr'||pos==='br') ? G.W-G.safe.right-pad-half : G.safe.left+pad+half;
   const cy=(pos==='tr'||pos==='bl') ? G.safe.top+pad+half  : G.H-G.safe.bottom-pad-half;
+  /* 徽标从「实心贴纸」改成「描边水印」：
+     —— 之前是满色块 + 重投影，在浅色底上像贴上去的贴纸，突兀且抢标题的戏
+     —— 现在改成：极淡同色填充 + 细描边 + 同色图形，缩小一圈
+        远看只是角落一抹淡色印记，近看才看清图形 —— 不抢标题，但仍然能区分合集 */
+  const shapePath=()=>{
+    if(c.badge==='dice'){
+      ctx.beginPath(); ctx.arc(cx,cy,half,0,Math.PI*2);
+    }else if(c.badge==='scissors'){
+      roundRectPath(ctx,cx-half,cy-half,sz,sz,Math.round(sz*0.26));
+    }else{
+      /* 旗标：右下斜切，像路标小旗 */
+      polyPath(ctx,[[cx-half,cy-half],[cx+half,cy-half],[cx+half,cy+half],[cx-half,cy+half+sz*0.20]]);
+    }
+  };
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.28)'; ctx.shadowBlur=Math.round(22*k); ctx.shadowOffsetY=Math.round(7*k);
-  ctx.fillStyle=c.accent;
-  if(c.badge==='dice'){
-    ctx.beginPath(); ctx.arc(cx,cy,half,0,Math.PI*2); ctx.fill();
-  }else if(c.badge==='scissors'){
-    roundRectPath(ctx,cx-half,cy-half,sz,sz,Math.round(sz*0.24)); ctx.fill();
-  }else{
-    /* 旗标：右下斜切，像路标小旗 */
-    polyPath(ctx,[[cx-half,cy-half],[cx+half,cy-half],[cx+half,cy+half],[cx-half,cy+half+sz*0.20]]);
-    ctx.fill();
-  }
+  shapePath();
+  ctx.fillStyle=c.accent; ctx.globalAlpha=0.13; ctx.fill();
+  ctx.globalAlpha=0.55; ctx.strokeStyle=c.accent;
+  ctx.lineWidth=Math.max(1.5,Math.round(3*k)); ctx.stroke();
   ctx.restore();
-  /* 白色内芯图形：不依赖 emoji 字体，任何机器渲染一致 */
+
+  /* 图形用主色实描，不再是白填充 —— 白填充在淡色底上会和底色糊在一起 */
   ctx.save();
-  ctx.fillStyle='#FFFFFF'; ctx.strokeStyle='#FFFFFF';
+  ctx.strokeStyle=c.accent; ctx.fillStyle=c.accent;
+  ctx.globalAlpha=0.72;
   ctx.lineCap='round'; ctx.lineJoin='round';
   if(c.badge==='dice'){
-    const r=Math.round(sz*0.09);
-    [[-0.20,-0.20],[0.20,0.20],[0,0]].forEach(p=>{
+    const r=Math.round(sz*0.085);
+    [[-0.19,-0.19],[0.19,0.19],[0,0]].forEach(p=>{
       ctx.beginPath(); ctx.arc(cx+p[0]*sz, cy+p[1]*sz, r, 0, Math.PI*2); ctx.fill();
     });
   }else if(c.badge==='scissors'){
-    ctx.lineWidth=Math.round(sz*0.075);
+    ctx.lineWidth=Math.round(sz*0.065);
     ctx.beginPath();
-    ctx.moveTo(cx-sz*0.22,cy-sz*0.20); ctx.lineTo(cx+sz*0.24,cy+sz*0.20);
-    ctx.moveTo(cx+sz*0.22,cy-sz*0.20); ctx.lineTo(cx-sz*0.24,cy+sz*0.20);
+    ctx.moveTo(cx-sz*0.20,cy-sz*0.18); ctx.lineTo(cx+sz*0.22,cy+sz*0.18);
+    ctx.moveTo(cx+sz*0.20,cy-sz*0.18); ctx.lineTo(cx-sz*0.22,cy+sz*0.18);
     ctx.stroke();
-    ctx.lineWidth=Math.round(sz*0.062);
-    ctx.beginPath(); ctx.arc(cx-sz*0.26,cy+sz*0.26,sz*0.11,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx+sz*0.26,cy+sz*0.26,sz*0.11,0,Math.PI*2); ctx.stroke();
+    ctx.lineWidth=Math.round(sz*0.055);
+    ctx.beginPath(); ctx.arc(cx-sz*0.24,cy+sz*0.24,sz*0.095,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx+sz*0.24,cy+sz*0.24,sz*0.095,0,Math.PI*2); ctx.stroke();
   }else{
     /* 山形：两座山 + 一轮太阳 */
+    ctx.lineWidth=Math.round(sz*0.062);
     ctx.beginPath();
-    ctx.moveTo(cx-sz*0.34,cy+sz*0.28); ctx.lineTo(cx-sz*0.06,cy-sz*0.20); ctx.lineTo(cx+sz*0.16,cy+sz*0.28);
-    ctx.closePath(); ctx.fill();
+    ctx.moveTo(cx-sz*0.32,cy+sz*0.26); ctx.lineTo(cx-sz*0.06,cy-sz*0.18); ctx.lineTo(cx+sz*0.15,cy+sz*0.26);
+    ctx.closePath(); ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(cx-sz*0.02,cy+sz*0.28); ctx.lineTo(cx+sz*0.22,cy-sz*0.02); ctx.lineTo(cx+sz*0.40,cy+sz*0.28);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx+sz*0.26,cy-sz*0.26,sz*0.085,0,Math.PI*2); ctx.fill();
+    ctx.moveTo(cx-sz*0.03,cy+sz*0.26); ctx.lineTo(cx+sz*0.20,cy-sz*0.02); ctx.lineTo(cx+sz*0.38,cy+sz*0.26);
+    ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx+sz*0.25,cy-sz*0.24,sz*0.075,0,Math.PI*2); ctx.fill();
   }
   ctx.restore();
 }
@@ -1053,7 +1094,7 @@ function buildCols(){
     b.className='colcard'+(state.col===k?' on':'');
     b.style.setProperty('--c1',c.g1); b.style.setProperty('--c2',c.g2); b.style.setProperty('--acc',c.accent);
     b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
-    b.innerHTML='<span class="ccbadge">'+c.icon+'</span>'+
+    b.innerHTML='<span class="ccbadge">'+colBadgeSVG(c,26)+'</span>'+
                 '<span class="ccname">'+c.short+'</span>'+
                 '<span class="ccrec">统一 '+c.rec[0]+' 骨架</span>'+
                 '<span class="ccswatch"></span>';
@@ -1065,7 +1106,7 @@ function buildCols(){
   });
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
-  if(note) note.innerHTML='<b>当前合集：</b>'+cur.icon+' '+cur.name+
+  if(note) note.innerHTML='<b>当前合集：</b>'+colBadgeSVG(cur,20)+' '+cur.name+
     '<br>'+cur.desc+'。三个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
     '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
     '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清三个合集的关键。';
