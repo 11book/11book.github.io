@@ -80,9 +80,6 @@ button.ghost:hover{border-color:#111}
 button.ghost b{float:right;color:#111}
 .tips{font-size:12px;color:#8a9099;line-height:1.9}
 .ok{color:#12a150}.bad{color:#e5484d}
-.hook{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.hook button{font-size:11px;padding:4px 9px;border:1px solid #dcdfe4;background:#fff;border-radius:999px;cursor:pointer;font-family:inherit}
-.hook button:hover{border-color:#111}
 .note{font-size:12px;color:#8a9099;background:#f7f8fa;border-radius:9px;padding:10px 12px;line-height:1.8;margin-bottom:11px}
 .note b{color:#333}
 /* ---------- v5：左控制列 / 右工作列 ---------- */
@@ -142,8 +139,8 @@ details.sumcard .note{margin:11px 0 0}
   .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
   .colL,.colR{display:contents}
   .sumcard{grid-column:1;grid-row:auto}
-  #cardText{order:1}#cardPv{order:2}#cardTpl{order:3}
-  #cardCol{order:4}#cardImg{order:5}#cardSize{order:6}
+  #cardPv{order:1}#cardCol{order:2}#cardText{order:3}
+  #cardTpl{order:4}#cardImg{order:5}#cardSize{order:6}
   .colcards{gap:7px}
   .pv.mini{display:none}
   .pv.main canvas{width:min(52vw,230px)}
@@ -164,7 +161,6 @@ details.sumcard .note{margin:11px 0 0}
   .btns button.ghost{flex:1 1 calc(50% - 4px);text-align:center;padding:11px 8px;font-size:12.5px}
   .btns button.ghost b{float:none;display:block;margin-top:2px}
   .tips{flex:1 1 100%;font-size:11.5px;line-height:1.75}
-  .hook button{font-size:12px;padding:6px 11px}
 }
 @media(max-width:560px){
   .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
@@ -175,28 +171,22 @@ details.sumcard .note{margin:11px 0 0}
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v5 合集视觉指纹</span>
-  <span>① 文字 → ② 合集 → ③ 主图 → ④ 版式 · 写完即见预览</span>
+  <span>① 选合集 → ② 写文字 → ③ 传主图 → ④ 选版式 · 选完即见预览</span>
   <a href="../douyin-cover-tool-v4/">← v4</a>
 </header>
 <div class="wrap">
   <div class="colL">
 
     <div class="card" id="cardText">
-      <h2>① 文字（只保留两级）</h2>
+      <h2>② 文字（只保留两级）</h2>
       <div class="note"><b>v5 铁律：</b>封面只有主标题 + 副标题两级文字；先排文字、再按剩余空间放图，<b>文字和图片物理上不可能重叠</b>。</div>
       <label>主标题 <span class="hint">建议 4–8 字，手机上一眼能读完</span>
         <input id="title" placeholder="例：纸杯塔能有多高"></label>
       <label>副标题 <span class="hint">主标题的一半大小，只留一句</span>
         <input id="sub" placeholder="例：今天实验做到第 12 轮"></label>
-      <div style="font-size:12px;color:#8a9099;margin:-4px 0 8px">钩子句式一键改写：</div>
-      <div class="hook" id="hooks"></div>
+      <div style="font-size:11.5px;color:#8a9099;margin:-2px 0 4px">每个合集都预置了一组示例文案，切合集会自动带上；你一旦手改，就永远以你写的为准。</div>
     </div>
 
-    <div class="card" id="cardCol">
-      <h2>② 合集（决定配色与形状）</h2>
-      <div class="colcards" id="cols"></div>
-      <div class="note" id="colNote" style="margin:11px 0 0"></div>
-    </div>
 
     <div class="card" id="cardImg">
       <h2>③ 主图</h2>
@@ -230,6 +220,12 @@ details.sumcard .note{margin:11px 0 0}
   </div>
 
   <div class="colR">
+
+    <div class="card" id="cardCol">
+      <h2>① 合集（决定配色与形状，选完立即预览）</h2>
+      <div class="colcards" id="cols"></div>
+      <div class="note" id="colNote" style="margin:11px 0 0"></div>
+    </div>
 
     <div class="card" id="cardPv">
       <h2>预览与导出</h2>
@@ -1024,6 +1020,7 @@ function drawColBadge(ctx,c,G,pos){
 
 /* ================= 状态与交互 ================= */
 const state={col:'play',layout:'B5',ratio:'3x4',title:'',sub:'',img:null,
+  autoText:true,               /* true=标题还是合集自带示例文案，切合集时自动跟着换；用户一旦手改就置 false */
   cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
   objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
   exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
@@ -1143,7 +1140,15 @@ function buildCols(){
                 '<span class="ccswatch"></span>';
     b.onclick=()=>{
       state.col=k; state.layout=c.rec[0];
-      buildCols(); buildTpls(); buildHooks(); refresh();
+      /* 标题还是"合集自带示例文案"时，跟随合集自动换；用户自己写过的一律不动 */
+      if(state.autoText){
+        const pc=PRESETS[k]||{};
+        const pd=pc[state.layout]||pc;
+        state.title=pd.title||''; state.sub=pd.sub||'';
+        const ti=document.getElementById('title'),si=document.getElementById('sub');
+        if(ti) ti.value=state.title; if(si) si.value=state.sub;
+      }
+      buildCols(); buildTpls(); refresh();
     };
     box.appendChild(b);
   });
@@ -1152,7 +1157,8 @@ function buildCols(){
   if(note) note.innerHTML='<b>当前合集：</b>'+colBadgeSVG(cur,20)+' '+cur.name+
     '<br>'+cur.desc+'。四个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
     '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
-    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清四个合集的关键。';
+    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清四个合集的关键。'+
+    '<br><b>点合集卡片</b>：配色 + 徽标 + 示例文案一起换，下面预览立刻变；你自己写过标题后，系统就不再替你改文案了。';
 }
 function buildTpls(){
   const host=document.getElementById('fams');host.innerHTML='';
@@ -1180,39 +1186,6 @@ function buildTpls(){
       grid.appendChild(d);
     });
     host.appendChild(grid);
-  });
-}
-const HOOKS={
-  play:{
-    '数字挑战':['3 步搞定亲子实验','纸杯塔能有多高','搭了 12 轮才倒'],
-    '悬念提问':['为什么娃总问为什么','纸杯塔能有多高','云是不是棉花糖'],
-    '结果反差':['从 0 到 30 层','娃笑到停不下来','室内也能玩到疯']
-  },
-  craft:{
-    '数字挑战':['3 个纸箱做成小汽车','一张纸折出小动物','旧物改造第 4 版'],
-    '悬念提问':['纸箱还能干嘛','你猜这个是啥','娃自己想出来的'],
-    '结果反差':['垃圾袋变成小汽车','比买的还爱玩','一岁半也会做']
-  },
-  travel:{
-    '数字挑战':['3 小时来回不累','第 6 个踩过点的地方','推车能到的 5 个地方'],
-    '悬念提问':['这地方娃能疯一下午','你会带娃去哪','树荫下面有惊喜'],
-    '结果反差':['不晒不累还凉快','娃赖着不肯走','不用排队的地方']
-  },
-  daily:{
-    '数字挑战':['带娃 3 年踩过的 7 个坑','一天能省 2 小时的 5 个办法','娃出生第 1 年我买错的 6 样'],
-    '悬念提问':['带娃这事你干过吗','为什么娃睡前非要喝奶','一句话娃就不哭了'],
-    '结果反差':['带娃其实没那么难','娃自己把饭吃完','娃反而主动去刷牙']
-  }
-};
-function buildHooks(){
-  const box=document.getElementById('hooks');box.innerHTML='';
-  const HK=HOOKS[state.col]||{};
-  Object.keys(HK).forEach(k=>{
-    HK[k].forEach(t=>{
-      const b=document.createElement('button');b.textContent=t;
-      b.onclick=()=>{state.title=t;document.getElementById('title').value=t;refresh();};
-      box.appendChild(b);
-    });
   });
 }
 /* ================= 上传 · 裁剪 · 高清导出 ================= */
@@ -1523,7 +1496,7 @@ document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.targ
 ['dragleave','drop'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.remove('hot');}));
 document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))useFile(f);});
 ['title','sub'].forEach(k=>{
-  document.getElementById(k).oninput=e=>{state[k]=e.target.value;refresh();};
+  document.getElementById(k).oninput=e=>{state[k]=e.target.value;state.autoText=false;refresh();};
 });
 document.getElementById('guides').onchange=refresh;
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
@@ -1570,7 +1543,7 @@ document.getElementById('expThree').onclick=()=>{
     c.toBlob(b=>dl(b,'cover-v5-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
   });
 };
-buildHooks();buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
+buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
 let pending=Object.keys(COLLECTIONS).length;
 Object.keys(COLLECTIONS).forEach(k=>{
   const im=new Image();
