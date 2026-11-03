@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>抖音封面工具 v3 · 极简重构版</title>
+<title>抖音封面工具 v4 · 三尺寸真重排</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f2f3f5;color:#222;font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
@@ -25,13 +25,19 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{padding:7px 13px;border:1px solid #dcdfe4;border-radius:999px;cursor:pointer;font-size:13px;background:#fff}
 .chip.on{background:#111;border-color:#111;color:#fff}
+.chip b{font-weight:700}
+.chip small{display:block;font-size:10px;opacity:.65;margin-top:1px}
 .drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
 .drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
 .drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
+.famh{display:flex;align-items:baseline;gap:8px;margin:16px 0 8px;font-size:12px;color:#333;font-weight:700}
+.famh:first-child{margin-top:0}
+.famh span{font-weight:400;color:#9aa0a8;font-size:11px}
+.famh i{font-style:normal;background:#111;color:#fff;font-size:10px;padding:2px 8px;border-radius:999px}
 .tpl{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;min-width:0}
 .tpl .t{min-width:0}
 .t{border:2px solid #e6e8eb;border-radius:10px;overflow:hidden;cursor:pointer;background:#fff;position:relative;min-width:0}
-.t canvas{width:100%;display:block}
+.t canvas{width:100%;display:block;background:#eee}
 .t.on{border-color:#111;box-shadow:0 4px 14px rgba(0,0,0,.13)}
 .t .n{padding:4px 6px;font-size:11px;color:#555;display:flex;justify-content:space-between;align-items:center;gap:4px;line-height:1.35}
 .t.on .n{color:#111;font-weight:700}
@@ -46,7 +52,6 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .pv.mini canvas{width:132px;max-width:100%;box-shadow:0 3px 10px rgba(0,0,0,.09)}
 .pv.mini{text-align:center;min-width:0}
 .pv.mini .cap{font-size:11px;color:#8a9099;margin-top:6px}
-.pv.v9 canvas{width:150px;max-width:100%;box-shadow:0 3px 10px rgba(0,0,0,.09)}
 .btns{display:flex;flex-direction:column;gap:9px;min-width:200px}
 button.big{background:#111;color:#fff;border:none;border-radius:9px;padding:13px 15px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 button.big:hover{background:#000}
@@ -77,7 +82,7 @@ button.ghost b{float:right;color:#111}
   #mbar{display:flex}
   header{display:none}
   .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
-  .pv.mini,.pv.v9{display:none}
+  .pv.mini{display:none}
   .pv.main canvas{width:min(52vw,230px)}
   body{font-size:15px}
   .card{padding:12px;margin-bottom:10px;border-radius:10px}
@@ -106,20 +111,26 @@ button.ghost b{float:right;color:#111}
 </head>
 <body>
 <header>
-  <h1>抖音封面工具</h1><span class="v">v3 极简重构版</span>
-  <span>16 款骨架 · 纯色/渐变底 · 只有主副标题 · 图片做主角</span>
-  <a href="../douyin-cover-tool-v2/">← v2 重制版</a>
+  <h1>抖音封面工具</h1><span class="v">v4 三尺寸真重排</span>
+  <span>3:4 / 9:16 / 16:9 各自独立排版 · 16 款骨架分 4 族 · 文字与图片零重叠</span>
+  <a href="../douyin-cover-tool-v3/">← v3</a>
 </header>
 <div class="wrap">
   <div class="card wide">
-    <h2>① 版式（16 款骨架，任意合集可用；带「荐」的是该合集推荐）</h2>
-    <div class="tpl" id="tpls"></div>
+    <h2>① 尺寸（抖音封面有两版竖版，选对才不浪费画面）</h2>
+    <div class="chips" id="ratios"></div>
+    <div class="note" id="ratioNote" style="margin:11px 0 0"></div>
+  </div>
+
+  <div class="card wide">
+    <h2>② 版式（16 款骨架，按 4 大族分类；带「荐」的是该合集推荐）</h2>
+    <div id="fams"></div>
   </div>
 
   <div>
     <div class="card">
-      <h2>② 文字（只保留两级）</h2>
-      <div class="note"><b>v3 铁律：</b>封面只有主标题 + 副标题两级文字，角标与标签已全部取消——信息流缩略图上多层文字等于零信息。</div>
+      <h2>③ 文字（只保留两级）</h2>
+      <div class="note"><b>v4 铁律：</b>封面只有主标题 + 副标题两级文字；先排文字、再按剩余空间放图，<b>文字和图片物理上不可能重叠</b>。</div>
       <label>主标题 <span class="hint">建议 4–8 字，手机上一眼能读完</span>
         <input id="title" placeholder="例：纸杯塔能有多高"></label>
       <label>副标题 <span class="hint">主标题的一半大小，只留一句</span>
@@ -129,7 +140,7 @@ button.ghost b{float:right;color:#111}
     </div>
 
     <div class="card">
-      <h2>③ 主图</h2>
+      <h2>④ 主图</h2>
       <div class="drop" id="drop">
         <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
         <input type="file" id="file" accept="image/*" hidden>
@@ -137,7 +148,7 @@ button.ghost b{float:right;color:#111}
     </div>
 
     <div class="card">
-      <h2>④ 合集（决定配色）</h2>
+      <h2>⑤ 合集（决定配色）</h2>
       <div class="chips" id="cols"></div>
     </div>
   </div>
@@ -147,7 +158,7 @@ button.ghost b{float:right;color:#111}
       <h2>预览与导出</h2>
       <div class="stage">
         <div class="pv main">
-          <h4>封面 1080×1440（3:4 实际显示尺寸）</h4>
+          <h4 id="pvTitle">封面 1080×1440</h4>
           <canvas id="pv" width="1080" height="1440"></canvas>
           <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
         </div>
@@ -156,15 +167,11 @@ button.ghost b{float:right;color:#111}
           <canvas id="mini" width="132" height="176"></canvas>
           <div class="cap">132px 宽 · 还认得出吗？</div>
         </div>
-        <div class="pv v9">
-          <h4>竖屏 1080×1920</h4>
-          <canvas id="pv9" width="1080" height="1920"></canvas>
-        </div>
         <div class="btns">
-          <button class="big" id="exp34">导出封面 1080×1440（PNG）</button>
-          <button class="ghost" id="exp916">导出竖屏 1080×1920（PNG）<b>9:16</b></button>
-          <button class="ghost" id="expjpg">导出封面 JPG<b>小体积</b></button>
-          <button class="ghost" id="exptrio">导出 16 款拼图<b>4320×2880</b></button>
+          <button class="big" id="expNow">导出当前尺寸 PNG</button>
+          <button class="ghost" id="expJpg">导出当前尺寸 JPG<b>小体积</b></button>
+          <button class="ghost" id="expAll">导出 16 款拼图<b>当前尺寸</b></button>
+          <button class="ghost" id="expThree">导出三尺寸各一张<b>3:4 / 9:16 / 16:9</b></button>
           <div class="tips" id="check"></div>
         </div>
       </div>
@@ -176,7 +183,7 @@ button.ghost b{float:right;color:#111}
 __ENGINE__
 
 /* ================= 状态与交互 ================= */
-const state={col:'play',layout:'B1',title:'',sub:'',img:null};
+const state={col:'play',layout:'B2',ratio:'3x4',title:'',sub:'',img:null};
 const imgs={};
 
 function D(){
@@ -185,40 +192,79 @@ function D(){
   return {col:state.col,layout:state.layout,
     title:state.title||p.title||'', sub:state.sub||p.sub||''};
 }
-function drawDesign(ctx,id,guides){
+function G(){ return geo(state.ratio); }
+
+function drawDesign(ctx,id,guides,Gg){
   const img=state.img||imgs[state.col]||null;
   const c=COLLECTIONS[state.col];
-  try{ RENDER[id](ctx,D(),img,c); }
+  try{ RENDER[id](ctx,D(),img,c,Gg); }
   catch(e){ console.error('render',id,e);
-    ctx.fillStyle='#3a1f1f';ctx.fillRect(0,0,CW,CH);
+    ctx.fillStyle='#3a1f1f';ctx.fillRect(0,0,Gg.W,Gg.H);
     ctx.fillStyle='#ffb4b4';ctx.font=F(700,44);ctx.textAlign='center';
-    ctx.fillText('渲染出错：'+id,CW/2,700);ctx.textAlign='left'; }
-  if(guides) drawGuides(ctx);
+    ctx.fillText('渲染出错：'+id,Gg.W/2,Gg.H/2);ctx.textAlign='left'; }
+  if(guides) drawGuides(ctx,Gg);
 }
+
+/* 缩略图：当前尺寸 contain 适配 */
+function drawThumb(ctx,id,Gg,tw,th){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,tw,th);
+  ctx.fillStyle='#eee'; ctx.fillRect(0,0,tw,th);
+  const s=Math.min(tw/Gg.W, th/Gg.H);
+  const w=Gg.W*s, h=Gg.H*s;
+  ctx.setTransform(s,0,0,s,(tw-w)/2,(th-h)/2);
+  drawDesign(ctx,id,false,Gg);
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
 function refresh(){
-  const c=document.getElementById('pv'),x=c.getContext('2d');
-  x.clearRect(0,0,CW,CH);drawDesign(x,state.layout,document.getElementById('guides').checked);
+  const Gg=G();
+  const c=document.getElementById('pv');
+  if(c.width!==Gg.W||c.height!==Gg.H){ c.width=Gg.W; c.height=Gg.H; }
+  const x=c.getContext('2d');
+  x.setTransform(1,0,0,1,0,0);
+  x.clearRect(0,0,Gg.W,Gg.H);
+  drawDesign(x,state.layout,document.getElementById('guides').checked,Gg);
+  document.getElementById('pvTitle').textContent='封面 '+Gg.W+'×'+Gg.H+'（'+RATIOS[state.ratio].label+'）';
+  /* 信息流缩略图：3:4 中心裁切 */
   const m=document.getElementById('mini'),mx=m.getContext('2d');
-  mx.clearRect(0,0,132,176);mx.drawImage(c,0,0,CW,CH,0,0,132,176);
-  const v9=document.getElementById('pv9'),v9x=v9.getContext('2d');
-  v9x.clearRect(0,0,1080,1920);
-  v9x.save();v9x.filter='blur(28px) brightness(.72)';
-  v9x.drawImage(c,-30,180,1140,1140);v9x.restore();
-  v9x.drawImage(c,0,240);
+  mx.clearRect(0,0,132,176);
+  const tr=3/4, sr=Gg.W/Gg.H;
+  let sw,mh;
+  if(sr>tr){ sw=Gg.H*tr; mh=Gg.H; } else { sw=Gg.W; mh=Gg.W/tr; }
+  mx.drawImage(c,(Gg.W-sw)/2,(Gg.H-mh)/2,sw,mh,0,0,132,176);
   check();
 }
 function check(){
-  const d=D(),o=[];
+  const d=D(),Gg=G(),o=[];
   const n=(d.title||'').replace(/\s/g,'').length;
   o.push(n===0?['bad','还没填主标题']:(n<=8?['ok','主标题 '+n+' 字 ✓']:['bad','主标题 '+n+' 字，建议 ≤8 字（缩略图看不清）']));
   o.push([(d.sub||'').length<=20?'ok':'bad','副标题 '+(d.sub||'').length+' 字，建议 ≤20 字']);
-  const est=(d.title.length*(d.title.length>8?130:170)*(d.title.length>6?2:1))/(CW*CH);
+  const est=(d.title.length*(d.title.length>8?130:170)*(d.title.length>6?2:1))/(Gg.W*Gg.H);
   o.push([est<0.40?'ok':'bad','文字占比约 '+Math.round(est*100)+'%（应 <40%）']);
+  o.push(['ok','安全区已内缩：上下 '+Gg.safe.top+'/'+(Gg.H-Gg.safe.bottom)+'px，左右 '+Gg.safe.left+'px']);
   const banned=['爆款','热播','强推','第一','全网最低','国家级','绝对','天花板','yyds'];
   const hit=banned.filter(w=>((d.title+d.sub).includes(w)));
   o.push(hit.length?['bad','命中敏感词：'+hit.join('、')]:['ok','无违禁/绝对化用词 ✓']);
   o.push(['ok','AI 素材：发布页勾「含有 AI 生成内容」+ 官方 AI 标识工具']);
   document.getElementById('check').innerHTML=o.map(v=>`<div class="${v[0]}">${v[0]==='ok'?'✓':'⚠'} ${v[1]}</div>`).join('');
+}
+
+function buildRatios(){
+  const box=document.getElementById('ratios');box.innerHTML='';
+  Object.keys(RATIOS).forEach(k=>{
+    const r=RATIOS[k];
+    const b=document.createElement('div');
+    b.className='chip'+(state.ratio===k?' on':'');
+    b.innerHTML='<b>'+r.label+'</b><small>'+r.w+'×'+r.h+'</small>';
+    b.onclick=()=>{state.ratio=k;buildRatios();buildTpls();refresh();};
+    box.appendChild(b);
+  });
+  document.getElementById('ratioNote').innerHTML=
+    '<b>怎么选：</b>抖音竖版封面有 <b>3:4（1080×1440）</b> 和 <b>9:16（1080×1920）</b> 两种。'+
+    '3:4 在信息流/主页里展示面积最大，知识口播类首选；9:16 占满全屏，沉浸感强，上下要留更多白。'+
+    '横版 16:9（1920×1080）给横屏原片。'+
+    '<br><b>本工具对三种尺寸分别独立排版</b>，不是拉伸、也不是模糊补边——切到哪个尺寸，文字和图片都按那个尺寸重新算位置。';
 }
 function buildCols(){
   const box=document.getElementById('cols');box.innerHTML='';
@@ -231,22 +277,31 @@ function buildCols(){
   });
 }
 function buildTpls(){
-  const box=document.getElementById('tpls');box.innerHTML='';
+  const host=document.getElementById('fams');host.innerHTML='';
   const rec=COLLECTIONS[state.col].rec;
-  LAYOUTS.forEach(l=>{
-    const d=document.createElement('div');
-    d.className='t'+(state.layout===l.id?' on':'');
-    const c=document.createElement('canvas');c.width=240;c.height=320;
-    const cx=c.getContext('2d');
-    cx.setTransform(c.width/CW,0,0,c.height/CH,0,0);
-    drawDesign(cx,l.id,false);
-    const n=document.createElement('div');n.className='n';
-    n.innerHTML='<span>'+l.id+' '+l.name+'</span>';
-    if(rec.includes(l.id)){const r=document.createElement('span');r.className='rec';r.textContent='荐';n.appendChild(r);}
-    n.title=l.desc;
-    d.appendChild(c);d.appendChild(n);
-    d.onclick=()=>{state.layout=l.id;buildTpls();refresh();};
-    box.appendChild(d);
+  const Gg=G();
+  FAMILIES.forEach(fam=>{
+    const h=document.createElement('div');
+    h.className='famh';
+    h.innerHTML='<i>'+fam.id+'</i>'+fam.name+'<span>'+fam.desc+'</span>';
+    host.appendChild(h);
+    const grid=document.createElement('div');
+    grid.className='tpl';
+    fam.ids.forEach(id=>{
+      const l=LAYOUTS.find(x=>x.id===id); if(!l) return;
+      const d=document.createElement('div');
+      d.className='t'+(state.layout===l.id?' on':'');
+      const c=document.createElement('canvas');c.width=240;c.height=320;
+      drawThumb(c.getContext('2d'),l.id,Gg,240,320);
+      const n=document.createElement('div');n.className='n';
+      n.innerHTML='<span>'+l.id+' '+l.name+'</span>';
+      if(rec.includes(l.id)){const r=document.createElement('span');r.className='rec';r.textContent='荐';n.appendChild(r);}
+      n.title=l.desc;
+      d.appendChild(c);d.appendChild(n);
+      d.onclick=()=>{state.layout=l.id;buildTpls();refresh();};
+      grid.appendChild(d);
+    });
+    host.appendChild(grid);
   });
 }
 const HOOKS={
@@ -281,28 +336,43 @@ document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransf
 });
 document.getElementById('guides').onchange=refresh;
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
-function renderFull(id){
-  const t=document.createElement('canvas');t.width=CW;t.height=CH;
-  drawDesign(t.getContext('2d'),id,false);return t;
+function renderFull(id,ratioId){
+  const Gg=geo(ratioId||state.ratio);
+  const t=document.createElement('canvas');t.width=Gg.W;t.height=Gg.H;
+  drawDesign(t.getContext('2d'),id,false,Gg);return t;
 }
-function exportCanvas(w,h,type,name,id){
-  const src=renderFull(id||state.layout);
-  const c=document.createElement('canvas');c.width=w;c.height=h;
-  const x=c.getContext('2d');
-  if(w===CW&&h===CH)x.drawImage(src,0,0);
-  else{ x.save();x.filter='blur(28px) brightness(.72)';x.drawImage(src,-40,200,w+80,w+80);x.restore(); x.drawImage(src,0,(h-CH)/2); }
-  c.toBlob(b=>dl(b,name),type||'image/png',0.92);
+function exportNow(type,name){
+  const Gg=G();
+  const src=renderFull(state.layout);
+  src.toBlob(b=>dl(b,name),type||'image/png',0.92);
 }
-document.getElementById('exp34').onclick=()=>exportCanvas(CW,CH,'image/png','cover-v3-'+COLLECTIONS[state.col].id+'-'+state.layout+'-1080x1440.png');
-document.getElementById('exp916').onclick=()=>exportCanvas(1080,1920,'image/png','cover-v3-1080x1920.png');
-document.getElementById('expjpg').onclick=()=>exportCanvas(CW,CH,'image/jpeg','cover-v3-1080x1440.jpg');
-document.getElementById('exptrio').onclick=()=>{
-  const ids=LAYOUTS.map(l=>l.id);
-  const c=document.createElement('canvas');c.width=1080*4;c.height=1440*4;const x=c.getContext('2d');
-  ids.forEach((id,i)=>{const s=renderFull(id);x.drawImage(s,(i%4)*1080,Math.floor(i/4)*1440,1080,1440);});
-  c.toBlob(b=>dl(b,'layouts-v3-16.png'),'image/png');
+document.getElementById('expNow').onclick=()=>{
+  const Gg=G();
+  exportNow('image/png','cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png');
 };
-buildHooks();buildCols();buildTpls();
+document.getElementById('expJpg').onclick=()=>{
+  const Gg=G();
+  exportNow('image/jpeg','cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.jpg');
+};
+document.getElementById('expAll').onclick=()=>{
+  const Gg=G();
+  const ids=LAYOUTS.map(l=>l.id);
+  const cols=4, rows=Math.ceil(ids.length/cols);
+  const c=document.createElement('canvas');c.width=Gg.W*cols;c.height=Gg.H*rows;const x=c.getContext('2d');
+  ids.forEach((id,i)=>{const s=renderFull(id);x.drawImage(s,(i%cols)*Gg.W,Math.floor(i/cols)*Gg.H);});
+  c.toBlob(b=>dl(b,'layouts-v4-16-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
+};
+document.getElementById('expThree').onclick=()=>{
+  const ids=LAYOUTS.map(l=>l.id);
+  const list=[];
+  ['3x4','9x16','16x9'].forEach(r=>{
+    const Gg=geo(r);
+    const c=document.createElement('canvas');c.width=Gg.W;c.height=Gg.H;
+    drawDesign(c.getContext('2d'),state.layout,false,Gg);
+    c.toBlob(b=>dl(b,'cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
+  });
+};
+buildHooks();buildRatios();buildCols();buildTpls();
 let pending=Object.keys(COLLECTIONS).length;
 Object.keys(COLLECTIONS).forEach(k=>{
   const im=new Image();
@@ -315,11 +385,11 @@ refresh();
 
 <div id="mtop">
   <div class="mtp"></div>
-  <div class="mti"><b id="mtName">B1 大字顶·出血图底</b><span id="mtCol">你带娃在玩啥呢？</span></div>
+  <div class="mti"><b id="mtName">B2 大圆图·上文字</b><span id="mtCol">你带娃在玩啥呢？</span></div>
   <button id="mtBtn">放大看</button>
 </div>
 <div id="mbar">
-  <button id="mExport">导出封面 1080×1440</button>
+  <button id="mExport">导出封面</button>
 </div>
 <script>
 (function(){
@@ -331,16 +401,22 @@ refresh();
   mtp.appendChild(miniCv);
   function syncTop(){
     var src=document.getElementById('pv');
+    var Gg=geo(state.ratio);
+    miniCv.width=Gg.W; miniCv.height=Gg.H;
     var cx=miniCv.getContext('2d');
-    cx.clearRect(0,0,1080,1440);
+    cx.clearRect(0,0,Gg.W,Gg.H);
     cx.drawImage(src,0,0);
     var L=LAYOUTS.find(function(x){return x.id===state.layout;});
-    mtName.textContent=(L?L.id+' '+L.name:'')+' · 1080×1440';
+    mtName.textContent=(L?L.id+' '+L.name:'')+' · '+Gg.W+'×'+Gg.H;
     mtCol.textContent=COLLECTIONS[state.col].icon+' '+COLLECTIONS[state.col].name+' — '+D().title;
   }
   var _refresh=refresh;
   refresh=function(){_refresh();syncTop();};
-  mExport.onclick=function(){exportCanvas(CW,CH,'image/png','cover-v3-'+COLLECTIONS[state.col].id+'-'+state.layout+'-1080x1440.png');};
+  mExport.onclick=function(){
+    var Gg=geo(state.ratio);
+    var src=renderFull(state.layout);
+    src.toBlob(function(b){dl(b,'cover-v4-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png');},'image/png',0.92);
+  };
   mtBtn.onclick=function(){document.getElementById('pv').scrollIntoView({behavior:'smooth',block:'center'});};
   setTimeout(syncTop,100);
   setTimeout(syncTop,800);
