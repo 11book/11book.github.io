@@ -429,6 +429,70 @@ function fitText(ctx,text,maxW,maxSize,minSize,weight,maxLines){
    anchor: 'top' 从 y 往下排；'bottom' 以 y 为底往上排
    → 布局只要拿到 bottom，就知道图能放在哪，物理上不重叠
    --------------------------------------------------------------- */
+/* hex -> rgba，带 alpha */
+function withA(hex,a){
+  const h=(hex||'#000').replace('#','');
+  const n=h.length===3?h.split('').map(c=>c+c).join(''):h;
+  const r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+/* 发光分隔线：中间最亮、左右向两端渐隐，带柔和光晕
+   —— 不是实心横条，而是一道「有光」的束：中心白色高光核 + accent 光带 + 椭圆辉光 */
+function drawGlowSep(ctx,cx,cy,w,h,color,coreOn){
+  if(w<=0||h<=0) return;
+  const rx=w/2;
+  ctx.save();
+  /* 全部 source-over：'lighter' 叠加会把浅色底直接推成死白，
+     光晕靠真实模糊 + 渐变本身来产生，深底浅底都成立 */
+
+  /* ① 外光晕：先真实高斯模糊，得到「光扩散」的柔边，而不是硬边色块 */
+  if(ctx.filter!==undefined){
+    ctx.save();
+    ctx.filter='blur('+Math.max(2,Math.round(h*1.5))+'px)';
+    ctx.translate(cx,cy);
+    ctx.scale(1,Math.max(0.08,h*2.4/rx));
+    const gg=ctx.createRadialGradient(0,0,0,0,0,rx);
+    gg.addColorStop(0,withA(color,.50));
+    gg.addColorStop(.40,withA(color,.26));
+    gg.addColorStop(.75,withA(color,.07));
+    gg.addColorStop(1,withA(color,0));
+    ctx.fillStyle=gg;
+    ctx.beginPath(); ctx.arc(0,0,rx,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  /* ② 光带本体：两端渐隐、中心最亮
+     纵向用椭圆收窄（两头尖、中间厚），横向用非线性长尾衰减
+     —— 中心急落、两端拖长，模拟光自然消散，而不是匀速变淡 */
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.scale(1,Math.max(0.02,h/rx));
+  const core=ctx.createRadialGradient(0,0,0,0,0,rx);
+  core.addColorStop(0,withA(color,.98));
+  core.addColorStop(.12,withA(color,.92));
+  core.addColorStop(.30,withA(color,.62));
+  core.addColorStop(.52,withA(color,.30));
+  core.addColorStop(.76,withA(color,.09));
+  core.addColorStop(1,withA(color,0));
+  ctx.fillStyle=core;
+  ctx.beginPath(); ctx.arc(0,0,rx,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  /* ③ 中心亮核：一小段白色高光，给出「光」的焦点
+     仅用于深底（图片上）；浅底上白色高光会过曝成刺眼的白点，直接不画 */
+  if(coreOn!==false){
+    const cw=Math.max(2,rx*0.12);
+    const cg=ctx.createLinearGradient(cx-cw,0,cx+cw,0);
+    cg.addColorStop(0,'rgba(255,255,255,0)');
+    cg.addColorStop(.5,'rgba(255,255,255,.30)');
+    cg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=cg;
+    ctx.fillRect(cx-cw,cy-h*0.5,cw*2,Math.max(1,h));
+  }
+  ctx.restore();
+}
+
 function textBlock(ctx,d,o){
   const k=o.k||1;
   const maxT=Math.round((o.titleSize||120)*k), minT=Math.round(40*k);
@@ -468,12 +532,13 @@ function textBlock(ctx,d,o){
   const align=o.align||'left';
   const drawX = (align==='center') ? o.x + w/2 : o.x;
 
-  /* 装饰短线：位于主标题上方，不与主副标题之间的净空隙抢位置 */
-  const dc=o.deco?{
-    w:Math.round(o.deco.w*k), h:Math.round(o.deco.h*k),
-    gap:Math.round(o.deco.gap*k), color:o.deco.color||o.color||'#000'
+  /* 分隔线：放在主标题与副标题「之间」的那段净空隙里
+     —— 不占用额外高度，它活在 gap 里，所以不改变整块排版 */
+  const sp=o.sep?{
+    w:Math.round(o.sep.w*k), h:Math.round(o.sep.h*k),
+    color:o.sep.color||o.accent||'#FFFFFF',
+    core:o.sep.core   /* undefined=有白核 / false=浅底不要白核 */
   }:null;
-  const decoTotal = dc ? dc.h + dc.gap : 0;   /* 装饰占用的顶部高度 */
 
   /* 用真实字体度量（actualBoundingBox）取代魔法系数 0.86，中文才准 */
   ctx.letterSpacing='0px';
@@ -501,7 +566,7 @@ function textBlock(ctx,d,o){
     const blockInkH = tAsc + (nLines-1)*lh + tDesc + (st? gap+sAsc+sDesc : 0);
     firstBase = o.y - blockInkH + tAsc;
   }else{
-    firstBase = o.y + decoTotal + tAsc;
+    firstBase = o.y + tAsc;
   }
 
   ctx.textAlign=align; ctx.textBaseline='alphabetic';
@@ -518,22 +583,21 @@ function textBlock(ctx,d,o){
     ctx.fillText(st.lines[0],drawX,sb);
     subBottom = sb + sDesc;
   }
-  /* 装饰短线：画在主标题墨迹顶上方 */
-  if(dc){
-    const lineTop = firstBase - tAsc - dc.gap - dc.h;
-    const lx = (align==='center') ? drawX - dc.w/2 : drawX;
+  /* 发光分隔线：居中于主副标题之间的净空隙 */
+  if(sp && st){
+    const cy = titleInkBottom + gap/2;
+    const cx = (align==='center') ? drawX : o.x + sp.w/2;
     ctx.letterSpacing='0px';
-    ctx.fillStyle=dc.color;
-    ctx.fillRect(lx, lineTop, dc.w, dc.h);
+    drawGlowSep(ctx,cx,cy,sp.w,sp.h,sp.color,sp.core);
   }
   ctx.letterSpacing=prevLS||'0px';
   ctx.textAlign='left';
   return {
-    top: firstBase - tAsc - decoTotal,
+    top: firstBase - tAsc,
     bottom: subBottom,
     titleBottom: titleInkBottom,
     size: t.size, subSize: st?st.size:0, lh:lh, gap:gap,
-    decoH: decoTotal
+    sepW: sp?sp.w:0
   };
 }
 /* 文字块高度预估（不落笔），用于先占位 */
@@ -557,9 +621,9 @@ B1(ctx,d,img,c,G){
   const by=Math.min(G.safe.bottom, Math.round(G.H*0.889));
   textBlock(ctx,d,{x:G.safe.left,y:by,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:122,subSize:64,gap:60,k:G.k,
+    titleSize:122,subSize:64,gap:64,k:G.k,
     subSpacing:0.06,
-    deco:{w:150,h:8,gap:28,color:c.accent}});
+    sep:{w:170,h:9,color:c.accent}});
 },
 
 /* B2 满图·顶部白字 */
@@ -574,9 +638,9 @@ B2(ctx,d,img,c,G){
   const ty=Math.max(G.safe.top, Math.round(G.H*0.12));
   textBlock(ctx,d,{x:G.safe.left,y:ty,w:G.W-G.safe.left-G.safe.right,
     anchor:'top',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:96,subSize:50,gap:58,k:G.k,
+    titleSize:96,subSize:50,gap:62,k:G.k,
     subSpacing:0.06,
-    deco:{w:120,h:8,gap:26,color:c.accent}});
+    sep:{w:140,h:8,color:c.accent}});
 },
 
 /* B3 满图·底部色条 */
@@ -592,9 +656,9 @@ B3(ctx,d,img,c,G){
   const by=Math.round(G.H*0.915);
   textBlock(ctx,d,{x:G.safe.left,y:by,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:112,subSize:58,gap:58,k:G.k,
+    titleSize:112,subSize:58,gap:62,k:G.k,
     subSpacing:0.06,
-    deco:{w:140,h:8,gap:26,color:c.accent}});
+    sep:{w:160,h:9,color:c.accent,core:false}});
 },
 
 /* B4 满图·悬浮卡片 */
@@ -609,7 +673,7 @@ B4(ctx,d,img,c,G){
   const GAP=58;
   const probe=textBlock(probeCtx,d,{x:mx+padX,y:0,w:mw-padX*2,anchor:'top',align:'left',
     color:'#000',subColor:'#000',titleSize:96,subSize:50,gap:GAP,k:G.k,
-    subSpacing:0.06,deco:{w:120,h:8,gap:26,color:'#000'}});
+    subSpacing:0.06,sep:{w:140,h:8,color:'#000'}});
   const inkH=probe.bottom-probe.top;
   /* 卡片高度 = 文字墨迹 + 上下等距内边距 */
   const mh=Math.round(inkH+padY*2);
@@ -627,7 +691,7 @@ B4(ctx,d,img,c,G){
   const ty=my+padY;
   textBlock(ctx,d,{x:mx+padX,y:ty,w:mw-padX*2,anchor:'top',align:'left',color:'#FFFFFF',
     subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:50,gap:GAP,k:G.k,
-    subSpacing:0.06,deco:{w:120,h:8,gap:26,color:c.accent}});
+    subSpacing:0.06,sep:{w:140,h:8,color:c.accent}});
 },
 
 /* ---- 族 B：分栏对切 ---- */
@@ -644,9 +708,9 @@ B5(ctx,d,img,c,G){
   const W=G.W;
   const t=textBlock(ctx,d,{x:G.safe.left,y:Math.round(G.H*0.08),
     w:W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:110,subSize:58,gap:58,k:G.k,
+    color:c.ink,subColor:c.ink2,titleSize:110,subSize:58,gap:62,k:G.k,
     subSpacing:0.06,
-    deco:{w:140,h:8,gap:26,color:c.accent}});
+    sep:{w:160,h:9,color:c.accent,core:false}});
   const gap=Math.round(G.H*0.055);
   const circleTop=t.bottom+gap;
   const maxR=Math.min((W-G.safe.left*2)/2, (G.H-circleTop-Math.round(G.H*0.06))/2);
