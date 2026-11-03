@@ -113,11 +113,23 @@ button.ghost b{float:right;color:#111}
 .ok{color:#12a150}.bad{color:#e5484d}
 .note{font-size:12px;color:#8a9099;background:#f7f8fa;border-radius:9px;padding:10px 12px;line-height:1.8;margin-bottom:11px}
 .note b{color:#333}
-/* ---------- v5：左控制列 / 右工作列 ---------- */
-.colL{grid-column:1;grid-row:1;min-width:0}
-.colR{grid-column:2;grid-row:1;min-width:0}
+/* ---------- v5.2：标题条置顶全宽 + 左控制列 / 右工作列 ---------- */
+.titlestrip{grid-column:1/-1;grid-row:1;margin-bottom:14px;padding:13px 16px}
+.colL{grid-column:1;grid-row:2;min-width:0}
+.colR{grid-column:2;grid-row:2;min-width:0}
 /* 桌面端：预览卡现在装着 主图/裁剪/导出，内容高，不再吸顶 */
-.sumcard{grid-column:1/-1;grid-row:2}
+.sumcard{grid-column:1/-1;grid-row:3}
+
+/* ---------- v5.2：标题条（整页最上方，最该被改的东西） ---------- */
+.titlestrip .tshead{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.titlestrip .tshead h2{margin:0;font-size:12px;color:#8a9099;font-weight:700;letter-spacing:.6px}
+.titlestrip .tsnote{font-size:11.5px;color:#a6acb4}
+.titlestrip .tsrow{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px}
+.titlestrip label{margin:0;font-size:12px;color:#555;font-weight:700}
+.titlestrip label .hint{font-weight:400;display:block}
+.titlestrip input{font-size:15px;font-weight:600;background:#fff;padding:11px 13px}
+.titlestrip .tssub input{font-weight:400;font-size:14px}
+.titlestrip .tsfoot{font-size:11.5px;color:#a6acb4;margin-top:9px}
 .ratiowrap{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:-2px 0 12px}
 .ratiowrap .lb{font-size:11px;color:#8a9099;font-weight:700;letter-spacing:.5px}
 .ratiowrap .chip{padding:5px 12px;font-size:12px}
@@ -160,8 +172,12 @@ details.sumcard .note{margin:11px 0 0}
   .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
   .colL,.colR{display:contents}
   .sumcard{grid-column:1;grid-row:auto}
-  #cardPv{order:1}#cardText{order:2}
+  #cardText{order:1}#cardPv{order:2}
   #cardTpl{order:3}#cardSize{order:4}
+  .titlestrip{margin-bottom:10px;padding:12px}
+  .titlestrip .tsrow{grid-template-columns:minmax(0,1fr);gap:9px}
+  .titlestrip input{font-size:16px;padding:10px 12px}
+  .titlestrip .tssub input{font-size:15px}
   .pv.mini{display:none}
   .pv.main canvas{width:min(52vw,230px)}
   body{font-size:15px}
@@ -208,28 +224,30 @@ details.sumcard .note{margin:11px 0 0}
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v5 合集视觉指纹</span>
-  <span>选合集 → 传主图 → 写文字 → 选版式 · 全部就位在预览里，改一处即时见效</span>
+  <span>改标题 → 选合集 → 传主图 → 选版式 · 全部就位在预览里，改一处即时见效</span>
   <a href="../douyin-cover-tool-v4/">← v4</a>
 </header>
 <div class="wrap">
-  <div class="colL">
 
-    <div class="card" id="cardText">
-      <h2>① 文字（只保留两级）</h2>
-      <div class="note"><b>v5 铁律：</b>封面只有主标题 + 副标题两级文字；先排文字、再按剩余空间放图，<b>文字和图片物理上不可能重叠</b>。</div>
-      <label>主标题 <span class="hint">建议 4–8 字，手机上一眼能读完</span>
-        <input id="title" placeholder="例：纸杯塔能有多高"></label>
-      <label>副标题 <span class="hint">主标题的一半大小，只留一句</span>
-        <input id="sub" placeholder="例：今天实验做到第 12 轮"></label>
-      <div style="font-size:11.5px;color:#8a9099;margin:-2px 0 4px">每个合集都预置了一组示例文案，切合集会自动带上；你一旦手改，就永远以你写的为准。</div>
+  <div class="card titlestrip" id="cardText">
+    <div class="tshead">
+      <h2>① 封面标题</h2>
+      <span class="tsnote">切合集会带示例文案；你手改过，就永远以你写的为准</span>
     </div>
+    <div class="tsrow">
+      <label class="tsmain">主标题
+        <input id="title" placeholder="例：纸杯塔能有多高（4–8 字）" autocomplete="off"></label>
+      <label class="tssub">副标题
+        <input id="sub" placeholder="例：今天实验做到第 12 轮（一句）" autocomplete="off"></label>
+    </div>
+  </div>
+
+  <div class="colL">
 
     <div class="card" id="cardTpl">
       <h2>② 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
       <div id="fams"></div>
     </div>
-
-
 
   </div>
 
@@ -309,12 +327,13 @@ details.sumcard .note{margin:11px 0 0}
   </div>
 
   <details class="sumcard" id="cardSize">
-    <summary><b>④ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
+    <summary><b>③ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
     <div class="note" id="ratioNote" style="margin:11px 0 0"></div>
   </details>
 </div>
 
 <script>
+/* V52_MARKER: v5.2 引擎起点 —— 本行勿删 */
 /* =========================================================
    乐小侠 · 抖音封面工作台 v5.0 引擎
    —— 先写文字即见预览 · 四合集视觉指纹（配色+形状）· 文字图片零重叠 ——
@@ -1787,7 +1806,7 @@ refresh();
     cx.drawImage(src,0,0);
     var L=LAYOUTS.find(function(x){return x.id===state.layout;});
     mtName.textContent=(L?L.id+' '+L.name:'')+' · '+Gg.W+'×'+Gg.H;
-    mtCol.textContent=COLLECTIONS[state.col].icon+' '+COLLECTIONS[state.col].name+' — '+D().title;
+    mtCol.textContent=COLLECTIONS[state.col].name+' — '+D().title;
   }
   var _refresh=refresh;
   refresh=function(){_refresh();syncTop();};
