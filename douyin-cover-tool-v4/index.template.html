@@ -132,7 +132,7 @@ button.ghost b{float:right;color:#111}
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v4 三尺寸真重排</span>
-  <span>3:4 / 9:16 / 16:9 各自独立排版 · 16 款骨架分 4 族 · 文字与图片零重叠</span>
+  <span>3:4 / 9:16 / 16:9 各自独立排版 · 5 款骨架分 2 族 · 文字与图片零重叠</span>
   <a href="../douyin-cover-tool-v3/">← v3</a>
 </header>
 <div class="wrap">
@@ -143,7 +143,7 @@ button.ghost b{float:right;color:#111}
   </div>
 
   <div class="card wide">
-    <h2>② 版式（16 款骨架，按 4 大族分类；带「荐」的是该合集推荐）</h2>
+    <h2>② 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
     <div id="fams"></div>
   </div>
 
@@ -211,7 +211,7 @@ button.ghost b{float:right;color:#111}
         <div class="btns">
           <button class="big" id="expNow">导出当前尺寸 PNG</button>
           <button class="ghost" id="expJpg">导出当前尺寸 JPG<b>小体积</b></button>
-          <button class="ghost" id="expAll">导出 16 款拼图<b>当前尺寸</b></button>
+          <button class="ghost" id="expAll">导出 5 款拼图<b>当前尺寸</b></button>
           <button class="ghost" id="expThree">导出三尺寸各一张<b>3:4 / 9:16 / 16:9</b></button>
           <div class="tips" id="check"></div>
         </div>
@@ -713,18 +713,18 @@ document.getElementById('expJpg').onclick=()=>{
 };
 document.getElementById('expAll').onclick=()=>{
   const ids=LAYOUTS.map(l=>l.id);
-  const cols=4, rows=Math.ceil(ids.length/cols);
-  /* 16 款拼图是大画布：限制总像素，避免 3× 时 canvas 撑爆内存 */
+  const cols=3, rows=Math.ceil(ids.length/cols);
+  /* 5 款拼图是大画布：限制总像素，避免 3× 时 canvas 撑爆内存 */
   const MAXPX=40e6;
   let sc=state.exportScale;
   let Gg=geo(state.ratio,sc);
   while(sc>1 && (Gg.W*cols)*(Gg.H*rows) > MAXPX){ sc--; Gg=geo(state.ratio,sc); }
   if(sc!==state.exportScale){
-    alert('16 款拼图画布过大，倍率自动降为 '+sc+'×（'+Gg.W+'×'+Gg.H+'）。\n单张导出仍可用 '+state.exportScale+'×。');
+    alert('5 款拼图画布过大，倍率自动降为 '+sc+'×（'+Gg.W+'×'+Gg.H+'）。\n单张导出仍可用 '+state.exportScale+'×。');
   }
   const c=document.createElement('canvas');c.width=Gg.W*cols;c.height=Gg.H*rows;const x=c.getContext('2d');
   ids.forEach((id,i)=>{const s=renderFull(id,null,sc);x.drawImage(s,(i%cols)*Gg.W,Math.floor(i/cols)*Gg.H);});
-  c.toBlob(b=>dl(b,'layouts-v4-16-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
+  c.toBlob(b=>dl(b,'layouts-v4-5-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
 };
 document.getElementById('expThree').onclick=()=>{
   ['3x4','9x16','16x9'].forEach(r=>{

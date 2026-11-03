@@ -132,7 +132,7 @@ button.ghost b{float:right;color:#111}
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v4 三尺寸真重排</span>
-  <span>3:4 / 9:16 / 16:9 各自独立排版 · 16 款骨架分 4 族 · 文字与图片零重叠</span>
+  <span>3:4 / 9:16 / 16:9 各自独立排版 · 5 款骨架分 2 族 · 文字与图片零重叠</span>
   <a href="../douyin-cover-tool-v3/">← v3</a>
 </header>
 <div class="wrap">
@@ -143,7 +143,7 @@ button.ghost b{float:right;color:#111}
   </div>
 
   <div class="card wide">
-    <h2>② 版式（16 款骨架，按 4 大族分类；带「荐」的是该合集推荐）</h2>
+    <h2>② 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
     <div id="fams"></div>
   </div>
 
@@ -211,7 +211,7 @@ button.ghost b{float:right;color:#111}
         <div class="btns">
           <button class="big" id="expNow">导出当前尺寸 PNG</button>
           <button class="ghost" id="expJpg">导出当前尺寸 JPG<b>小体积</b></button>
-          <button class="ghost" id="expAll">导出 16 款拼图<b>当前尺寸</b></button>
+          <button class="ghost" id="expAll">导出 5 款拼图<b>当前尺寸</b></button>
           <button class="ghost" id="expThree">导出三尺寸各一张<b>3:4 / 9:16 / 16:9</b></button>
           <div class="tips" id="check"></div>
         </div>
@@ -223,7 +223,7 @@ button.ghost b{float:right;color:#111}
 <script>
 /* =========================================================
    乐小侠 · 抖音封面工作台 v4.0 引擎
-   —— 三尺寸真实重排 · 16 款骨架分 4 族 · 文字图片零重叠 ——
+   —— 三尺寸真实重排 · 5 款骨架分 2 族 · 文字图片零重叠 ——
 
    v4 铁律
    1. 每张封面只有两级文字：主标题 + 副标题
@@ -264,31 +264,18 @@ function geo(id,scale){
   };
 }
 
-/* ---------- 16 款骨架（4 族，每族 4 款） ---------- */
+/* ---------- 5 款骨架（2 族） ---------- */
 const FAMILIES = [
-  {id:'A', name:'① 满图压字', desc:'图片满幅，文字压在图上', ids:['B1','B4','B7','B12']},
-  {id:'B', name:'② 分栏对切', desc:'图和字各占一边，硬切',   ids:['B5','B6','B3','B9']},
-  {id:'C', name:'③ 卡片图形', desc:'图片装进圆/卡片，文字独立', ids:['B2','B8','B14','B10']},
-  {id:'D', name:'④ 纯文字牌', desc:'几乎纯文字，图只当点缀', ids:['B11','B13','B16','B15']}
+  {id:'A', name:'① 满图压字', desc:'图片满幅，文字压在图上', ids:['B1','B4','B12','B7']},
+  {id:'C', name:'② 圆形大图', desc:'纯色底 + 居中大圆图，文字在上', ids:['B2']}
 ];
 
 const LAYOUTS = [
   {id:'B1',  fam:'A', name:'满图·底部白字', desc:'满幅图 + 底部压暗，白字'},
   {id:'B4',  fam:'A', name:'满图·顶部白字', desc:'满幅图 + 顶部压暗，白字'},
-  {id:'B7',  fam:'A', name:'满图·底部色条', desc:'上图下纯色实条，条上排字'},
   {id:'B12', fam:'A', name:'满图·悬浮卡片', desc:'满幅图 + 图上一张深色圆角卡'},
-  {id:'B5',  fam:'B', name:'左图右字',       desc:'左半出血图，右半纯色排字'},
-  {id:'B6',  fam:'B', name:'上图下字',       desc:'上半出血图，下半纯色排字'},
-  {id:'B3',  fam:'B', name:'斜切·左文右图',  desc:'对角线分割，右侧大面积图'},
-  {id:'B9',  fam:'B', name:'斜切·上图下字',  desc:'对角线下缘，文字在左下'},
-  {id:'B2',  fam:'C', name:'大圆图·上文字',  desc:'纯色底，大圆图居中，标题在上'},
-  {id:'B8',  fam:'C', name:'大卡图·上文字',  desc:'纯色底，大圆角卡图，标题在上'},
-  {id:'B14', fam:'C', name:'竖图居中·上下字',desc:'竖图居中，标题在上副题在下'},
-  {id:'B10', fam:'C', name:'方图居中·字在下',desc:'方图居中偏上，标题在图下'},
-  {id:'B11', fam:'D', name:'大字顶·底部半图',desc:'纯色大字，底部半幅出血图'},
-  {id:'B13', fam:'D', name:'大字左·右下方图',desc:'纯色大字，右下角一枚大方图'},
-  {id:'B16', fam:'D', name:'大字左·右下小圆',desc:'纯色大字，右下角一枚小圆图'},
-  {id:'B15', fam:'D', name:'大字顶·斜置压边',desc:'纯色大字，斜置图压右下角'}
+  {id:'B7',  fam:'A', name:'满图·底部色条', desc:'上图下纯色实条，条上排字'},
+  {id:'B2',  fam:'C', name:'大圆图·上文字',  desc:'纯色底，大圆图居中，标题在上'}
 ];
 
 /* ---------- 合集视觉系统 ---------- */
@@ -297,19 +284,19 @@ const COLLECTIONS = {
     id:'play', name:'你带娃在玩啥呢？', icon:'🎮', sub:'日常游戏 + 有趣的小实验',
     g1:'#FFF4E2', g2:'#FFDCA8', ink:'#2B1D0E', ink2:'#7A6244', accent:'#E8871E',
     card:'#FFFFFF', img:'assets/cover-play.jpg',
-    rec:['B2','B11','B1']
+    rec:['B2','B1','B12']
   },
   talk: {
     id:'talk', name:'你听过娃冒出啥话？', icon:'💭', sub:'奇思妙想 · 小孩的金句',
     g1:'#241634', g2:'#432A61', ink:'#FFF3E4', ink2:'#C6B2DF', accent:'#F2A64E',
     card:'#2E1E42', img:'assets/cover-talk.jpg',
-    rec:['B4','B8','B16']
+    rec:['B4','B12','B1']
   },
   travel: {
     id:'travel', name:'你陪娃去过哪儿呢？', icon:'🗺️', sub:'乐小侠的去处地图',
     g1:'#F3EFE3', g2:'#D9E3D2', ink:'#262218', ink2:'#6B6A55', accent:'#5E6F52',
     card:'#FFFFFF', img:'assets/cover-travel.jpg',
-    rec:['B6','B14','B10']
+    rec:['B7','B2','B12']
   }
 };
 
@@ -319,58 +306,25 @@ const PRESETS = {
     title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮',
     B1:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
     B2:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
-    B3:{title:'纸杯塔能有多高', sub:'沙发上的亲子实验'},
     B4:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
-    B5:{title:'纸杯塔能有多高', sub:'搭到第 12 层才倒'},
-    B6:{title:'纸杯塔能有多高', sub:'娃自己数到了 12'},
     B7:{title:'纸杯塔能有多高', sub:'亲子游戏 · 第 12 轮'},
-    B8:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
-    B9:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
-    B10:{title:'纸杯塔能有多高', sub:'娃自己数到了 12'},
-    B11:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
     B12:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
-    B13:{title:'纸杯塔能有多高', sub:'亲子游戏 · 第 12 轮'},
-    B14:{title:'纸杯塔能有多高', sub:'娃自己数到了 12'},
-    B15:{title:'纸杯塔能有多高', sub:'沙发上的亲子实验'},
-    B16:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'}
   },
   talk:{
     title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半',
     B1:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
     B2:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
-    B3:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
     B4:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B5:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
-    B6:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
     B7:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B8:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B9:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
-    B10:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
-    B11:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
     B12:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
-    B13:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B14:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
-    B15:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B16:{title:'娃今天冒出啥话', sub:'一句比一句离谱'}
   },
   travel:{
     title:'带娃去过哪儿呢', sub:'乐小侠的去处地图',
     B1:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
     B2:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
-    B3:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
     B4:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
-    B5:{title:'带娃去过哪儿呢', sub:'一路向北'},
-    B6:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
     B7:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
-    B8:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
-    B9:{title:'带娃去过哪儿呢', sub:'一路向北'},
-    B10:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
-    B11:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
     B12:{title:'带娃去过哪儿呢', sub:'一路向北'},
-    B13:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
-    B14:{title:'带娃去过哪儿呢', sub:'娃自己数到了 12'},
-    B15:{title:'带娃去过哪儿呢', sub:'沙发上的亲子实验'},
-    B16:{title:'带娃去过哪儿呢', sub:'今年去了 6 个地方'}
   }
 };
 
@@ -401,10 +355,9 @@ function gradBg(ctx,c,dir,G){
   g.addColorStop(0,c.g1); g.addColorStop(1,c.g2);
   ctx.fillStyle=g; ctx.fillRect(0,0,G.W,G.H);
 }
-function solidBg(ctx,c,G){ ctx.fillStyle=c.g1; ctx.fillRect(0,0,G.W,G.H); }
 
 /* 裁剪源区域：裁剪挂在图片实例上（img.__crop），归一化矩形 {x,y,w,h} 相对原图 0~1
-   —— 用户框选的「要显示的部分」；16 款骨架共用同一份，容器各自再 cover 贴合
+   —— 用户框选的「要显示的部分」；5 款骨架共用同一份，容器各自再 cover 贴合
    —— 挂在实例上而非全局，切换合集用示例图时不会被误裁 */
 function cropSrc(img){
   const iw=img.width, ih=img.height;
@@ -429,25 +382,10 @@ function drawCoverF(ctx,img,x,y,w,h,fy){
   /* 记录本次放大倍率（>1 = 源像素不够，导出会糊） */
   if(CURSTAT && s>(CURSTAT.up||0)) CURSTAT.up=s;
 }
-function coverRect(ctx,img,x,y,w,h,r,fy){
-  ctx.save();
-  roundRectPath(ctx,x,y,w,h,r); ctx.clip();
-  drawCoverF(ctx,img,x,y,w,h,fy===undefined?0.30:fy);
-  ctx.restore();
-}
 function coverCircle(ctx,img,cx,cy,r,fy){
   ctx.save();
   ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
   drawCoverF(ctx,img,cx-r,cy-r,r*2,r*2,fy===undefined?0.28:fy);
-  ctx.restore();
-}
-function coverPoly(ctx,img,pts,fy){
-  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
-  const x=Math.min.apply(null,xs), y=Math.min.apply(null,ys);
-  const w=Math.max.apply(null,xs)-x, h=Math.max.apply(null,ys)-y;
-  ctx.save();
-  polyPath(ctx,pts); ctx.clip();
-  drawCoverF(ctx,img,x,y,w,h,fy===undefined?0.30:fy);
   ctx.restore();
 }
 function ring(ctx,cx,cy,r,w,color){
@@ -560,7 +498,7 @@ function textBlock(ctx,d,o){
 
 function mainImg(img){ return img && img.width ? img : null; }
 
-/* ================= 16 款骨架（v4 · 三尺寸真重排） ================= */
+/* ================= 5 款骨架（v4 · 三尺寸真重排） ================= */
 const RENDER = {
 
 /* ---- 族 A：满图压字 ---- */
@@ -573,7 +511,9 @@ B1(ctx,d,img,c,G){
   g.addColorStop(.55,'rgba(0,0,0,.52)');
   g.addColorStop(1,'rgba(0,0,0,.88)');
   ctx.fillStyle=g; ctx.fillRect(0,G.H*0.40,G.W,G.H*0.60);
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom,w:G.W-G.safe.left-G.safe.right,
+  /* 底部文字：底边锚在画布 88.9% 处（不贴 safe.bottom，避免 16:9 顶到画面底边） */
+  const by=Math.min(G.safe.bottom, Math.round(G.H*0.889));
+  textBlock(ctx,d,{x:G.safe.left,y:by,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
     titleSize:122,subSize:46,gap:40,k:G.k});
 },
@@ -586,9 +526,11 @@ B4(ctx,d,img,c,G){
   g.addColorStop(.55,'rgba(0,0,0,.42)');
   g.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=g; ctx.fillRect(0,0,G.W,G.H*0.52);
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.top,w:G.W-G.safe.left-G.safe.right,
+  /* 顶部文字：顶边锚在画布 12% 处（避开状态栏 UI），标题收窄、层级更紧凑 */
+  const ty=Math.max(G.safe.top, Math.round(G.H*0.12));
+  textBlock(ctx,d,{x:G.safe.left,y:ty,w:G.W-G.safe.left-G.safe.right,
     anchor:'top',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:122,subSize:46,gap:40,k:G.k});
+    titleSize:96,subSize:40,gap:36,k:G.k});
 },
 
 /* B7 满图·底部色条 */
@@ -600,7 +542,10 @@ B7(ctx,d,img,c,G){
   g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.18)');
   ctx.fillStyle=g; ctx.fillRect(0,bandTop-90*G.k,G.W,90*G.k);
   ctx.fillStyle=c.accent; ctx.fillRect(0,bandTop,G.W,Math.round(8*G.k));
-  textBlock(ctx,d,{x:G.safe.left,y:G.H-Math.round(60*G.k),w:G.W-G.safe.left-G.safe.right,
+  /* 色条内文字：墨迹块在色条内垂直居中（色条 70%~100%，墨迹约 79%~91.5%，
+     上留白 ≈8.9%、下留白 ≈8.5%），文字不贴条底、不悬空 */
+  const by=Math.round(G.H*0.915);
+  textBlock(ctx,d,{x:G.safe.left,y:by,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
     titleSize:112,subSize:44,gap:34,k:G.k});
 },
@@ -609,81 +554,38 @@ B7(ctx,d,img,c,G){
 B12(ctx,d,img,c,G){
   drawCoverF(ctx,mainImg(img),0,0,G.W,G.H,0.12);
   ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(0,0,G.W,G.H);
-  const mx=Math.round(G.safe.left*1.1), mw=G.W-mx*2;
-  /* 卡片高度随文字块自适应，文字在卡内垂直居中 —— 字号/间距变化时不会偏上 */
+  /* 卡片收窄成「悬浮标签」而非横贯全屏的条幅，避免横向切断画面 */
+  const mw=Math.round(G.W*0.76), mx=Math.round((G.W-mw)/2);
+  /* 卡片高度随文字块自适应 —— 上下等距内边距，文字视觉居中 */
   const padX=Math.round(48*G.k), padY=Math.round(40*G.k);
   const probeCtx=document.createElement('canvas').getContext('2d');
+  const GAP=48;
   const probe=textBlock(probeCtx,d,{x:mx+padX,y:0,w:mw-padX*2,anchor:'top',align:'left',
-    color:'#000',subColor:'#000',titleSize:96,subSize:40,gap:30,k:G.k});
+    color:'#000',subColor:'#000',titleSize:96,subSize:40,gap:GAP,k:G.k});
   const inkH=probe.bottom-probe.top;
-  const mh=Math.round(Math.max(G.H*0.22, inkH+padY*2));
-  const my=Math.round(Math.min(G.H*0.66, G.H-mh-Math.round(G.H*0.10)));
+  /* 卡片高度 = 文字墨迹 + 上下等距内边距 */
+  const mh=Math.round(inkH+padY*2);
+  /* 卡片纵向位置：文字墨迹顶锚在画布 13% 处 —— 落在上方背景区，
+     不压人物脸、不压手部动作区；三种尺寸一致生效 */
+  const inkTop=Math.round(G.H*0.13);
+  const my=Math.max(G.safe.top, inkTop-padY);
   ctx.save();
   ctx.shadowColor='rgba(0,0,0,.34)'; ctx.shadowBlur=Math.round(46*G.k); ctx.shadowOffsetY=Math.round(16*G.k);
-  ctx.fillStyle='rgba(0,0,0,.58)';
-  roundRectPath(ctx,mx,my,mw,mh,Math.round(36*G.k)); ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.46)';
+  roundRectPath(ctx,mx,my,mw,mh,Math.round(40*G.k)); ctx.fill();
   ctx.restore();
   ctx.fillStyle=c.accent; ctx.fillRect(mx,my,mw,Math.round(8*G.k));
   /* 文字在卡片内垂直居中 */
-  const ty=my+Math.round((mh-inkH)/2);
+  const ty=my+padY;
   textBlock(ctx,d,{x:mx+padX,y:ty,w:mw-padX*2,anchor:'top',align:'left',color:'#FFFFFF',
-    subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:40,gap:48,k:G.k});
+    subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:40,gap:GAP,k:G.k});
 },
 
 /* ---- 族 B：分栏对切 ---- */
 
-/* B5 左图右字 */
-B5(ctx,d,img,c,G){
-  const split=Math.round(G.W*0.46);
-  drawCoverF(ctx,mainImg(img),0,0,split,G.H,0.20);
-  solidBg(ctx,c,G);
-  ctx.fillStyle=c.g1; ctx.fillRect(split,0,G.W-split,G.H);
-  const x=split+Math.round(G.safe.left*0.8);
-  const w=G.W-x-G.safe.right;
-  textBlock(ctx,d,{x:x,y:G.safe.bottom-Math.round(G.H*0.06),w:w,
-    anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:88,subSize:38,gap:26,k:G.k});
-  ctx.fillStyle=c.accent; ctx.fillRect(x,G.safe.top+Math.round(20*G.k),Math.round(84*G.k),Math.round(9*G.k));
-},
 
-/* B6 上图下字 */
-B6(ctx,d,img,c,G){
-  const split=Math.round(G.H*0.52);
-  drawCoverF(ctx,mainImg(img),0,0,G.W,split,0.14);
-  solidBg(ctx,c,G);
-  ctx.fillStyle=c.g1; ctx.fillRect(0,split,G.W,G.H-split);
-  const g=ctx.createLinearGradient(0,split-Math.round(80*G.k),0,split);
-  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.20)');
-  ctx.fillStyle=g; ctx.fillRect(0,split-Math.round(80*G.k),G.W,Math.round(80*G.k));
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom-Math.round(50*G.k),
-    w:G.W-G.safe.left-G.safe.right,anchor:'bottom',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:112,subSize:44,gap:36,k:G.k});
-},
 
-/* B3 斜切·左文右图 */
-B3(ctx,d,img,c,G){
-  solidBg(ctx,c,G);
-  const topX=G.W*0.46, botX=G.W*0.30;
-  coverPoly(ctx,mainImg(img),[[topX,0],[G.W,0],[G.W,G.H],[botX,G.H]],0.18);
-  const tx=G.safe.left;
-  const tw=Math.min(G.W*0.40,G.W-tx-G.safe.right)-G.safe.left*0.2;
-  textBlock(ctx,d,{x:tx,y:G.safe.top+Math.round(G.H*0.06),w:tw,
-    anchor:'top',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:92,subSize:38,gap:28,k:G.k});
-  ctx.fillStyle=c.accent; ctx.fillRect(tx,G.safe.top,Math.round(84*G.k),Math.round(9*G.k));
-},
 
-/* B9 斜切·上图下字 */
-B9(ctx,d,img,c,G){
-  solidBg(ctx,c,G);
-  coverPoly(ctx,mainImg(img),[[0,0],[G.W,0],[G.W,G.H*0.60],[0,G.H*0.76]],0.16);
-  const g=ctx.createLinearGradient(0,G.H*0.58,0,G.H*0.78);
-  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.22)');
-  ctx.fillStyle=g; ctx.fillRect(0,G.H*0.58,G.W,G.H*0.20);
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom-Math.round(G.H*0.05),
-    w:G.W*0.66,anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:104,subSize:42,gap:28,k:G.k});
-},
 
 /* ---- 族 C：卡片图形 ---- */
 
@@ -691,7 +593,7 @@ B9(ctx,d,img,c,G){
 B2(ctx,d,img,c,G){
   gradBg(ctx,c,'v',G);
   const W=G.W;
-  const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.03),
+  const t=textBlock(ctx,d,{x:G.safe.left,y:Math.round(G.H*0.08),
     w:W-G.safe.left-G.safe.right,anchor:'top',align:'center',
     color:c.ink,subColor:c.ink2,titleSize:110,subSize:44,gap:32,k:G.k});
   const gap=Math.round(G.H*0.055);
@@ -704,122 +606,16 @@ B2(ctx,d,img,c,G){
   ring(ctx,W/2,cy,rad+Math.round(12*G.k),Math.round(10*G.k),c.accent);
 },
 
-/* B8 大卡图·上文字 */
-B8(ctx,d,img,c,G){
-  gradBg(ctx,c,'v',G);
-  const mx=Math.round(G.safe.left*1.15), mw=G.W-mx*2;
-  const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.03),
-    w:G.W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:106,subSize:42,gap:30,k:G.k});
-  const top=t.bottom+Math.round(G.H*0.05);
-  const h=Math.min(G.H-top-Math.round(G.H*0.07), mw*0.68);
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=Math.round(50*G.k); ctx.shadowOffsetY=Math.round(18*G.k);
-  coverRect(ctx,mainImg(img),mx,top,mw,h,Math.round(44*G.k),0.16); ctx.restore();
-},
 
-/* B14 竖图居中·上下字 */
-B14(ctx,d,img,c,G){
-  solidBg(ctx,c,G);
-  /* 顶部标题+副标题（与 V3 语义一致）；底部不再重复画副标题 —— 原实现同一副标题画了两次 */
-  const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.02),
-    w:G.W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:98,subSize:40,gap:26,k:G.k});
-  const top=t.bottom+Math.round(G.H*0.045);
-  /* 图片占满标题块到下安全区之间的剩余空间，不再受底部副标题挤压 */
-  const ih=Math.max(200*G.k,G.safe.bottom-top-Math.round(G.H*0.04));
-  const iw=Math.min(G.W*0.62, ih*0.66);
-  const ix=(G.W-iw)/2;
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=Math.round(46*G.k); ctx.shadowOffsetY=Math.round(16*G.k);
-  coverRect(ctx,mainImg(img),ix,top,iw,ih,Math.round(40*G.k),0.14); ctx.restore();
-},
 
-/* B10 方图居中·字在下 */
-B10(ctx,d,img,c,G){
-  gradBg(ctx,c,'v',G);
-  const side=Math.min(G.W*0.66, G.H*0.50);
-  const sx=(G.W-side)/2, sy=G.safe.top+Math.round(G.H*0.02);
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=Math.round(48*G.k); ctx.shadowOffsetY=Math.round(16*G.k);
-  coverRect(ctx,mainImg(img),sx,sy,side,side,Math.round(38*G.k),0.14); ctx.restore();
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.bottom-Math.round(G.H*0.04),
-    w:G.W-G.safe.left-G.safe.right,anchor:'bottom',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:98,subSize:40,gap:30,k:G.k});
-},
 
 /* ---- 族 D：纯文字牌 ---- */
 
-/* B11 大字顶·底部半图 */
-B11(ctx,d,img,c,G){
-  gradBg(ctx,c,'v',G);
-  const imgTop=Math.round(G.H*0.60);
-  drawCoverF(ctx,mainImg(img),0,imgTop,G.W,G.H-imgTop,0.16);
-  const g=ctx.createLinearGradient(0,imgTop-Math.round(120*G.k),0,imgTop+Math.round(40*G.k));
-  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.26)');
-  ctx.fillStyle=g; ctx.fillRect(0,imgTop-Math.round(120*G.k),G.W,Math.round(160*G.k));
-  textBlock(ctx,d,{x:G.safe.left,y:imgTop-Math.round(G.H*0.05),
-    w:G.W-G.safe.left-G.safe.right,anchor:'bottom',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:120,subSize:46,gap:42,k:G.k});
-},
 
-/* B13 大字左·右下方图 */
-B13(ctx,d,img,c,G){
-  gradBg(ctx,c,'d',G);
-  ctx.globalAlpha=.20; ctx.fillStyle=c.accent;
-  [[G.W*0.14,G.H*0.14,G.W*0.09],[G.W*0.22,G.H*0.22,G.W*0.05],
-   [G.W*0.09,G.H*0.34,G.W*0.05],[G.W*0.86,G.H*0.24,G.W*0.07]].forEach(p=>{
-    ctx.beginPath(); ctx.arc(p[0],p[1],p[2],0,Math.PI*2); ctx.fill();
-  });
-  ctx.globalAlpha=1;
-  const side=Math.min(G.W*0.46, G.H*0.40);
-  const ix=G.W-side-G.safe.right, iy=G.H-side-Math.round(G.H*0.05);
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=Math.round(42*G.k); ctx.shadowOffsetY=Math.round(14*G.k);
-  coverRect(ctx,mainImg(img),ix,iy,side,side,Math.round(34*G.k),0.14); ctx.restore();
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.10),
-    w:G.W-G.safe.left-G.safe.right-side*0.35,anchor:'top',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:104,subSize:42,gap:36,k:G.k});
-},
 
-/* B16 大字左·右下小圆 */
-B16(ctx,d,img,c,G){
-  gradBg(ctx,c,'d',G);
-  const t=textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.10),
-    w:G.W-G.safe.left-G.safe.right,anchor:'top',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:118,subSize:46,gap:42,k:G.k});
-  const r=Math.min(G.W*0.15, G.H*0.11);
-  const cx=G.W-G.safe.right-r-Math.round(G.H*0.02);
-  /* 小圆必须让开文字块底部：文字变高时不能被压住 */
-  const minTop=t.bottom+Math.round(30*G.k);
-  const cy=Math.max(G.H-G.safe.bottom*0.55-r, minTop+r);
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=Math.round(40*G.k); ctx.shadowOffsetY=Math.round(14*G.k);
-  coverCircle(ctx,mainImg(img),cx,cy,r,0.16); ctx.restore();
-  ring(ctx,cx,cy,r+Math.round(10*G.k),Math.round(9*G.k),c.accent);
-},
 
-/* B15 大字顶·斜置压边 */
-B15(ctx,d,img,c,G){
-  gradBg(ctx,c,'d',G);
-  const cw=Math.min(G.W*0.56, G.H*0.66), chh=Math.min(G.H*0.50, G.W*0.34);
-  const cx=G.W-cw*0.62, cy=G.H-chh*0.60;
-  ctx.save();
-  ctx.translate(cx,cy); ctx.rotate(-0.15);
-  ctx.shadowColor='rgba(0,0,0,.24)'; ctx.shadowBlur=Math.round(48*G.k); ctx.shadowOffsetY=Math.round(16*G.k);
-  coverRect(ctx,mainImg(img),-cw/2,-chh/2,cw,chh,Math.round(38*G.k),0.14);
-  ctx.restore();
-  textBlock(ctx,d,{x:G.safe.left,y:G.safe.top+Math.round(G.H*0.06),
-    w:G.W-G.safe.left-G.safe.right-cw*0.35,anchor:'top',align:'left',
-    color:c.ink,subColor:c.ink2,titleSize:108,subSize:44,gap:36,k:G.k});
-}
 
 };
-
-/* 副标题单行绘制（B14 用） */
-function drawSubText(ctx,text,x,y,w,color,align,size,k){
-  if(!text||!text.trim()) return;
-  const t=fitText(ctx,text,w,Math.round(size*(k||1)),Math.round(24*(k||1)),600,1);
-  ctx.font=F(600,t.size); ctx.fillStyle=color;
-  ctx.textAlign=align||'left'; ctx.textBaseline='alphabetic';
-  ctx.fillText(t.lines[0]||'',x,y);
-  ctx.textAlign='left';
-}
 
 /* 安全区参考线 */
 function drawGuides(ctx,G){
@@ -1329,18 +1125,18 @@ document.getElementById('expJpg').onclick=()=>{
 };
 document.getElementById('expAll').onclick=()=>{
   const ids=LAYOUTS.map(l=>l.id);
-  const cols=4, rows=Math.ceil(ids.length/cols);
-  /* 16 款拼图是大画布：限制总像素，避免 3× 时 canvas 撑爆内存 */
+  const cols=3, rows=Math.ceil(ids.length/cols);
+  /* 5 款拼图是大画布：限制总像素，避免 3× 时 canvas 撑爆内存 */
   const MAXPX=40e6;
   let sc=state.exportScale;
   let Gg=geo(state.ratio,sc);
   while(sc>1 && (Gg.W*cols)*(Gg.H*rows) > MAXPX){ sc--; Gg=geo(state.ratio,sc); }
   if(sc!==state.exportScale){
-    alert('16 款拼图画布过大，倍率自动降为 '+sc+'×（'+Gg.W+'×'+Gg.H+'）。\n单张导出仍可用 '+state.exportScale+'×。');
+    alert('5 款拼图画布过大，倍率自动降为 '+sc+'×（'+Gg.W+'×'+Gg.H+'）。\n单张导出仍可用 '+state.exportScale+'×。');
   }
   const c=document.createElement('canvas');c.width=Gg.W*cols;c.height=Gg.H*rows;const x=c.getContext('2d');
   ids.forEach((id,i)=>{const s=renderFull(id,null,sc);x.drawImage(s,(i%cols)*Gg.W,Math.floor(i/cols)*Gg.H);});
-  c.toBlob(b=>dl(b,'layouts-v4-16-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
+  c.toBlob(b=>dl(b,'layouts-v4-5-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
 };
 document.getElementById('expThree').onclick=()=>{
   ['3x4','9x16','16x9'].forEach(r=>{
