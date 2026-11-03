@@ -30,11 +30,42 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
 .drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
 .drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
-.cropbox{margin-top:11px;border:1px solid #e6e8eb;border-radius:10px;padding:11px;background:#fafbfc}
+.drop.mini{border-width:1.5px;padding:0;height:40px;border-radius:9px;font-size:12px;
+  display:flex;align-items:center;justify-content:center;flex:1;min-width:190px}
+.drop.mini #dropTxt{display:flex;align-items:center;gap:8px;line-height:1.2}
+.drop.mini img{max-width:96px;max-height:26px;border-radius:5px;margin:0;flex:0 0 auto}
+.cropbox{border:1px solid #e6e8eb;border-radius:10px;padding:11px;background:#fafbfc}
+.workbench{display:flex;gap:14px;align-items:flex-start;flex:1 1 auto;min-width:0}
+.workbench .cropbox{flex:1 1 300px;min-width:270px;max-width:460px}
+.workbench .pv.main{flex:0 0 auto}
+#pv{cursor:zoom-in}
+.zoomhint{font-size:10px;color:#a9b0b8;font-weight:400;margin-left:6px}
+.pv.main:hover .zoomhint{color:#111}
+#lb{position:fixed;inset:0;z-index:60;background:rgba(10,10,12,.94);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px}
+#lb.hide{display:none}
+#lb img{max-width:94vw;max-height:86vh;object-fit:contain;border-radius:8px;
+  box-shadow:0 12px 50px rgba(0,0,0,.7)}
+#lb .lbclose{color:#fff;font-size:12px;opacity:.7}
 .cropbox.hide{display:none}
 .cropbox .ct{font-size:12px;font-weight:700;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .cropbox .ct .info{font-weight:400;color:#8a9099;font-size:11px}
 .cropcv{width:100%;max-width:300px;border-radius:8px;background:#222;display:block;touch-action:none;cursor:crosshair;margin-bottom:9px}
+.cropwrap{position:relative}
+.croplock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;background:rgba(250,251,252,.86);color:#6b7280;font-size:12px;font-weight:700;text-align:center;
+  border-radius:8px;pointer-events:none}
+.croplock span{font-weight:400;font-size:11px;color:#9aa1a9}
+.cropbox.locked .croplock{display:flex}
+.cropbox:not(.locked) .croplock{display:none}
+.cropbox.locked .cropcv{opacity:.5;cursor:not-allowed}
+.cropbox.locked #cropRatios,.cropbox.locked .croprow .sbtn{opacity:.45;pointer-events:none}
+.sbtn.cropon{margin-left:auto;font-weight:700}
+.cropmodes{display:flex;gap:5px;margin:-2px 0 8px}
+.cropmodes .sbtn{flex:1 1 0;text-align:center}
+.cropmodes .sbtn.on{background:#111;border-color:#111;color:#fff;font-weight:700}
+.sbtn.cropon.on{background:#111;border-color:#111;color:#fff}
+.cropcv{user-select:none;-webkit-user-drag:none}
 .croprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .croprow .lb{font-size:11px;color:#8a9099;margin-right:2px}
 .sbtn{padding:4px 10px;border:1px solid #dcdfe4;border-radius:999px;font-size:11px;cursor:pointer;background:#fff;font-family:inherit}
@@ -80,40 +111,27 @@ button.ghost:hover{border-color:#111}
 button.ghost b{float:right;color:#111}
 .tips{font-size:12px;color:#8a9099;line-height:1.9}
 .ok{color:#12a150}.bad{color:#e5484d}
-.hook{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.hook button{font-size:11px;padding:4px 9px;border:1px solid #dcdfe4;background:#fff;border-radius:999px;cursor:pointer;font-family:inherit}
-.hook button:hover{border-color:#111}
 .note{font-size:12px;color:#8a9099;background:#f7f8fa;border-radius:9px;padding:10px 12px;line-height:1.8;margin-bottom:11px}
 .note b{color:#333}
 /* ---------- v5：左控制列 / 右工作列 ---------- */
 .colL{grid-column:1;grid-row:1;min-width:0}
 .colR{grid-column:2;grid-row:1;min-width:0}
-/* 桌面端：预览卡片吸顶 —— 左边写文字时，封面一直在眼前 */
-@media(min-width:901px){
-  #cardPv{position:sticky;top:12px;z-index:5;box-shadow:0 6px 22px rgba(0,0,0,.07)}
-}
+/* 桌面端：预览卡现在装着 主图/裁剪/导出，内容高，不再吸顶 */
 .sumcard{grid-column:1/-1;grid-row:2}
 .ratiowrap{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:-2px 0 12px}
 .ratiowrap .lb{font-size:11px;color:#8a9099;font-weight:700;letter-spacing:.5px}
 .ratiowrap .chip{padding:5px 12px;font-size:12px}
 .ratiowrap .chip small{display:inline;margin-left:6px;opacity:.7}
-/* ---------- v5：合集卡片（配色 + 形状 一眼可辨） ---------- */
-.colcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.colcard{text-align:center;cursor:pointer;font-family:inherit;border:1.5px solid #e6e8eb;
-  background:#fff;border-radius:11px;padding:9px 5px 8px;display:flex;flex-direction:column;
-  align-items:center;gap:5px;overflow:hidden}
-.colcard:hover{border-color:#c9ced6}
-.colcard.on{border-color:var(--acc);box-shadow:0 4px 13px rgba(0,0,0,.10);
-  background:linear-gradient(165deg,var(--c1) 0%,var(--c2) 100%)}
-.colcard .ccbadge{width:30px;height:30px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0}
-.colcard .ccbadge .ccsvg{display:block}
-.colcard .ccname{font-weight:700;font-size:13px;color:#222;line-height:1.2;white-space:nowrap}
-.colcard .ccrec{font-size:9.5px;color:var(--acc);font-weight:700;letter-spacing:.2px;white-space:nowrap}
-.colcard.on .ccname{color:#241c10}
-.colcard.on .ccrec{color:var(--acc)}
-.colcard.on .ccbadge{background:#fff;box-shadow:0 2px 7px rgba(0,0,0,.10)}
-.colcard .ccswatch{width:100%;height:5px;border-radius:3px;background:var(--acc);opacity:.9}
+/* ---------- v5：合集选择（并入预览卡，和「输出尺寸」同一排） ---------- */
+.colchips{gap:6px}
+.colchip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 5px;
+  border:1px solid #dcdfe4;border-radius:999px;background:#fff;cursor:pointer;
+  font-family:inherit;font-size:12px;color:#333;line-height:1;white-space:nowrap}
+.colchip:hover{border-color:#c2c7cf}
+.colchip .ccsvg{display:block;flex:0 0 auto}
+.colchip.on{border-color:var(--acc);background:var(--c1);color:#241c10;font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.colnote{font-size:11px;color:#8a9099;line-height:1.7;margin:-2px 0 10px}
 /* ---------- v5：尺寸说明（折叠置底） ---------- */
 details.sumcard{border:1px solid #e6e8eb;border-radius:12px;background:#fff;padding:13px 15px;margin-bottom:6px}
 details.sumcard>summary{cursor:pointer;font-size:12px;color:#8a9099;font-weight:700;letter-spacing:.6px;list-style:none}
@@ -142,9 +160,8 @@ details.sumcard .note{margin:11px 0 0}
   .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
   .colL,.colR{display:contents}
   .sumcard{grid-column:1;grid-row:auto}
-  #cardText{order:1}#cardPv{order:2}#cardTpl{order:3}
-  #cardCol{order:4}#cardImg{order:5}#cardSize{order:6}
-  .colcards{gap:7px}
+  #cardPv{order:1}#cardText{order:2}
+  #cardTpl{order:3}#cardSize{order:4}
   .pv.mini{display:none}
   .pv.main canvas{width:min(52vw,230px)}
   body{font-size:15px}
@@ -153,29 +170,45 @@ details.sumcard .note{margin:11px 0 0}
   label input{font-size:16px;padding:10px 12px}
   .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:100%}
   .t .n{padding:5px 6px;font-size:11px}
-  .pv.main{position:sticky;top:44px;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
+  .pv.main{position:static;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
   .pv.main canvas{width:min(46vw,200px);margin:0 auto}
   .pv.main h4{margin-bottom:6px;font-size:10px;text-align:center}
   .pv.main label{margin-top:6px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px}
   .pv.main label input{width:auto;margin:0}
   .stage{gap:10px}
+  /* 手机上：裁剪画布与封面预览并排一行，比例/按钮/说明另起整行铺满 */
+  .workbench{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 8px;align-items:start}
+  .workbench .cropbox{display:contents}
+  .workbench .cropbox .ct{grid-column:1/-1;grid-row:1;font-size:11px;gap:4px;margin:0}
+  .workbench .cropwrap{grid-column:1;grid-row:2;border:1px solid #e6e8eb;border-radius:10px;padding:6px;background:#fafbfc}
+  .workbench .cropcv{width:100%;display:block}
+  .workbench .cropbox .croprow{grid-column:1/-1;gap:5px;margin:0}
+  .workbench .cropbox .cropres{grid-column:1/-1;font-size:10.5px}
+  .workbench .pv.main{grid-column:2;grid-row:2;padding:6px;width:auto}
+  .pv.main canvas{width:min(40vw,146px)!important;margin:0 auto}
+  .pv.main h4{font-size:9.5px}
   .btns{min-width:100%;flex-direction:row;flex-wrap:wrap;gap:8px}
   .btns button.big{flex:1 1 100%}
   .btns button.ghost{flex:1 1 calc(50% - 4px);text-align:center;padding:11px 8px;font-size:12.5px}
   .btns button.ghost b{float:none;display:block;margin-top:2px}
   .tips{flex:1 1 100%;font-size:11.5px;line-height:1.75}
-  .hook button{font-size:12px;padding:6px 11px}
 }
 @media(max-width:560px){
   .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-  .pv.main canvas{width:min(52vw,190px)}
+  .workbench{gap:6px}
+  .workbench .cropwrap{padding:5px}
+  .workbench .pv.main{padding:5px}
+  .pv.main canvas{width:min(38vw,136px)!important}
+  .cropbox .ct{font-size:10.5px}
+  .cropbox .ct .info{display:none}
+  .sbtn{padding:3px 7px;font-size:10.5px}
 }
 </style>
 </head>
 <body>
 <header>
   <h1>抖音封面工具</h1><span class="v">v5 合集视觉指纹</span>
-  <span>① 文字 → ② 合集 → ③ 主图 → ④ 版式 · 写完即见预览</span>
+  <span>选合集 → 传主图 → 写文字 → 选版式 · 全部就位在预览里，改一处即时见效</span>
   <a href="../douyin-cover-tool-v4/">← v4</a>
 </header>
 <div class="wrap">
@@ -188,60 +221,69 @@ details.sumcard .note{margin:11px 0 0}
         <input id="title" placeholder="例：纸杯塔能有多高"></label>
       <label>副标题 <span class="hint">主标题的一半大小，只留一句</span>
         <input id="sub" placeholder="例：今天实验做到第 12 轮"></label>
-      <div style="font-size:12px;color:#8a9099;margin:-4px 0 8px">钩子句式一键改写：</div>
-      <div class="hook" id="hooks"></div>
+      <div style="font-size:11.5px;color:#8a9099;margin:-2px 0 4px">每个合集都预置了一组示例文案，切合集会自动带上；你一旦手改，就永远以你写的为准。</div>
     </div>
 
-    <div class="card" id="cardCol">
-      <h2>② 合集（决定配色与形状）</h2>
-      <div class="colcards" id="cols"></div>
-      <div class="note" id="colNote" style="margin:11px 0 0"></div>
+    <div class="card" id="cardTpl">
+      <h2>② 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
+      <div id="fams"></div>
     </div>
 
-    <div class="card" id="cardImg">
-      <h2>③ 主图</h2>
-      <div class="drop" id="drop">
-        <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
-        <input type="file" id="file" accept="image/*" hidden>
-      </div>
 
-      <div class="cropbox hide" id="cropBox">
-        <div class="ct">✂️ 裁剪要显示的区域 <span class="info" id="cropSrcInfo"></span></div>
-        <canvas class="cropcv" id="cropCv" height="220"></canvas>
-        <div class="croprow">
-          <span class="lb">比例</span>
-          <span id="cropRatios"></span>
-        </div>
-        <div class="croprow">
-          <span class="lb">操作</span>
-          <button class="sbtn" id="cropReset">重置裁剪</button>
-          <button class="sbtn" id="cropFull">用整张图</button>
-        </div>
-        <div class="cropres" id="cropRes"></div>
-      </div>
-
-      <div class="scalebox">
-        <div class="st">导出清晰度</div>
-        <div class="chips" id="scales"></div>
-        <div class="scaleq" id="scaleQ"></div>
-      </div>
-    </div>
 
   </div>
 
   <div class="colR">
 
     <div class="card" id="cardPv">
-      <h2>预览与导出</h2>
+      <h2>预览 · 主图 · 导出</h2>
       <div class="ratiowrap">
         <span class="lb">输出尺寸</span>
         <div class="chips" id="ratiosMini"></div>
       </div>
+      <div class="ratiowrap" style="margin:-2px 0 8px">
+        <span class="lb">合集</span>
+        <div class="chips colchips" id="cols"></div>
+      </div>
+      <div class="colnote" id="colNote"></div>
+      <div class="ratiowrap" style="margin:0 0 8px">
+        <span class="lb">主图</span>
+        <div class="drop mini" id="drop">
+          <div id="dropTxt">点击选图 · 或拖进来 · 不传则用合集示例图</div>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+      </div>
       <div class="stage">
-        <div class="pv main">
-          <h4 id="pvTitle">封面 1080×1440</h4>
-          <canvas id="pv" width="1080" height="1440"></canvas>
-          <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
+        <div class="workbench">
+          <div class="cropbox hide locked" id="cropBox">
+            <div class="ct">✂️ 裁剪要显示的区域
+              <span class="info" id="cropSrcInfo"></span>
+              <button class="sbtn cropon" id="cropBtn" type="button">🔒 启用裁剪</button>
+            </div>
+            <div class="cropmodes" id="cropModes">
+              <button class="sbtn" id="cropFitFull" type="button">看全图</button>
+              <button class="sbtn on" id="cropFitWide" type="button">按宽取景</button>
+            </div>
+            <div class="cropwrap">
+              <canvas class="cropcv" id="cropCv" height="220" draggable="false"></canvas>
+              <div class="croplock" id="cropLock">🔒 裁剪已锁定<br><span>点上面「启用裁剪」才能拖动选框</span></div>
+            </div>
+            <div class="croprow">
+              <span class="lb">比例</span>
+              <span id="cropRatios"></span>
+            </div>
+            <div class="croprow">
+              <span class="lb">操作</span>
+              <button class="sbtn" id="cropReset">重置裁剪</button>
+              <button class="sbtn" id="cropFull">用整张图</button>
+            </div>
+            <div class="cropres" id="cropRes"></div>
+          </div>
+          <div class="pv main" id="pvMain">
+            <h4 id="pvTitle">封面 1080×1440 <span class="zoomhint" id="zoomHint">🔍 点击放大</span></h4>
+            <canvas id="pv" width="1080" height="1440"></canvas>
+            <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
+          </div>
         </div>
         <div class="pv mini">
           <h4>信息流缩略图实际大小</h4>
@@ -253,20 +295,21 @@ details.sumcard .note{margin:11px 0 0}
           <button class="ghost" id="expJpg">导出当前尺寸 JPG<b>小体积</b></button>
           <button class="ghost" id="expAll">导出 5 款拼图<b>当前尺寸</b></button>
           <button class="ghost" id="expThree">导出三尺寸各一张<b>3:4 / 9:16 / 16:9</b></button>
+          <div class="scalebox">
+            <div class="st">导出清晰度</div>
+            <div class="chips" id="scales"></div>
+            <div class="scaleq" id="scaleQ"></div>
+          </div>
           <div class="tips" id="check"></div>
         </div>
       </div>
     </div>
 
-    <div class="card" id="cardTpl">
-      <h2>④ 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
-      <div id="fams"></div>
-    </div>
 
   </div>
 
   <details class="sumcard" id="cardSize">
-    <summary><b>⑤ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
+    <summary><b>④ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
     <div class="note" id="ratioNote" style="margin:11px 0 0"></div>
   </details>
 </div>
@@ -274,6 +317,10 @@ details.sumcard .note{margin:11px 0 0}
 <script>
 __ENGINE__/* ================= 状态与交互 ================= */
 const state={col:'play',layout:'B5',ratio:'3x4',title:'',sub:'',img:null,
+  autoText:true,               /* true=标题还是合集自带示例文案，切合集时自动跟着换；用户一旦手改就置 false */
+  cropOn:false,                /* 裁剪开关：默认锁住，防止手滑拖坏图；要裁先点「启用裁剪」 */
+  cropFit:'wide',              /* 取景模式：wide=按宽度取景（竖图可上下拖动），full=看全图 */
+  cropPan:0,                   /* 按宽取景时的纵向滚动偏移（画布像素） */
   cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
   objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
   exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
@@ -384,25 +431,30 @@ function buildCols(){
   Object.keys(COLLECTIONS).forEach(k=>{
     const c=COLLECTIONS[k];
     const b=document.createElement('button');
-    b.className='colcard'+(state.col===k?' on':'');
+    b.className='colchip'+(state.col===k?' on':'');
     b.style.setProperty('--c1',c.g1); b.style.setProperty('--c2',c.g2); b.style.setProperty('--acc',c.accent);
     b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
-    b.innerHTML='<span class="ccbadge">'+colBadgeSVG(c,26)+'</span>'+
-                '<span class="ccname">'+c.short+'</span>'+
-                '<span class="ccrec">统一 '+c.rec[0]+' 骨架</span>'+
-                '<span class="ccswatch"></span>';
+    b.innerHTML=colBadgeSVG(c,17)+'<span>'+c.short+'</span>';
     b.onclick=()=>{
       state.col=k; state.layout=c.rec[0];
-      buildCols(); buildTpls(); buildHooks(); refresh();
+      /* 标题还是"合集自带示例文案"时，跟随合集自动换；用户自己写过的一律不动 */
+      if(state.autoText){
+        const pc=PRESETS[k]||{};
+        const pd=pc[state.layout]||pc;
+        state.title=pd.title||''; state.sub=pd.sub||'';
+        const ti=document.getElementById('title'),si=document.getElementById('sub');
+        if(ti) ti.value=state.title; if(si) si.value=state.sub;
+      }
+      buildCols(); buildTpls(); refresh();
     };
     box.appendChild(b);
   });
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
-  if(note) note.innerHTML='<b>当前合集：</b>'+colBadgeSVG(cur,20)+' '+cur.name+
-    '<br>'+cur.desc+'。三个合集<b>共用同一套 B5 骨架</b>，只换配色与徽标形状 —— '+
-    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b>，'+
-    '左上角徽标也跟着变（'+cur.badge+'）—— 这是放进主页九宫格后能一眼分清三个合集的关键。';
+  if(note) note.innerHTML='<b style="color:'+cur.accent+'">'+cur.short+'</b> · '+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为同款几何点缀，'+
+    '四个合集靠主色区分。<br>'+
+    '点合集会连示例文案一起换；你自己写过标题后，系统就不再替你改。';
 }
 function buildTpls(){
   const host=document.getElementById('fams');host.innerHTML='';
@@ -430,34 +482,6 @@ function buildTpls(){
       grid.appendChild(d);
     });
     host.appendChild(grid);
-  });
-}
-const HOOKS={
-  play:{
-    '数字挑战':['3 步搞定亲子实验','纸杯塔能有多高','搭了 12 轮才倒'],
-    '悬念提问':['为什么娃总问为什么','纸杯塔能有多高','云是不是棉花糖'],
-    '结果反差':['从 0 到 30 层','娃笑到停不下来','室内也能玩到疯']
-  },
-  craft:{
-    '数字挑战':['3 个纸箱做成小汽车','一张纸折出小动物','旧物改造第 4 版'],
-    '悬念提问':['纸箱还能干嘛','你猜这个是啥','娃自己想出来的'],
-    '结果反差':['垃圾袋变成小汽车','比买的还爱玩','一岁半也会做']
-  },
-  travel:{
-    '数字挑战':['3 小时来回不累','第 6 个踩过点的地方','推车能到的 5 个地方'],
-    '悬念提问':['这地方娃能疯一下午','你会带娃去哪','树荫下面有惊喜'],
-    '结果反差':['不晒不累还凉快','娃赖着不肯走','不用排队的地方']
-  }
-};
-function buildHooks(){
-  const box=document.getElementById('hooks');box.innerHTML='';
-  const HK=HOOKS[state.col]||{};
-  Object.keys(HK).forEach(k=>{
-    HK[k].forEach(t=>{
-      const b=document.createElement('button');b.textContent=t;
-      b.onclick=()=>{state.title=t;document.getElementById('title').value=t;refresh();};
-      box.appendChild(b);
-    });
   });
 }
 /* ================= 上传 · 裁剪 · 高清导出 ================= */
@@ -489,20 +513,56 @@ function setCrop(c){
 }
 
 /* 裁剪预览画布：显示原图 + 可拖拽的选框 */
+/* 宽取景：选区最多一屏高，并始终完整可见；上下移动选区 = 在长图里找位置 */
+function cropVH(){
+  const cv=document.getElementById('cropCv');
+  const W=cv.clientWidth||300;
+  const mob=window.innerWidth<=900;
+  const H=mob?Math.max(220,Math.min(430,Math.round(window.innerHeight*0.46)))
+             :Math.max(120,Math.min(220,Math.round(W*0.72)));
+  return {W:W,H:H,dh:state.img?Math.round(W*state.img.height/state.img.width):H};
+}
+function clampCropWide(){
+  if(!state.img) return;
+  const V=cropVH();
+  const c=getCrop();
+  let w=Math.max(0.06,Math.min(1,c.w));
+  let h=Math.max(0.06,Math.min(c.h, V.H*0.88/Math.max(1,V.dh)));
+  let y=Math.max(0,Math.min(1-h,c.y));
+  let x=Math.max(0,Math.min(1-w,c.x));
+  setCrop({x:x,y:y,w:w,h:h});
+}
 function drawCropUI(){
   const box=document.getElementById('cropBox');
   const im=state.img;
   if(!im||!im.width){ box.classList.add('hide'); return; }
   box.classList.remove('hide');
   const cv=document.getElementById('cropCv');
-  const W=cv.clientWidth||300, H=220;
+  const W=cv.clientWidth||300;
+  /* 画布高度：桌面按宽度比例；手机竖屏时给足高度，方便框选竖图 */
+  const mob=window.innerWidth<=900;
+  const H=mob?Math.max(220,Math.min(430,Math.round(window.innerHeight*0.46)))
+             :Math.max(120,Math.min(220,Math.round(W*0.72)));
   cv.width=W; cv.height=H;
   const x=cv.getContext('2d');
   const iw=im.width, ih=im.height;
-  /* contain：完整显示原图（用户要看到全部才能框选），四周留底色 */
-  const s=Math.min(W/iw,H/ih);
-  const dw=iw*s, dh=ih*s;
-  const ox=(W-dw)/2, oy=(H-dh)/2;
+  let dw,dh,ox,oy;
+  const wideFit = state.cropFit==='wide' && (ih/iw) > (H/W)*1.15;
+  if(wideFit){
+    /* 按宽度取景：竖图按真实宽度铺满，选区居中显示，可在长图里上下移动 */
+    clampCropWide();
+    dw=W; dh=Math.round(W*ih/iw); ox=0;
+    const maxPan=Math.max(0,dh-H);
+    const c0=getCrop();
+    const center=c0.y*dh+c0.h*dh/2;
+    state.cropPan=Math.max(0,Math.min(maxPan, center-H/2));
+    oy=-state.cropPan;
+  }else{
+    /* 看全图：完整显示原图，四周留底色 */
+    const s=Math.min(W/iw,H/ih);
+    dw=iw*s; dh=ih*s; ox=(W-dw)/2; oy=(H-dh)/2;
+    state.cropPan=0;
+  }
   x.fillStyle='#1a1a1a'; x.fillRect(0,0,W,H);
   x.drawImage(im,ox,oy,dw,dh);
   /* 选框（归一化 → 画布像素） */
@@ -510,9 +570,11 @@ function drawCropUI(){
   const cx=ox+c.x*dw, cy=oy+c.y*dh, cw=c.w*dw, ch=c.h*dh;
   /* 框外压暗 */
   x.fillStyle='rgba(0,0,0,.55)';
-  x.fillRect(0,0,W,cy); x.fillRect(0,cy+ch,W,H-cy-ch);
-  x.fillRect(0,cy,cx,ch); x.fillRect(cx+cw,cy,W-cx-cw,ch);
+  x.fillRect(0,0,W,Math.max(0,cy)); x.fillRect(0,cy+ch,W,Math.max(0,H-(cy+ch)));
+  x.fillRect(0,cy,Math.max(0,cx),ch); x.fillRect(cx+cw,cy,Math.max(0,W-(cx+cw)),ch);
   x.strokeStyle='#fff'; x.lineWidth=2; x.strokeRect(cx,cy,cw,ch);
+  /* 画布外的选框部分补一条视口边界线，提示还能往下拖 */
+  if(cy+ch>H){ x.strokeStyle='rgba(255,255,255,.6)'; x.setLineDash([4,4]); x.beginPath(); x.moveTo(cx,H); x.lineTo(cx+cw,H); x.stroke(); x.setLineDash([]); }
   /* 三分线 */
   x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=1;
   for(let i=1;i<3;i++){
@@ -522,9 +584,20 @@ function drawCropUI(){
   /* 角把手 */
   x.fillStyle='#fff';
   [[cx,cy],[cx+cw,cy],[cx,cy+ch],[cx+cw,cy+ch]].forEach(p=>{
+    if(p[0]<-4||p[0]>W+4||p[1]<-4||p[1]>H+4) return;
     x.fillRect(p[0]-4,p[1]-4,8,8);
   });
-  cv._map={ox:ox,oy:oy,dw:dw,dh:dh,W:W,H:H};
+  if(wideFit && dh>H+4){
+    const barW=6, bx=W-barW-3;
+    const trackH=H-8;
+    const th=Math.max(24,Math.round(trackH*(H/dh)));
+    const tp=Math.round((trackH-th)*(state.cropPan/Math.max(1,dh-H)));
+    x.fillStyle='rgba(255,255,255,.22)';
+    x.fillRect(bx,4,barW,trackH);
+    x.fillStyle='rgba(255,255,255,.85)';
+    x.fillRect(bx,4+tp,barW,th);
+  }
+  cv._map={ox:ox,oy:oy,dw:dw,dh:dh,W:W,H:H,wide:wideFit,barW:wideFit?9:0};
   /* 文字反馈 */
   const info=document.getElementById('cropSrcInfo');
   if(info) info.textContent='原图 '+iw+'×'+ih;
@@ -606,7 +679,7 @@ function cropPointer(ev){
   const r=cv.getBoundingClientRect();
   const px=(ev.clientX-r.left)*(cv.width/r.width);
   const py=(ev.clientY-r.top)*(cv.height/r.height);
-  return {px:px,py:py,map:m};
+  return {px:px,py:py,clientY:ev.clientY,map:m};
 }
 function cropHit(pt){
   const m=pt.map, c=getCrop();
@@ -620,8 +693,21 @@ function cropHit(pt){
   return null;
 }
 function cropStart(ev){
+  if(!state.cropOn) return;          /* 未启用裁剪 → 不响应，防止误拖 */
   const pt=cropPointer(ev); if(!pt) return;
   const hit=cropHit(pt);
+  const wide=pt.map.wide;
+  if(wide && pt.px>pt.map.W-(pt.map.barW||0)){
+    state.cropDrag={mode:'pan',py0:ev.clientY,pan0:state.cropPan,bar:true};
+    ev.preventDefault();
+    return;
+  }
+  if(!hit && wide){
+    /* 按宽取景时，点框外 = 上下平移取景器（不是新建选框） */
+    state.cropDrag={mode:'pan',py0:ev.clientY,pan0:state.cropPan};
+    ev.preventDefault();
+    return;
+  }
   if(!hit){ /* 点框外 → 以该点为中心开新选框 */
     const m=pt.map;
     state.cropDrag={mode:'new',ox:m.ox,oy:m.oy,dw:m.dw,dh:m.dh,px:pt.px,py:pt.py,c:getCrop()};
@@ -637,6 +723,25 @@ function cropApplyDrag(pt){
   const m=pt.map;
   const c=d.c;
   let nx=c.x, ny=c.y, nw=c.w, nh=c.h;
+  if(d.mode==='pan'){
+    const maxPan=Math.max(0,m.dh-m.H);
+    if(d.bar){
+      /* 右侧滚动条：直接定位选区中心 */
+      const track=m.H-8;
+      const frac=Math.max(0,Math.min(1,(pt.clientY-4)/Math.max(1,track-24)));
+      const c=getCrop();
+      const target=(frac*maxPan+m.H/2)/m.dh - c.h/2;
+      setCrop({x:c.x,y:Math.max(0,Math.min(1-c.h,target)),w:c.w,h:c.h});
+    }else{
+      /* 空白处拖动 = 在长图里上下移动选区 */
+      const c=getCrop();
+      const dy=(d.py0-pt.clientY)/m.dh;
+      setCrop({x:c.x,y:Math.max(0,Math.min(1-c.h,c.y+dy)),w:c.w,h:c.h});
+    }
+    drawCropUI();
+    refresh();
+    return;
+  }
   if(d.mode==='move'){
     nx=c.x+(pt.px-d.px0)/m.dw; ny=c.y+(pt.py-d.py0)/m.dh;
   }else{
@@ -671,11 +776,13 @@ function cropApplyDrag(pt){
   }
 }
 function cropMove(ev){
+  if(!state.cropOn) return;
   const d=state.cropDrag; if(!d) return;
   const pt=cropPointer(ev); if(!pt) return;
   cropApplyDrag(pt);
 }
 function cropEnd(){
+  if(!state.cropOn){ state.cropDrag=null; return; }
   if(!state.cropDrag) return;
   state.cropDrag=null;
   drawCropUI(); refresh();
@@ -752,6 +859,28 @@ document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.targ
 (function(){
   const cv=document.getElementById('cropCv');
   if(!cv) return;
+  /* 裁剪开关：默认锁住，避免手滑把图拖坏；要裁先点按钮 */
+  const cbtn=document.getElementById('cropBtn');
+  const cbox=document.getElementById('cropBox');
+  /* 取景模式：看全图 / 按宽取景 */
+  const fFull=document.getElementById('cropFitFull'), fWide=document.getElementById('cropFitWide');
+  function setFit(v){
+    state.cropFit=v; state.cropPan=0;
+    if(fFull) fFull.classList.toggle('on',v==='full');
+    if(fWide) fWide.classList.toggle('on',v==='wide');
+    drawCropUI();
+  }
+  if(fFull) fFull.onclick=()=>setFit('full');
+  if(fWide) fWide.onclick=()=>setFit('wide');
+  if(cbtn){
+    cbtn.onclick=()=>{
+      state.cropOn=!state.cropOn;
+      cbox.classList.toggle('locked',!state.cropOn);
+      cbtn.classList.toggle('on',state.cropOn);
+      cbtn.textContent=state.cropOn?'✓ 裁剪已启用 · 点此关闭':'🔒 启用裁剪';
+      if(state.cropOn){ drawCropUI(); }
+    };
+  }
   cv.addEventListener('pointerdown',cropStart);
   cv.addEventListener('pointermove',cropMove);
   window.addEventListener('pointerup',cropEnd);
@@ -768,7 +897,7 @@ document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.targ
 ['dragleave','drop'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.remove('hot');}));
 document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))useFile(f);});
 ['title','sub'].forEach(k=>{
-  document.getElementById(k).oninput=e=>{state[k]=e.target.value;refresh();};
+  document.getElementById(k).oninput=e=>{state[k]=e.target.value;state.autoText=false;refresh();};
 });
 document.getElementById('guides').onchange=refresh;
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
@@ -815,7 +944,7 @@ document.getElementById('expThree').onclick=()=>{
     c.toBlob(b=>dl(b,'cover-v5-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
   });
 };
-buildHooks();buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
+buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
 let pending=Object.keys(COLLECTIONS).length;
 Object.keys(COLLECTIONS).forEach(k=>{
   const im=new Image();
@@ -826,6 +955,24 @@ Object.keys(COLLECTIONS).forEach(k=>{
 refresh();
 </script>
 
+<div id="lb" class="hide">
+  <img id="lbImg" alt="封面放大预览">
+  <div class="lbclose">点击任意处关闭 · 按 ESC 退出</div>
+</div>
+<script>
+/* 点击预览图 → 全屏放大查看 */
+(function(){
+  var lb=document.getElementById('lb'), img=document.getElementById('lbImg');
+  var pv=document.getElementById('pv');
+  if(!lb||!img||!pv) return;
+  function open(){ try{ img.src=pv.toDataURL('image/png'); }catch(e){ return; } lb.classList.remove('hide'); }
+  function close(){ lb.classList.add('hide'); }
+  pv.addEventListener('click',open);
+  pv.setAttribute('title','点击放大查看');
+  lb.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+</script>
 <div id="mtop">
   <div class="mtp"></div>
   <div class="mti"><b id="mtName">B2 大圆图·上文字</b><span id="mtCol">你带娃在玩啥呢？</span></div>

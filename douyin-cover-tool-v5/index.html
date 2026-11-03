@@ -388,7 +388,7 @@ const COLLECTIONS = {
     desc:'室内外的亲子游戏 · 各种好玩的挑战',
     g1:'#F6EEE1', g2:'#EBDCC6', ink:'#2C2721', ink2:'#6E6458',
     accent:'#C59463', accent2:'#D6BDA4', card:'#FFFFFF',
-    badge:'dice',                       /* 形状指纹：圆牌 + 骰子点 */
+    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
     img:'assets/cover-play.jpg',
     rec:['B5']                         /* 统一骨架：四个合集一律 B5 打底，只换配色 */
   },
@@ -397,7 +397,7 @@ const COLLECTIONS = {
     desc:'各种手工制作 · 零成本也能做',
     g1:'#F1E9E6', g2:'#E0D0DA', ink:'#2C2721', ink2:'#6E6458',
     accent:'#9E6EAA', accent2:'#BDA8C2', card:'#FFFFFF',
-    badge:'scissors',                   /* 形状指纹：方牌 + 剪刀 */
+    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
     img:'assets/cover-craft.jpg',
     rec:['B5']
   },
@@ -406,7 +406,7 @@ const COLLECTIONS = {
     desc:'出去逛的攻略 · 游山玩水不踩坑',
     g1:'#EDEEE0', g2:'#D5DDC6', ink:'#2C2721', ink2:'#6E6458',
     accent:'#74A15E', accent2:'#A3B899', card:'#FFFFFF',
-    badge:'mountain',                   /* 形状指纹：旗牌 + 山形 */
+    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
     img:'assets/cover-travel.jpg',
     rec:['B5']
   },
@@ -415,7 +415,7 @@ const COLLECTIONS = {
     desc:'碎碎念的经验 · 省事不踩坑',
     g1:'#EAEBE7', g2:'#CFD6D8', ink:'#2C2721', ink2:'#6E6458',
     accent:'#608BA9', accent2:'#9BB0BF', card:'#FFFFFF',
-    badge:'bubble',                     /* 形状指纹：气泡牌 + 对话点 */
+    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
     img:'assets/cover-daily.jpg',
     rec:['B5']
   }
@@ -460,37 +460,24 @@ const PRESETS = {
 /* 合集徽标的 SVG 版本（UI 用）—— 与封面 drawColBadge 同形同色
    —— 原来这里用的是 emoji，不同机器字体不同、渲染不一致，且和封面徽标长得不一样 */
 function colBadgeSVG(c,size){
-  const s=size||34, h=s/2, sw=Math.max(1.6,s*0.075);
-  const shape= c.badge==='dice'
-    ? '<circle cx="'+h+'" cy="'+h+'" r="'+(h-1.5)+'"/>'
-    : (c.badge==='scissors'
-      ? '<rect x="1.5" y="1.5" width="'+(s-3)+'" height="'+(s-3)+'" rx="'+(s*0.26)+'"/>'
-      : (c.badge==='mountain'
-        ? '<path d="M1.5 1.5 H'+(s-1.5)+' V'+(s-1.5)+' L1.5 '+(s+s*0.20-1.5)+' Z"/>'
-        : '<path d="M'+(s*0.08)+' '+(s*0.08)+' H'+(s*0.92)+' V'+(s*0.78)+' H'+(s*0.44)+' L'+(s*0.26)+' '+(s*0.94)+' V'+(s*0.78)+' H'+(s*0.08)+' Z"/>'));
-  let glyph='';
-  if(c.badge==='dice'){
-    const r=s*0.085, pts=[[-0.19,-0.19],[0.19,0.19],[0,0]];
-    glyph=pts.map(p=>'<circle cx="'+(h+p[0]*s)+'" cy="'+(h+p[1]*s)+'" r="'+r+'" fill="'+c.accent+'"/>').join('');
-  }else if(c.badge==='scissors'){
-    glyph='<g stroke="'+c.accent+'" stroke-width="'+sw+'" fill="none" stroke-linecap="round">'+
-      '<path d="M'+(h-s*0.20)+' '+(h-s*0.18)+' L'+(h+s*0.22)+' '+(h+s*0.18)+'"/>'+
-      '<path d="M'+(h+s*0.20)+' '+(h-s*0.18)+' L'+(h-s*0.22)+' '+(h+s*0.18)+'"/>'+
-      '<circle cx="'+(h-s*0.24)+'" cy="'+(h+s*0.24)+'" r="'+(s*0.095)+'"/>'+
-      '<circle cx="'+(h+s*0.24)+'" cy="'+(h+s*0.24)+'" r="'+(s*0.095)+'"/></g>';
-  }else if(c.badge==='mountain'){
-    glyph='<g stroke="'+c.accent+'" stroke-width="'+sw+'" fill="none" stroke-linejoin="round">'+
-      '<path d="M'+(h-s*0.32)+' '+(h+s*0.26)+' L'+(h-s*0.06)+' '+(h-s*0.18)+' L'+(h+s*0.15)+' '+(h+s*0.26)+' Z"/>'+
-      '<path d="M'+(h-s*0.03)+' '+(h+s*0.26)+' L'+(h+s*0.20)+' '+(h-s*0.02)+' L'+(h+s*0.38)+' '+(h+s*0.26)+' Z"/></g>'+
-      '<circle cx="'+(h+s*0.25)+'" cy="'+(h-s*0.24)+'" r="'+(s*0.075)+'" fill="'+c.accent+'"/>';
-  }else{
-    glyph='<g stroke="'+c.accent+'" stroke-linecap="round" fill="none">'+
-      '<path d="M'+(h-s*0.20)+' '+(h-s*0.09)+' H'+(h+s*0.20)+'" stroke-width="'+(s*0.072)+'"/>'+
-      '<path d="M'+(h-s*0.20)+' '+(h+s*0.12)+' H'+(h+s*0.06)+'" stroke-width="'+(s*0.058)+'"/></g>';
-  }
+  /* v5.1：与封面 drawColBadge 同形 —— 同心双弧 + 实心点（纯几何点缀） */
+  const s=size||34, h=s/2, ay=h+s*0.06;
+  const arc=(r,lw,op)=>{
+    const a0=Math.PI*1.05, a1=Math.PI*1.95;
+    const x0=h+Math.cos(a0)*r, y0=ay+Math.sin(a0)*r;
+    const x1=h+Math.cos(a1)*r, y1=ay+Math.sin(a1)*r;
+    const large=(a1-a0)>Math.PI?1:0;
+    return '<path d="M'+x0.toFixed(2)+' '+y0.toFixed(2)+
+      ' A'+r.toFixed(2)+' '+r.toFixed(2)+' 0 '+large+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+
+      '" fill="none" stroke="'+c.accent+'" stroke-opacity="'+op+'" stroke-width="'+lw.toFixed(2)+
+      '" stroke-linecap="round"/>';
+  };
   return '<svg class="ccsvg" viewBox="0 0 '+s+' '+s+'" width="'+s+'" height="'+s+'" aria-hidden="true">'+
-    '<g fill="'+c.accent+'" fill-opacity="0.13" stroke="'+c.accent+'" stroke-opacity="0.55" stroke-width="2">'+shape+'</g>'+
-    glyph+'</svg>';
+    arc(s*0.40,Math.max(1.4,s*0.072),0.52)+
+    arc(s*0.26,Math.max(1.1,s*0.056),0.32)+
+    '<circle cx="'+h.toFixed(2)+'" cy="'+(h+s*0.30).toFixed(2)+'" r="'+(s*0.075).toFixed(2)+
+      '" fill="'+c.accent+'" fill-opacity="0.70"/>'+
+    '</svg>';
 }
 
 /* ================= 通用绘制工具 ================= */
@@ -998,70 +985,46 @@ function drawGuides(ctx,G){
 function drawColBadge(ctx,c,G,pos){
   const k=G.k, sz=Math.round(74*k), pad=Math.round(34*k);
   const half=sz/2;
-  const cx=(pos==='tr'||pos==='br') ? G.W-G.safe.right-pad-half : G.safe.left+pad+half;
-  const cy=(pos==='tr'||pos==='bl') ? G.safe.top+pad+half  : G.H-G.safe.bottom-pad-half;
-  /* 徽标从「实心贴纸」改成「描边水印」：
-     —— 之前是满色块 + 重投影，在浅色底上像贴上去的贴纸，突兀且抢标题的戏
-     —— 现在改成：极淡同色填充 + 细描边 + 同色图形，缩小一圈
-        远看只是角落一抹淡色印记，近看才看清图形 —— 不抢标题，但仍然能区分合集 */
-  const shapePath=()=>{
-    if(c.badge==='dice'){
-      ctx.beginPath(); ctx.arc(cx,cy,half,0,Math.PI*2);
-    }else if(c.badge==='scissors'){
-      roundRectPath(ctx,cx-half,cy-half,sz,sz,Math.round(sz*0.26));
-    }else if(c.badge==='mountain'){
-      /* 旗标：右下斜切，像路标小旗 */
-      polyPath(ctx,[[cx-half,cy-half],[cx+half,cy-half],[cx+half,cy+half],[cx-half,cy+half+sz*0.20]]);
-    }else{
-      /* 气泡牌：圆角方 + 左下小尾巴，像一句对话 */
-      roundRectPath(ctx,cx-half,cy-half*0.92,sz,sz*0.94,Math.round(sz*0.28));
-    }
-  };
-  ctx.save();
-  shapePath();
-  ctx.fillStyle=c.accent; ctx.globalAlpha=0.13; ctx.fill();
-  ctx.globalAlpha=0.55; ctx.strokeStyle=c.accent;
-  ctx.lineWidth=Math.max(1.5,Math.round(3*k)); ctx.stroke();
-  ctx.restore();
-
-  /* 图形用主色实描，不再是白填充 —— 白填充在淡色底上会和底色糊在一起 */
+  /* 位置：tl/tr 上排，bl/br 下排 —— 原来条件写漏了 'tl'，
+     'tl' 落进下排分支，16:9 横版 safe.bottom 离画布底只有 56px，
+     算出来徽标中心 y=2 → 直接被画布顶边裁掉。
+     这里改成按 pos 取四个角，再加一道兜底钳制：
+     安全区容不下徽标时（16:9 上下留白很薄），把它拉回画布内，绝不出画。 */
+  const left= (pos==='tl'||pos==='bl');
+  const top = (pos==='tl'||pos==='tr');
+  /* safe.top / safe.bottom / safe.left / safe.right 都是「安全线的坐标」，
+     不是边距 —— 下排要减的是 safe.bottom 本身，不是 G.H-G.safe.bottom
+     （原来写成 G.H-G.safe.bottom，把 1440-1280=160 的下边距又减了一遍，
+       br/bl 的徽标被算到 y≈89，直接跑到画布顶上去压标题） */
+  let cx=left ? G.safe.left+pad+half : G.W-G.safe.right-pad-half;
+  let cy=top  ? G.safe.top+pad+half  : G.safe.bottom-pad-half;
+  const edge=Math.max(10,Math.round(18*k));
+  if(cx-half<edge) cx=edge+half;
+  if(cx+half>G.W-edge) cx=G.W-edge-half;
+  if(cy-half<edge) cy=edge+half;
+  if(cy+half>G.H-edge) cy=G.H-edge-half;
+  /* v5.1 合集角标：纯几何点缀（同心双弧 + 实心点）
+     —— 之前四个合集各用一种外框（圆牌/方牌/旗牌/气泡牌）+ 各异的具象符号，
+        外框形状不统一、线宽不统一、抽象与具象混搭，一排看过去像东拼西凑的图标包
+     —— 现在统一成同一枚「同心双弧 + 落底实心点」的几何记号：
+        没有外框、没有具象图形，远看只是角落一抹主色，近看是一枚轻巧的记号
+     —— 四个合集靠主色区分，形状完全一致 —— 版式统一优先，图形退到配角 */
   ctx.save();
   ctx.strokeStyle=c.accent; ctx.fillStyle=c.accent;
-  ctx.globalAlpha=0.72;
   ctx.lineCap='round'; ctx.lineJoin='round';
-  if(c.badge==='dice'){
-    const r=Math.round(sz*0.085);
-    [[-0.19,-0.19],[0.19,0.19],[0,0]].forEach(p=>{
-      ctx.beginPath(); ctx.arc(cx+p[0]*sz, cy+p[1]*sz, r, 0, Math.PI*2); ctx.fill();
-    });
-    /* 斜向三点 = 骰子的经典排布；再加一道细分割线强化「骰面」感 */
-  }else if(c.badge==='scissors'){
-    ctx.lineWidth=Math.round(sz*0.065);
-    ctx.beginPath();
-    ctx.moveTo(cx-sz*0.20,cy-sz*0.18); ctx.lineTo(cx+sz*0.22,cy+sz*0.18);
-    ctx.moveTo(cx+sz*0.20,cy-sz*0.18); ctx.lineTo(cx-sz*0.22,cy+sz*0.18);
-    ctx.stroke();
-    ctx.lineWidth=Math.round(sz*0.055);
-    ctx.beginPath(); ctx.arc(cx-sz*0.24,cy+sz*0.24,sz*0.095,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx+sz*0.24,cy+sz*0.24,sz*0.095,0,Math.PI*2); ctx.stroke();
-  }else if(c.badge==='mountain'){
-    /* 山形：两座山 + 一轮太阳 */
-    ctx.lineWidth=Math.round(sz*0.062);
-    ctx.beginPath();
-    ctx.moveTo(cx-sz*0.32,cy+sz*0.26); ctx.lineTo(cx-sz*0.06,cy-sz*0.18); ctx.lineTo(cx+sz*0.15,cy+sz*0.26);
-    ctx.closePath(); ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx-sz*0.03,cy+sz*0.26); ctx.lineTo(cx+sz*0.20,cy-sz*0.02); ctx.lineTo(cx+sz*0.38,cy+sz*0.26);
-    ctx.closePath(); ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx+sz*0.25,cy-sz*0.24,sz*0.075,0,Math.PI*2); ctx.fill();
-  }else{
-    /* 对话：两条消息条（不用圆点 —— 圆点会和骰子牌的三个点撞，缩略图上分不开） */
-    ctx.lineCap='round';
-    ctx.lineWidth=Math.round(sz*0.072);
-    ctx.beginPath(); ctx.moveTo(cx-sz*0.20,cy-sz*0.09); ctx.lineTo(cx+sz*0.20,cy-sz*0.09); ctx.stroke();
-    ctx.lineWidth=Math.round(sz*0.058);
-    ctx.beginPath(); ctx.moveTo(cx-sz*0.20,cy+sz*0.12); ctx.lineTo(cx+sz*0.06,cy+sz*0.12); ctx.stroke();
-  }
+  /* 同心双弧 + 一颗实心点：所有元素共享一条中轴，构图闭合、站得住
+     —— 不要外框（四个外框拼一起像图标包），不要具象图形（抽象与具象混搭不协调）
+     —— 双弧由外到内递减线宽与透明度，配一颗落底的实心点收住重心
+        远看只是角落一抹主色，近看是一枚轻巧的记号 —— 纯点缀，不抢标题 */
+  const ay=cy+sz*0.06;
+  ctx.globalAlpha=0.52;
+  ctx.lineWidth=Math.max(1.6,Math.round(3.0*k));
+  ctx.beginPath(); ctx.arc(cx,ay,sz*0.40,Math.PI*1.05,Math.PI*1.95); ctx.stroke();
+  ctx.globalAlpha=0.32;
+  ctx.lineWidth=Math.max(1.2,Math.round(2.2*k));
+  ctx.beginPath(); ctx.arc(cx,ay,sz*0.26,Math.PI*1.05,Math.PI*1.95); ctx.stroke();
+  ctx.globalAlpha=0.70;
+  ctx.beginPath(); ctx.arc(cx,cy+sz*0.30,sz*0.075,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
 
@@ -1202,8 +1165,8 @@ function buildCols(){
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
   if(note) note.innerHTML='<b style="color:'+cur.accent+'">'+cur.short+'</b> · '+
-    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 徽标 '+cur.badge+
-    ' · 同一套骨架只换配色与形状，九宫格里一眼分清。<br>'+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为同款几何点缀，'+
+    '四个合集靠主色区分。<br>'+
     '点合集会连示例文案一起换；你自己写过标题后，系统就不再替你改。';
 }
 function buildTpls(){
