@@ -1549,9 +1549,11 @@ function updateCropRes(){
 /* ---------- v5.3 清晰度可视化 ---------- */
 /* 当前倍率的清晰度档案：放大系数 / 最大无损倍率 / 建议原图像素 */
 function blurProfile(){
-  const m=measureBlur();
   const sc=state.exportScale;
-  if(!m) return null;
+  const needW0=Math.round(G().W*sc), needH0=Math.round(G().H*sc);
+  const m=measureBlur();
+  if(!m) return {up:1,sc:sc,blur:1,sw:0,sh:0,iw:0,ih:0,
+    needW:needW0,needH:needH0,safe:3,ready:false};
   const blur=m.up*sc;
   const needW=Math.round(G().W*sc), needH=Math.round(G().H*sc);
   /* 想要不糊，选框源像素至少要等于输出像素 */
@@ -1561,7 +1563,8 @@ function blurProfile(){
     sw:m.sw, sh:m.sh, iw:m.iw, ih:m.ih,
     needW:needW, needH:needH,
     safe:Math.max(1,Math.floor((1/m.up)+1e-6)),   /* 最大无损倍率（只取 1/2/3） */
-    needMoreW:gapW, needMoreH:gapH
+    needMoreW:gapW, needMoreH:gapH,
+    ready:true
   };
 }
 
@@ -1627,10 +1630,11 @@ function pxRender(){
   document.getElementById('pxALab').textContent='1× 标准导出 · 局部 1:1';
   document.getElementById('pxBLab').textContent=sc+'× 导出 · 同一区域';
   if(info){
-    const blur=p?p.blur:1;
+    const blur=p.blur;
+    const ready=p.ready?'':'<br><span class="warn">图片还在加载，放大系数稍后自动更新</span>';
     info.innerHTML='当前导出 <b>'+sc+'×</b> · 输出 <b>'+p.needW+'×'+p.needH+'</b> px（1:1 显示，可滚动看真实像素）<br>'+
       '放大系数 <b>'+blur.toFixed(2)+'</b> '+(blur>1.5?'<span class="warn">→ 明显发软</span>':blur>1.1?'<span style="color:#b45309;font-weight:700">→ 略糊但可用</span>':'<span class="ok">✓ 清晰</span>')+
-      (p?('<br>左＝1× 标准导出的局部，右＝当前 '+sc+'× 导出的同一区域：右图每个像素更松软，说明这只是「变大」不是「变清楚」。'):'');
+      (p.ready?('<br>左＝1× 标准导出的局部，右＝当前 '+sc+'× 导出的同一区域：右图每个像素更松软，说明这只是「变大」不是「变清楚」。'):'')+ready;
   }
 }
 
@@ -1643,7 +1647,7 @@ function updateScaleQ(up){
   let q='导出 <b>'+needW+'×'+needH+'</b> px';
   const p=blurProfile();
   const im=state.img||imgs[state.col];
-  if(p&&im&&im.width){
+  if(p.ready&&im&&im.width){
     const sw=p.sw, sh=p.sh;
     const blur=p.blur;
     q+='<br>'+(state.img?'原图':'示例图')+' '+im.width+'×'+im.height+' · 选框 '+sw+'×'+sh;
@@ -1662,7 +1666,8 @@ function updateScaleQ(up){
       q+='<br><span class="ok">✓ 源像素已达 '+sc+'× 门槛，够清晰</span>';
     }
   }else{
-    q+='<br>未上传图片时使用内置示例图';
+    q+='<br>'+(im&&im.width?'图片加载中…':'未上传图片时使用内置示例图');
+    q+='<br>上传原图后这里会给出「放大系数」和「不糊所需最低像素」';
   }
   el.innerHTML=q;
 }
@@ -2015,7 +2020,7 @@ buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
 let pending=Object.keys(COLLECTIONS).length;
 Object.keys(COLLECTIONS).forEach(k=>{
   const im=new Image();
-  im.onload=()=>{imgs[k]=im;if(--pending===0){buildTpls();refresh();}};
+  im.onload=()=>{imgs[k]=im;if(--pending===0){buildTpls();refresh();buildScales();updateCropRes();if(pxOpen())pxRender();}};
   im.onerror=()=>{imgs[k]=null;if(--pending===0){buildTpls();refresh();}};
   im.src=COLLECTIONS[k].img;
 });
