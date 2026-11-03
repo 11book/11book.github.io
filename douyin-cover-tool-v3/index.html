@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>抖音封面工具 v3 · 极简重构版</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f3f5;color:#222;font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+header{background:#fff;border-bottom:1px solid #e6e8eb;padding:11px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:9;flex-wrap:wrap}
+header h1{font-size:17px;margin:0}
+header .v{background:#111;color:#fff;font-size:11px;padding:3px 9px;border-radius:999px;font-weight:700;letter-spacing:.5px}
+header span{color:#8a9099;font-size:12px}
+header a{color:#3b6ef6;text-decoration:none;font-size:12px;border:1px solid #dcdfe4;padding:4px 10px;border-radius:999px}
+header a:hover{border-color:#3b6ef6}
+.wrap{max-width:1340px;margin:0 auto;padding:16px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px}
+.wrap>div{min-width:0}
+.card{min-width:0;overflow:hidden;background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:15px;margin-bottom:14px}
+.card.wide{grid-column:1/-1}
+.card h2{font-size:12px;color:#8a9099;margin:0 0 10px;font-weight:700;letter-spacing:.6px}
+label{display:block;margin-bottom:11px;font-size:13px;color:#555}
+label input{width:100%;margin-top:5px;padding:9px 11px;border:1px solid #dcdfe4;border-radius:8px;font-size:14px;background:#fafbfc;font-family:inherit}
+label input:focus{outline:none;border-color:#111;background:#fff}
+label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:7px 13px;border:1px solid #dcdfe4;border-radius:999px;cursor:pointer;font-size:13px;background:#fff}
+.chip.on{background:#111;border-color:#111;color:#fff}
+.drop{border:2px dashed #c9ced6;border-radius:12px;padding:18px;text-align:center;color:#8a9099;cursor:pointer;background:#fafbfc}
+.drop:hover,.drop.hot{border-color:#111;color:#111;background:#f5f5f5}
+.drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
+.tpl{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;min-width:0}
+.tpl .t{min-width:0}
+.t{border:2px solid #e6e8eb;border-radius:10px;overflow:hidden;cursor:pointer;background:#fff;position:relative;min-width:0}
+.t canvas{width:100%;display:block}
+.t.on{border-color:#111;box-shadow:0 4px 14px rgba(0,0,0,.13)}
+.t .n{padding:4px 6px;font-size:11px;color:#555;display:flex;justify-content:space-between;align-items:center;gap:4px;line-height:1.35}
+.t.on .n{color:#111;font-weight:700}
+.t .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec{background:#111;color:#fff;font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;flex:0 0 auto}
+.stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.stage>*{min-width:0}
+.pv{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:12px;min-width:0}
+.pv h4{margin:0 0 9px;font-size:11px;color:#8a9099;font-weight:700}
+.pv canvas{display:block;border-radius:6px}
+.pv.main canvas{width:300px;max-width:100%;box-shadow:0 6px 20px rgba(0,0,0,.09)}
+.pv.mini canvas{width:132px;max-width:100%;box-shadow:0 3px 10px rgba(0,0,0,.09)}
+.pv.mini{text-align:center;min-width:0}
+.pv.mini .cap{font-size:11px;color:#8a9099;margin-top:6px}
+.pv.v9 canvas{width:150px;max-width:100%;box-shadow:0 3px 10px rgba(0,0,0,.09)}
+.btns{display:flex;flex-direction:column;gap:9px;min-width:200px}
+button.big{background:#111;color:#fff;border:none;border-radius:9px;padding:13px 15px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+button.big:hover{background:#000}
+button.ghost{background:#fff;color:#333;border:1px solid #dcdfe4;border-radius:9px;padding:11px 15px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left}
+button.ghost:hover{border-color:#111}
+button.ghost b{float:right;color:#111}
+.tips{font-size:12px;color:#8a9099;line-height:1.9}
+.ok{color:#12a150}.bad{color:#e5484d}
+.hook{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.hook button{font-size:11px;padding:4px 9px;border:1px solid #dcdfe4;background:#fff;border-radius:999px;cursor:pointer;font-family:inherit}
+.hook button:hover{border-color:#111}
+.note{font-size:12px;color:#8a9099;background:#f7f8fa;border-radius:9px;padding:10px 12px;line-height:1.8;margin-bottom:11px}
+.note b{color:#333}
+/* ============ 移动端适配 ============ */
+#mtop{display:none;position:fixed;left:0;right:0;top:0;z-index:21;align-items:center;gap:10px;padding:7px 10px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e6e8eb}
+#mtop .mtp{width:44px;height:59px;border-radius:5px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.16);flex:0 0 auto;background:#eee}
+#mtop .mtp canvas{width:100%;height:100%;display:block}
+#mtop .mti{flex:1;min-width:0}
+#mtop .mti b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mtop .mti span{display:block;font-size:11px;color:#8a9099;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mtop button{border:1px solid #dcdfe4;background:#fff;border-radius:8px;font-family:inherit;font-size:12px;padding:7px 11px;cursor:pointer;flex:0 0 auto}
+#mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #e6e8eb}
+#mbar button{border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;padding:12px 14px;cursor:pointer}
+#mExport{background:#111;color:#fff;flex:1}
+@media(max-width:900px){
+  html,body{max-width:100%;overflow-x:hidden}
+  #mtop{display:flex}
+  #mbar{display:flex}
+  header{display:none}
+  .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
+  .pv.mini,.pv.v9{display:none}
+  .pv.main canvas{width:min(52vw,230px)}
+  body{font-size:15px}
+  .card{padding:12px;margin-bottom:10px;border-radius:10px}
+  .card h2{font-size:11px;margin-bottom:9px}
+  label input{font-size:16px;padding:10px 12px}
+  .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:100%}
+  .t .n{padding:5px 6px;font-size:11px}
+  .pv.main{position:sticky;top:44px;z-index:6;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
+  .pv.main canvas{width:min(46vw,200px);margin:0 auto}
+  .pv.main h4{margin-bottom:6px;font-size:10px;text-align:center}
+  .pv.main label{margin-top:6px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px}
+  .pv.main label input{width:auto;margin:0}
+  .stage{gap:10px}
+  .btns{min-width:100%;flex-direction:row;flex-wrap:wrap;gap:8px}
+  .btns button.big{flex:1 1 100%}
+  .btns button.ghost{flex:1 1 calc(50% - 4px);text-align:center;padding:11px 8px;font-size:12.5px}
+  .btns button.ghost b{float:none;display:block;margin-top:2px}
+  .tips{flex:1 1 100%;font-size:11.5px;line-height:1.75}
+  .hook button{font-size:12px;padding:6px 11px}
+}
+@media(max-width:560px){
+  .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  .pv.main canvas{width:min(52vw,190px)}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>抖音封面工具</h1><span class="v">v3 极简重构版</span>
+  <span>16 款骨架 · 纯色/渐变底 · 只有主副标题 · 图片做主角</span>
+  <a href="../douyin-cover-tool-v2/">← v2 重制版</a>
+</header>
+<div class="wrap">
+  <div class="card wide">
+    <h2>① 版式（16 款骨架，任意合集可用；带「荐」的是该合集推荐）</h2>
+    <div class="tpl" id="tpls"></div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>② 文字（只保留两级）</h2>
+      <div class="note"><b>v3 铁律：</b>封面只有主标题 + 副标题两级文字，角标与标签已全部取消——信息流缩略图上多层文字等于零信息。</div>
+      <label>主标题 <span class="hint">建议 4–8 字，手机上一眼能读完</span>
+        <input id="title" placeholder="例：纸杯塔能有多高"></label>
+      <label>副标题 <span class="hint">主标题的一半大小，只留一句</span>
+        <input id="sub" placeholder="例：今天实验做到第 12 轮"></label>
+      <div style="font-size:12px;color:#8a9099;margin:-4px 0 8px">钩子句式一键改写：</div>
+      <div class="hook" id="hooks"></div>
+    </div>
+
+    <div class="card">
+      <h2>③ 主图</h2>
+      <div class="drop" id="drop">
+        <div id="dropTxt">点击选择图片，或拖进来<br><span style="font-size:12px">竖图更佳 · 不传则用示例图</span></div>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>④ 合集（决定配色）</h2>
+      <div class="chips" id="cols"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>预览与导出</h2>
+      <div class="stage">
+        <div class="pv main">
+          <h4>封面 1080×1440（3:4 实际显示尺寸）</h4>
+          <canvas id="pv" width="1080" height="1440"></canvas>
+          <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
+        </div>
+        <div class="pv mini">
+          <h4>信息流缩略图实际大小</h4>
+          <canvas id="mini" width="132" height="176"></canvas>
+          <div class="cap">132px 宽 · 还认得出吗？</div>
+        </div>
+        <div class="pv v9">
+          <h4>竖屏 1080×1920</h4>
+          <canvas id="pv9" width="1080" height="1920"></canvas>
+        </div>
+        <div class="btns">
+          <button class="big" id="exp34">导出封面 1080×1440（PNG）</button>
+          <button class="ghost" id="exp916">导出竖屏 1080×1920（PNG）<b>9:16</b></button>
+          <button class="ghost" id="expjpg">导出封面 JPG<b>小体积</b></button>
+          <button class="ghost" id="exptrio">导出 16 款拼图<b>4320×2880</b></button>
+          <div class="tips" id="check"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   乐小侠 · 抖音封面工作台 v3.0 引擎  (r2 布局修正版)
+   —— 极简重构版 ——
+
+   v3 设计铁律
+   1. 每张封面只有两级文字：主标题 + 副标题
+   2. 背景只有纯色与渐变，不叠装饰图片
+   3. 一个主角：要么图大出血，要么大字压场
+   4. 图宽 ≥45% 画面宽（或出血），文字面积 ≤40%
+   5. 底部 160px 为抖音 UI 遮挡区，文字内容止于 y=1280
+   6. 主体人脸不得被裁切或被文字压住
+
+   画布 1080×1440
+   ========================================================= */
+
+const CW = 1080, CH = 1440;
+const SAFE = { top: 72, bottom: 1280, left: 80, right: 80 };
+
+/* ---------- 合集视觉系统 ---------- */
+const COLLECTIONS = {
+  play: {
+    id:'play', name:'你带娃在玩啥呢？', icon:'🎮', sub:'日常游戏 + 有趣的小实验',
+    g1:'#FFF4E2', g2:'#FFDCA8', ink:'#2B1D0E', ink2:'#7A6244', accent:'#E8871E',
+    card:'#FFFFFF', img:'assets/cover-play.jpg',
+    rec:['B1','B2','B11']
+  },
+  talk: {
+    id:'talk', name:'你听过娃冒出啥话？', icon:'💭', sub:'奇思妙想 · 小孩的金句',
+    g1:'#241634', g2:'#432A61', ink:'#FFF3E4', ink2:'#C6B2DF', accent:'#F2A64E',
+    card:'#2E1E42', img:'assets/cover-talk.jpg',
+    rec:['B4','B8','B10']
+  },
+  travel: {
+    id:'travel', name:'你陪娃去过哪儿呢？', icon:'🗺️', sub:'乐小侠的去处地图',
+    g1:'#F3EFE3', g2:'#D9E3D2', ink:'#262218', ink2:'#6B6A55', accent:'#5E6F52',
+    card:'#FFFFFF', img:'assets/cover-travel.jpg',
+    rec:['B6','B13','B16']
+  }
+};
+
+/* ---------- 16 款骨架 ---------- */
+const LAYOUTS = [
+  {id:'B1',  name:'大字顶·出血图底', desc:'标题占上半，图整幅出血沉底'},
+  {id:'B2',  name:'纯色底·大圆图',     desc:'大圆图居中偏下，标题在上'},
+  {id:'B3',  name:'斜切色块·方图',     desc:'斜切分色，方形图在右下'},
+  {id:'B4',  name:'满图·白字压底',     desc:'满幅图 + 底部渐变 + 白字'},
+  {id:'B5',  name:'左图右字',          desc:'左半出血图，右半纯色排字'},
+  {id:'B6',  name:'上图下字',          desc:'图占上半，下半纯色大字'},
+  {id:'B7',  name:'渐变色带·窄图条',   desc:'柔渐变底 + 底部横向图条'},
+  {id:'B8',  name:'极简·大卡片图',     desc:'大字在上，大卡片图在下'},
+  {id:'B9',  name:'斜切分割·右图',     desc:'对角线分割，右侧大面积图'},
+  {id:'B10', name:'方图居中·字在下',   desc:'方图居中，标题在图下方纯色区'},
+  {id:'B11', name:'底部半图·大字顶',   desc:'大字占上半，下半整幅出血'},
+  {id:'B12', name:'满图·底部横条',     desc:'满幅图 + 底部横条排字'},
+  {id:'B13', name:'几何色块·方图',     desc:'纯色底 + 几何块，右下方图'},
+  {id:'B14', name:'竖图居中·上下字',   desc:'竖图居中，标题在上副题在下'},
+  {id:'B15', name:'对角大图·压边字',   desc:'斜置大图，标题压图形边缘'},
+  {id:'B16', name:'极简文字牌·小圆图', desc:'纯色大字，右下角一枚圆图'}
+];
+
+/* ---------- 默认文案 ---------- */
+const PRESETS = {
+  play:{
+    title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮',
+    B1:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
+    B2:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
+    B3:{title:'纸杯塔能有多高', sub:'沙发上的亲子实验'},
+    B4:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
+    B5:{title:'纸杯塔能有多高', sub:'搭到第 12 层才倒'},
+    B6:{title:'纸杯塔能有多高', sub:'娃自己数到了 12'},
+    B7:{title:'纸杯塔能有多高', sub:'亲子游戏 · 第 12 轮'},
+    B8:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
+    B9:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
+    B10:{title:'纸杯塔能有多高', sub:'娃自己数到了 12'},
+    B11:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
+    B12:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
+    B13:{title:'纸杯塔能有多高', sub:'亲子游戏 · 第 12 轮'},
+    B14:{title:'纸杯塔能有多高', sub:'娃自己数到了 12'},
+    B15:{title:'纸杯塔能有多高', sub:'沙发上的亲子实验'},
+    B16:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'}
+  },
+  talk:{
+    title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半',
+    B1:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B2:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
+    B3:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B4:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B5:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
+    B6:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
+    B7:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B8:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B9:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
+    B10:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
+    B11:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B12:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
+    B13:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B14:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
+    B15:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B16:{title:'娃今天冒出啥话', sub:'一句比一句离谱'}
+  },
+  travel:{
+    title:'带娃去过哪儿呢', sub:'乐小侠的去处地图',
+    B1:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B2:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
+    B3:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B4:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B5:{title:'带娃去过哪儿呢', sub:'一路向北'},
+    B6:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
+    B7:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B8:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B9:{title:'带娃去过哪儿呢', sub:'一路向北'},
+    B10:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
+    B11:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B12:{title:'带娃去过哪儿呢', sub:'一路向北'},
+    B13:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
+    B14:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B15:{title:'带娃去过哪儿呢', sub:'一路向北'},
+    B16:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'}
+  }
+};
+
+/* ================= 通用绘制工具 ================= */
+function F(w,s){ return w+' '+s+'px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif'; }
+
+function roundRectPath(ctx,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+function polyPath(ctx,pts){
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.closePath();
+}
+function gradBg(ctx,c,dir){
+  let g;
+  if(dir==='h') g=ctx.createLinearGradient(0,0,CW,CH);
+  else if(dir==='d') g=ctx.createLinearGradient(0,0,CW,CH*0.75);
+  else g=ctx.createLinearGradient(0,0,0,CH);
+  g.addColorStop(0,c.g1); g.addColorStop(1,c.g2);
+  ctx.fillStyle=g; ctx.fillRect(0,0,CW,CH);
+}
+function solidBg(ctx,c){ ctx.fillStyle=c.g1; ctx.fillRect(0,0,CW,CH); }
+
+/* 焦点裁切：fy=0 取源图顶部，fy=1 取底部。保证人脸不被裁掉 */
+function drawCoverF(ctx,img,x,y,w,h,fy){
+  if(!img||!img.width){ ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(x,y,w,h); return; }
+  const iw=img.width, ih=img.height, s=Math.max(w/iw,h/ih);
+  const dw=iw*s, dh=ih*s;
+  const off=(dh-h)*fy;
+  ctx.drawImage(img,x+(w-dw)/2,y-off,dw,dh);
+}
+function drawCover(ctx,img,x,y,w,h){ drawCoverF(ctx,img,x,y,w,h,0.30); }
+
+function coverRect(ctx,img,x,y,w,h,r,fy){
+  ctx.save();
+  roundRectPath(ctx,x,y,w,h,r); ctx.clip();
+  drawCoverF(ctx,img,x,y,w,h,fy===undefined?0.30:fy);
+  ctx.restore();
+}
+function coverCircle(ctx,img,cx,cy,r,fy){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+  drawCoverF(ctx,img,cx-r,cy-r,r*2,r*2,fy===undefined?0.28:fy);
+  ctx.restore();
+}
+function coverPoly(ctx,img,pts,fy){
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  const x=Math.min.apply(null,xs), y=Math.min.apply(null,ys);
+  const w=Math.max.apply(null,xs)-x, h=Math.max.apply(null,ys)-y;
+  ctx.save();
+  polyPath(ctx,pts); ctx.clip();
+  drawCoverF(ctx,img,x,y,w,h,fy===undefined?0.30:fy);
+  ctx.restore();
+}
+function ring(ctx,cx,cy,r,w,color){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.lineWidth=w; ctx.strokeStyle=color; ctx.stroke();
+  ctx.restore();
+}
+function fitText(ctx,text,maxW,maxSize,minSize,weight,maxLines){
+  text=(text||'').trim();
+  if(!text) return {size:maxSize,lines:['']};
+  for(let s=maxSize;s>=minSize;s-=2){
+    ctx.font=F(weight,s);
+    const lines=[]; let cur='';
+    for(const ch of text){
+      const t=cur+ch;
+      if(ctx.measureText(t).width>maxW && cur){ lines.push(cur); cur=ch; }
+      else cur=t;
+    }
+    if(cur) lines.push(cur);
+    if(lines.length<=maxLines) return {size:s,lines:lines};
+  }
+  ctx.font=F(weight,minSize);
+  return {size:minSize,lines:[text]};
+}
+function drawTitle(ctx,text,x,topY,maxW,maxSize,color,align,maxLines,weight){
+  const t=fitText(ctx,text,maxW,maxSize,44,weight||900,maxLines||2);
+  ctx.font=F(weight||900,t.size);
+  ctx.fillStyle=color; ctx.textAlign=align||'left'; ctx.textBaseline='alphabetic';
+  const lh=Math.round(t.size*1.22);
+  let y=topY;
+  t.lines.forEach(l=>{ ctx.fillText(l,x,y); y+=lh; });
+  ctx.textAlign='left';
+  return {bottom:y-lh, size:t.size, lh:lh};
+}
+function drawSub(ctx,text,x,y,maxW,size,color,align,weight){
+  const t=fitText(ctx,text,maxW,size||46,26,weight||600,1);
+  ctx.font=F(weight||600,t.size); ctx.fillStyle=color;
+  ctx.textAlign=align||'left'; ctx.textBaseline='alphabetic';
+  ctx.fillText(t.lines[0],x,y);
+  ctx.textAlign='left';
+  return {size:t.size, bottom:y};
+}
+function mainImg(img){ return img && img.width ? img : null; }
+
+/* ================= 16 款骨架（r2） ================= */
+const RENDER = {
+
+/* B1 大字顶·出血图底 —— 焦点 0.16 保证脸完整 */
+B1(ctx,d,img,c){
+  gradBg(ctx,c,'v');
+  const M=SAFE.left;
+  ctx.fillStyle=c.accent; ctx.fillRect(M,140,88,9);
+  const r=drawTitle(ctx,d.title,M,258,CW-M-M,128,c.ink,'left',2);
+  drawSub(ctx,d.sub,M,r.bottom+74,CW-M-M,44,c.ink2,'left');
+  ctx.save(); ctx.beginPath(); ctx.rect(0,440,CW,CH-440); ctx.clip();
+  drawCoverF(ctx,mainImg(img),0,440,CW,CH-440,0.06);
+  ctx.restore();
+  const g=ctx.createLinearGradient(0,440,0,530);
+  g.addColorStop(0,'rgba(0,0,0,.22)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,440,CW,90);
+},
+
+/* B2 纯色底·大圆图 */
+B2(ctx,d,img,c){
+  gradBg(ctx,c,'d');
+  const r=drawTitle(ctx,d.title,CW/2,300,CW-200,112,c.ink,'center',2);
+  drawSub(ctx,d.sub,CW/2,r.bottom+76,CW-240,44,c.ink2,'center');
+  const cy=980, rad=450;
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=56; ctx.shadowOffsetY=18;
+  coverCircle(ctx,mainImg(img),CW/2,cy,rad,0.18); ctx.restore();
+  ring(ctx,CW/2,cy,rad+16,12,c.accent);
+},
+
+/* B3 斜切色块·方图 —— 图更大，斜切退为背景 */
+B3(ctx,d,img,c){
+  solidBg(ctx,c);
+  /* 硬边斜切：右上整幅出血图，无渐变、不糊脸 */
+  coverPoly(ctx,mainImg(img),[[0,760],[CW,0],[CW,CH],[0,CH]],0.10);
+  const M=SAFE.left;
+  ctx.fillStyle=c.accent; ctx.fillRect(M,560,88,9);
+  const r=drawTitle(ctx,d.title,M,672,420,104,c.ink,'left',3);
+  drawSub(ctx,d.sub,M,r.bottom+76,420,44,c.ink2,'left');
+
+},
+
+/* B4 满图·白字压底 —— 渐变只压最底部 */
+B4(ctx,d,img,c){
+  drawCoverF(ctx,mainImg(img),0,0,CW,CH,0.16);
+  const g=ctx.createLinearGradient(0,0,0,620);
+  g.addColorStop(0,'rgba(0,0,0,.80)'); g.addColorStop(0.62,'rgba(0,0,0,.44)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,CW,620);
+  const M=SAFE.left;
+  const r=drawTitle(ctx,d.title,M,330,CW-M-M,124,'#FFFFFF','left',2);
+  drawSub(ctx,d.sub,M,r.bottom+86,CW-M-M,48,'rgba(255,255,255,.9)','left');
+},
+
+/* B5 左图右字 */
+B5(ctx,d,img,c){
+  solidBg(ctx,c);
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,520,CH); ctx.clip();
+  drawCoverF(ctx,mainImg(img),0,0,520,CH,0.24);
+  ctx.restore();
+  const M=580;
+  const r=drawTitle(ctx,d.title,M,600,CW-M-70,102,c.ink,'left',3);
+  drawSub(ctx,d.sub,M,r.bottom+88,CW-M-70,46,c.ink2,'left');
+  ctx.fillStyle=c.accent; ctx.fillRect(M,r.bottom+40,90,8);
+},
+
+/* B6 上图下字 —— 图更高，字上移缩小空档 */
+B6(ctx,d,img,c){
+  drawCoverF(ctx,mainImg(img),0,0,CW,720,0.16);
+  const g=ctx.createLinearGradient(0,620,0,780);
+  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,c.g1);
+  ctx.fillStyle=g; ctx.fillRect(0,620,CW,180);
+  ctx.fillStyle=c.g1; ctx.fillRect(0,700,CW,CH-700);
+  const M=SAFE.left;
+  ctx.fillStyle=c.accent; ctx.fillRect(M,830,96,10);
+  const r=drawTitle(ctx,d.title,M,948,CW-M-M,124,c.ink,'left',2);
+  drawSub(ctx,d.sub,M,r.bottom+90,CW-M-M,48,c.ink2,'left');
+},
+
+/* B7 渐变色带·窄图条 —— 焦点 0.10 保住脸 */
+B7(ctx,d,img,c){
+  gradBg(ctx,c,'d');
+  const r=drawTitle(ctx,d.title,CW/2,300,CW-200,114,c.ink,'center',2);
+  drawSub(ctx,d.sub,CW/2,r.bottom+82,CW-240,46,c.ink2,'center');
+  ctx.save(); ctx.beginPath(); ctx.rect(0,1010,CW,CH-1010); ctx.clip();
+  drawCoverF(ctx,mainImg(img),0,1010,CW,CH-1010,0.10);
+  ctx.restore();
+  const g=ctx.createLinearGradient(0,1010,0,1080);
+  g.addColorStop(0,'rgba(0,0,0,.18)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,1010,CW,70);
+},
+
+/* B8 极简·大卡片图 */
+B8(ctx,d,img,c){
+  gradBg(ctx,c,'v');
+  const r=drawTitle(ctx,d.title,CW/2,262,CW-200,114,c.ink,'center',2);
+  drawSub(ctx,d.sub,CW/2,r.bottom+80,CW-240,46,c.ink2,'center');
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=54; ctx.shadowOffsetY=20;
+  coverRect(ctx,mainImg(img),90,560,900,690,56,0.18); ctx.restore();
+},
+
+/* B9 斜切分割·右图 —— 渐变更轻 */
+B9(ctx,d,img,c){
+  solidBg(ctx,c);
+  coverPoly(ctx,mainImg(img),[[560,0],[CW,0],[CW,CH],[300,CH]],0.22);
+  const g=ctx.createLinearGradient(560,0,720,0);
+  g.addColorStop(0,c.g1); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,720,CH);
+  const M=SAFE.left;
+  const r=drawTitle(ctx,d.title,M,560,440,104,c.ink,'left',3);
+  drawSub(ctx,d.sub,M,r.bottom+84,440,44,c.ink2,'left');
+  ctx.fillStyle=c.accent; ctx.fillRect(M,r.bottom+38,80,8);
+},
+
+/* B10 方图居中·字在下 —— 字移出图外，不压头顶 */
+B10(ctx,d,img,c){
+  gradBg(ctx,c,'v');
+  const sx=185, sy=150, sw=710, sh=640;
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=52; ctx.shadowOffsetY=18;
+  coverRect(ctx,mainImg(img),sx,sy,sw,sh,44,0.16); ctx.restore();
+  const r=drawTitle(ctx,d.title,CW/2,sy+sh+150,sw-60,108,c.ink,'center',2);
+  drawSub(ctx,d.sub,CW/2,r.bottom+80,sw-60,44,c.ink2,'center');
+},
+
+/* B11 底部半图·大字顶 */
+B11(ctx,d,img,c){
+  gradBg(ctx,c,'v');
+  const M=SAFE.left;
+  ctx.fillStyle=c.accent; ctx.fillRect(M,232,96,10);
+  const r=drawTitle(ctx,d.title,M,360,CW-M-M,134,c.ink,'left',2);
+  drawSub(ctx,d.sub,M,r.bottom+96,CW-M-M,50,c.ink2,'left');
+  ctx.save(); ctx.beginPath(); ctx.rect(0,760,CW,CH-760); ctx.clip();
+  drawCoverF(ctx,mainImg(img),0,760,CW,CH-760,0.14);
+  ctx.restore();
+  const g=ctx.createLinearGradient(0,760,0,850);
+  g.addColorStop(0,'rgba(0,0,0,.20)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,760,CW,90);
+},
+
+/* B12 满图·底部横条 —— 横条压最底部，不遮脸 */
+B12(ctx,d,img,c){
+  drawCoverF(ctx,mainImg(img),0,0,CW,CH,0.14);
+  ctx.fillStyle='rgba(0,0,0,.26)'; ctx.fillRect(0,0,CW,CH);
+  const bx=70, by=930, bw=CW-140, bh=320;
+  ctx.fillStyle='rgba(0,0,0,.52)'; ctx.fillRect(bx,by,bw,bh);
+  ctx.fillStyle=c.accent; ctx.fillRect(bx,by,bw,10);
+  const r=drawTitle(ctx,d.title,CW/2,by+150,bw-110,104,'#FFFFFF','center',2);
+  drawSub(ctx,d.sub,CW/2,r.bottom+74,bw-130,44,'rgba(255,255,255,.9)','center');
+},
+
+/* B13 几何色块·方图 —— 图更大，几何退后 */
+B13(ctx,d,img,c){
+  gradBg(ctx,c,'d');
+  ctx.globalAlpha=.22; ctx.fillStyle=c.accent;
+  [[190,190,104],[300,300,56],[130,430,60],[CW-230,270,92]].forEach(p=>{
+    ctx.beginPath(); ctx.arc(p[0],p[1],p[2],0,Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  const M=SAFE.left;
+  const r=drawTitle(ctx,d.title,M,660,560,116,c.ink,'left',2);
+  drawSub(ctx,d.sub,M,r.bottom+86,560,46,c.ink2,'left');
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=42; ctx.shadowOffsetY=14;
+  coverRect(ctx,mainImg(img),520,820,500,500,38,0.14); ctx.restore();
+},
+
+/* B14 竖图居中·上下字 */
+B14(ctx,d,img,c){
+  solidBg(ctx,c);
+  const r=drawTitle(ctx,d.title,CW/2,210,CW-180,106,c.ink,'center',2);
+  drawSub(ctx,d.sub,CW/2,r.bottom+72,CW-240,44,c.ink2,'center');
+  const iw=580, ih=780, ix=(CW-iw)/2, iy=450;
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=50; ctx.shadowOffsetY=18;
+  coverRect(ctx,mainImg(img),ix,iy,iw,ih,44,0.14); ctx.restore();
+},
+
+/* B15 对角大图·压边字 */
+B15(ctx,d,img,c){
+  gradBg(ctx,c,'d');
+  ctx.save();
+  ctx.translate(CW/2,CH/2); ctx.rotate(-0.16); ctx.translate(-CW/2,-CH/2);
+  ctx.shadowColor='rgba(0,0,0,.24)'; ctx.shadowBlur=54; ctx.shadowOffsetY=18;
+  coverRect(ctx,mainImg(img),320,560,780,760,46,0.16);
+  ctx.restore();
+  const M=SAFE.left;
+  ctx.fillStyle=c.accent; ctx.fillRect(M,182,96,10);
+  const r=drawTitle(ctx,d.title,M,308,CW-M-M,128,c.ink,'left',2);
+  drawSub(ctx,d.sub,M,r.bottom+100,CW-M-M,48,c.ink2,'left');
+},
+
+/* B16 极简文字牌·小圆图 —— 限宽避免尴尬断行 */
+B16(ctx,d,img,c){
+  gradBg(ctx,c,'d');
+  const M=SAFE.left;
+  const r=drawTitle(ctx,d.title,M,520,700,132,c.ink,'left',2);
+  drawSub(ctx,d.sub,M,r.bottom+100,700,48,c.ink2,'left');
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.20)'; ctx.shadowBlur=40; ctx.shadowOffsetY=14;
+  coverCircle(ctx,mainImg(img),CW-290,1080,175,0.16); ctx.restore();
+  ring(ctx,CW-290,1080,195,10,c.accent);
+}
+};
+
+/* 安全区参考线 */
+function drawGuides(ctx){
+  ctx.save();
+  ctx.strokeStyle='rgba(255,0,80,.75)'; ctx.lineWidth=3; ctx.setLineDash([12,10]);
+  ctx.strokeRect(SAFE.left,SAFE.top,CW-SAFE.left-SAFE.right,SAFE.bottom-SAFE.top);
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,0,80,.9)'; ctx.font=F(700,24);
+  ctx.fillText('安全区 80 / 72 / 160',SAFE.left+8,SAFE.top-14);
+  ctx.strokeStyle='rgba(0,140,255,.6)'; ctx.lineWidth=2; ctx.setLineDash([8,8]);
+  ctx.beginPath(); ctx.moveTo(CW/3,0); ctx.lineTo(CW/3,CH); ctx.moveTo(CW*2/3,0); ctx.lineTo(CW*2/3,CH);
+  ctx.moveTo(0,CH/3); ctx.lineTo(CW,CH/3); ctx.moveTo(0,CH*2/3); ctx.lineTo(CW,CH*2/3); ctx.stroke();
+  ctx.restore();
+}
+
+
+/* ================= 状态与交互 ================= */
+const state={col:'play',layout:'B1',title:'',sub:'',img:null};
+const imgs={};
+
+function D(){
+  const pc=PRESETS[state.col]||{};
+  const p=pc[state.layout]||pc;
+  return {col:state.col,layout:state.layout,
+    title:state.title||p.title||'', sub:state.sub||p.sub||''};
+}
+function drawDesign(ctx,id,guides){
+  const img=state.img||imgs[state.col]||null;
+  const c=COLLECTIONS[state.col];
+  try{ RENDER[id](ctx,D(),img,c); }
+  catch(e){ console.error('render',id,e);
+    ctx.fillStyle='#3a1f1f';ctx.fillRect(0,0,CW,CH);
+    ctx.fillStyle='#ffb4b4';ctx.font=F(700,44);ctx.textAlign='center';
+    ctx.fillText('渲染出错：'+id,CW/2,700);ctx.textAlign='left'; }
+  if(guides) drawGuides(ctx);
+}
+function refresh(){
+  const c=document.getElementById('pv'),x=c.getContext('2d');
+  x.clearRect(0,0,CW,CH);drawDesign(x,state.layout,document.getElementById('guides').checked);
+  const m=document.getElementById('mini'),mx=m.getContext('2d');
+  mx.clearRect(0,0,132,176);mx.drawImage(c,0,0,CW,CH,0,0,132,176);
+  const v9=document.getElementById('pv9'),v9x=v9.getContext('2d');
+  v9x.clearRect(0,0,1080,1920);
+  v9x.save();v9x.filter='blur(28px) brightness(.72)';
+  v9x.drawImage(c,-30,180,1140,1140);v9x.restore();
+  v9x.drawImage(c,0,240);
+  check();
+}
+function check(){
+  const d=D(),o=[];
+  const n=(d.title||'').replace(/\s/g,'').length;
+  o.push(n===0?['bad','还没填主标题']:(n<=8?['ok','主标题 '+n+' 字 ✓']:['bad','主标题 '+n+' 字，建议 ≤8 字（缩略图看不清）']));
+  o.push([(d.sub||'').length<=20?'ok':'bad','副标题 '+(d.sub||'').length+' 字，建议 ≤20 字']);
+  const est=(d.title.length*(d.title.length>8?130:170)*(d.title.length>6?2:1))/(CW*CH);
+  o.push([est<0.40?'ok':'bad','文字占比约 '+Math.round(est*100)+'%（应 <40%）']);
+  const banned=['爆款','热播','强推','第一','全网最低','国家级','绝对','天花板','yyds'];
+  const hit=banned.filter(w=>((d.title+d.sub).includes(w)));
+  o.push(hit.length?['bad','命中敏感词：'+hit.join('、')]:['ok','无违禁/绝对化用词 ✓']);
+  o.push(['ok','AI 素材：发布页勾「含有 AI 生成内容」+ 官方 AI 标识工具']);
+  document.getElementById('check').innerHTML=o.map(v=>`<div class="${v[0]}">${v[0]==='ok'?'✓':'⚠'} ${v[1]}</div>`).join('');
+}
+function buildCols(){
+  const box=document.getElementById('cols');box.innerHTML='';
+  Object.keys(COLLECTIONS).forEach(k=>{
+    const b=document.createElement('div');
+    b.className='chip'+(state.col===k?' on':'');
+    b.textContent=COLLECTIONS[k].icon+' '+COLLECTIONS[k].name;
+    b.onclick=()=>{state.col=k;state.layout=COLLECTIONS[k].rec[0];buildCols();buildTpls();refresh();};
+    box.appendChild(b);
+  });
+}
+function buildTpls(){
+  const box=document.getElementById('tpls');box.innerHTML='';
+  const rec=COLLECTIONS[state.col].rec;
+  LAYOUTS.forEach(l=>{
+    const d=document.createElement('div');
+    d.className='t'+(state.layout===l.id?' on':'');
+    const c=document.createElement('canvas');c.width=240;c.height=320;
+    const cx=c.getContext('2d');
+    cx.setTransform(c.width/CW,0,0,c.height/CH,0,0);
+    drawDesign(cx,l.id,false);
+    const n=document.createElement('div');n.className='n';
+    n.innerHTML='<span>'+l.id+' '+l.name+'</span>';
+    if(rec.includes(l.id)){const r=document.createElement('span');r.className='rec';r.textContent='荐';n.appendChild(r);}
+    n.title=l.desc;
+    d.appendChild(c);d.appendChild(n);
+    d.onclick=()=>{state.layout=l.id;buildTpls();refresh();};
+    box.appendChild(d);
+  });
+}
+const HOOKS={
+  '数字承诺':['3 步搞定亲子实验','纸杯塔能有多高','搭了 12 轮才倒'],
+  '悬念提问':['为什么娃总问为什么','纸杯塔能有多高','云是不是棉花糖'],
+  '结果反差':['从 0 到 30 层','娃今天说了什么','去过的地方越来越多了']
+};
+function buildHooks(){
+  const box=document.getElementById('hooks');box.innerHTML='';
+  Object.keys(HOOKS).forEach(k=>{
+    HOOKS[k].forEach(t=>{
+      const b=document.createElement('button');b.textContent=t;
+      b.onclick=()=>{state.title=t;document.getElementById('title').value=t;refresh();};
+      box.appendChild(b);
+    });
+  });
+}
+function useFile(f){
+  const u=URL.createObjectURL(f);const im=new Image();
+  im.onload=()=>{state.img=im;
+    document.getElementById('dropTxt').innerHTML='<img src="'+u+'"><div style="font-size:12px;color:#12a150">已使用上传图片 · 再次点击可换</div>';
+    buildTpls();refresh();};
+  im.src=u;
+}
+document.getElementById('drop').onclick=()=>document.getElementById('file').click();
+document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.target.files[0]);};
+['dragover','dragenter'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.add('hot');}));
+['dragleave','drop'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.remove('hot');}));
+document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))useFile(f);});
+['title','sub'].forEach(k=>{
+  document.getElementById(k).oninput=e=>{state[k]=e.target.value;refresh();};
+});
+document.getElementById('guides').onchange=refresh;
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+function renderFull(id){
+  const t=document.createElement('canvas');t.width=CW;t.height=CH;
+  drawDesign(t.getContext('2d'),id,false);return t;
+}
+function exportCanvas(w,h,type,name,id){
+  const src=renderFull(id||state.layout);
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d');
+  if(w===CW&&h===CH)x.drawImage(src,0,0);
+  else{ x.save();x.filter='blur(28px) brightness(.72)';x.drawImage(src,-40,200,w+80,w+80);x.restore(); x.drawImage(src,0,(h-CH)/2); }
+  c.toBlob(b=>dl(b,name),type||'image/png',0.92);
+}
+document.getElementById('exp34').onclick=()=>exportCanvas(CW,CH,'image/png','cover-v3-'+COLLECTIONS[state.col].id+'-'+state.layout+'-1080x1440.png');
+document.getElementById('exp916').onclick=()=>exportCanvas(1080,1920,'image/png','cover-v3-1080x1920.png');
+document.getElementById('expjpg').onclick=()=>exportCanvas(CW,CH,'image/jpeg','cover-v3-1080x1440.jpg');
+document.getElementById('exptrio').onclick=()=>{
+  const ids=LAYOUTS.map(l=>l.id);
+  const c=document.createElement('canvas');c.width=1080*4;c.height=1440*4;const x=c.getContext('2d');
+  ids.forEach((id,i)=>{const s=renderFull(id);x.drawImage(s,(i%4)*1080,Math.floor(i/4)*1440,1080,1440);});
+  c.toBlob(b=>dl(b,'layouts-v3-16.png'),'image/png');
+};
+buildHooks();buildCols();buildTpls();
+let pending=Object.keys(COLLECTIONS).length;
+Object.keys(COLLECTIONS).forEach(k=>{
+  const im=new Image();
+  im.onload=()=>{imgs[k]=im;if(--pending===0){buildTpls();refresh();}};
+  im.onerror=()=>{imgs[k]=null;if(--pending===0){buildTpls();refresh();}};
+  im.src=COLLECTIONS[k].img;
+});
+refresh();
+</script>
+
+<div id="mtop">
+  <div class="mtp"></div>
+  <div class="mti"><b id="mtName">B1 大字顶·出血图底</b><span id="mtCol">你带娃在玩啥呢？</span></div>
+  <button id="mtBtn">放大看</button>
+</div>
+<div id="mbar">
+  <button id="mExport">导出封面 1080×1440</button>
+</div>
+<script>
+(function(){
+  var mExport=document.getElementById('mExport');
+  var mtp=document.querySelector('#mtop .mtp');
+  var mtName=document.getElementById('mtName'), mtCol=document.getElementById('mtCol');
+  var mtBtn=document.getElementById('mtBtn');
+  var miniCv=document.createElement('canvas');miniCv.width=1080;miniCv.height=1440;
+  mtp.appendChild(miniCv);
+  function syncTop(){
+    var src=document.getElementById('pv');
+    var cx=miniCv.getContext('2d');
+    cx.clearRect(0,0,1080,1440);
+    cx.drawImage(src,0,0);
+    var L=LAYOUTS.find(function(x){return x.id===state.layout;});
+    mtName.textContent=(L?L.id+' '+L.name:'')+' · 1080×1440';
+    mtCol.textContent=COLLECTIONS[state.col].icon+' '+COLLECTIONS[state.col].name+' — '+D().title;
+  }
+  var _refresh=refresh;
+  refresh=function(){_refresh();syncTop();};
+  mExport.onclick=function(){exportCanvas(CW,CH,'image/png','cover-v3-'+COLLECTIONS[state.col].id+'-'+state.layout+'-1080x1440.png');};
+  mtBtn.onclick=function(){document.getElementById('pv').scrollIntoView({behavior:'smooth',block:'center'});};
+  setTimeout(syncTop,100);
+  setTimeout(syncTop,800);
+})();
+</script>
+</body>
+</html>
