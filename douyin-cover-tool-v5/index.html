@@ -1568,30 +1568,27 @@ function blurProfile(){
   };
 }
 
-/* 预览图上的实时倍率徽标：一眼看清「导出多大 + 会不会糊」 */
+/* 预览图上的清晰度徽标：只给结论，不带任何尺寸/倍率信息
+   （大哥要求：预览图上不要添加任何高清的尺寸信息；
+     尺寸、倍率、放大系数一律留在倍率 chip 和下方提示区） */
 function drawPvBadge(ctx,Gg){
-  const sc=state.exportScale;
   const p=blurProfile();
   const blur=p?p.blur:1;
-  /* 预览上不标导出尺寸（尺寸在倍率 chip 和提示区看） */
-  const t1='导出 '+sc+'×';
-  const t2= blur>1.5 ? ('⚠ 放大'+blur.toFixed(2)+'× · 会发软')
-            : blur>1.1 ? ('● 放大'+blur.toFixed(2)+'× · 略糊')
-            : ('✓ 放大'+blur.toFixed(2)+'× · 清晰');
+  const txt= blur>1.5 ? '⚠ 会发软'
+           : blur>1.1 ? '● 略糊'
+           : '✓ 清晰';
   /* 字号跟着画布宽度走：16:9 是 1920 宽，固定字号会太小 */
-  const fs=Math.max(34,Math.round(Gg.W*0.05)), lh=fs*1.28, pad=Math.round(fs*0.45);
+  const fs=Math.max(34,Math.round(Gg.W*0.05)), pad=Math.round(fs*0.45);
   ctx.save();
   ctx.font='700 '+fs+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
-  const w=Math.max(ctx.measureText(t1).width,ctx.measureText(t2).width)+pad*2;
-  const h=lh*2+pad*1.1;
+  const w=ctx.measureText(txt).width+pad*2;
+  const h=fs*1.28+pad*1.1;
   const x=Gg.W-w-pad*0.8, y=pad*0.8;
   ctx.fillStyle='rgba(0,0,0,.66)';
   roundRectPath(ctx,x,y,w,h,16); ctx.fill();
-  ctx.textBaseline='top'; ctx.fillStyle='#fff';
-  ctx.fillText(t1,x+pad,y+pad*0.55);
+  ctx.textBaseline='top';
   ctx.fillStyle= blur>1.5?'#ffb09c': blur>1.1?'#ffd08a':'#7fe8b0';
-  ctx.font='700 '+Math.round(fs*0.74)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillText(t2,x+pad,y+pad*0.55+lh);
+  ctx.fillText(txt,x+pad,y+pad*0.55);
   ctx.restore();
 }
 
