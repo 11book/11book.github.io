@@ -452,8 +452,8 @@ function buildCols(){
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
   if(note) note.innerHTML='<b style="color:'+cur.accent+'">'+cur.short+'</b> · '+
-    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为同款几何点缀，'+
-    '四个合集靠主色区分。<br>'+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为该合集专属几何记号，'+
+    '四个合集形状 + 主色双区分。<br>'+
     '点合集会连示例文案一起换；你自己写过标题后，系统就不再替你改。';
 }
 function buildTpls(){

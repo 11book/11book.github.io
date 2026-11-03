@@ -388,7 +388,7 @@ const COLLECTIONS = {
     desc:'室内外的亲子游戏 · 各种好玩的挑战',
     g1:'#F6EEE1', g2:'#EBDCC6', ink:'#2C2721', ink2:'#6E6458',
     accent:'#C59463', accent2:'#D6BDA4', card:'#FFFFFF',
-    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
+    badge:'jump',                       /* v5.2：弹道弧 + 三颗递减点（跳跃） */
     img:'assets/cover-play.jpg',
     rec:['B5']                         /* 统一骨架：四个合集一律 B5 打底，只换配色 */
   },
@@ -397,7 +397,7 @@ const COLLECTIONS = {
     desc:'各种手工制作 · 零成本也能做',
     g1:'#F1E9E6', g2:'#E0D0DA', ink:'#2C2721', ink2:'#6E6458',
     accent:'#9E6EAA', accent2:'#BDA8C2', card:'#FFFFFF',
-    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
+    badge:'weave',                       /* v5.2：交叠双环 + 点（编织手作） */
     img:'assets/cover-craft.jpg',
     rec:['B5']
   },
@@ -406,7 +406,7 @@ const COLLECTIONS = {
     desc:'出去逛的攻略 · 游山玩水不踩坑',
     g1:'#EDEEE0', g2:'#D5DDC6', ink:'#2C2721', ink2:'#6E6458',
     accent:'#74A15E', accent2:'#A3B899', card:'#FFFFFF',
-    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
+    badge:'peak',                       /* v5.2：山形折线 + 点（远山去处） */
     img:'assets/cover-travel.jpg',
     rec:['B5']
   },
@@ -415,7 +415,7 @@ const COLLECTIONS = {
     desc:'碎碎念的经验 · 省事不踩坑',
     g1:'#EAEBE7', g2:'#CFD6D8', ink:'#2C2721', ink2:'#6E6458',
     accent:'#608BA9', accent2:'#9BB0BF', card:'#FFFFFF',
-    badge:'deco',                       /* v5.1：形状统一为几何点缀，靠主色区分合集 */
+    badge:'tent',                       /* v5.2：半圆 + 地平线 + 点（归家日常） */
     img:'assets/cover-daily.jpg',
     rec:['B5']
   }
@@ -460,24 +460,53 @@ const PRESETS = {
 /* 合集徽标的 SVG 版本（UI 用）—— 与封面 drawColBadge 同形同色
    —— 原来这里用的是 emoji，不同机器字体不同、渲染不一致，且和封面徽标长得不一样 */
 function colBadgeSVG(c,size){
-  /* v5.1：与封面 drawColBadge 同形 —— 同心双弧 + 实心点（纯几何点缀） */
-  const s=size||34, h=s/2, ay=h+s*0.06;
-  const arc=(r,lw,op)=>{
-    const a0=Math.PI*1.05, a1=Math.PI*1.95;
-    const x0=h+Math.cos(a0)*r, y0=ay+Math.sin(a0)*r;
-    const x1=h+Math.cos(a1)*r, y1=ay+Math.sin(a1)*r;
-    const large=(a1-a0)>Math.PI?1:0;
-    return '<path d="M'+x0.toFixed(2)+' '+y0.toFixed(2)+
-      ' A'+r.toFixed(2)+' '+r.toFixed(2)+' 0 '+large+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+
-      '" fill="none" stroke="'+c.accent+'" stroke-opacity="'+op+'" stroke-width="'+lw.toFixed(2)+
+  /* v5.2：与封面 drawColBadge 同形 —— 四个合集各一枚不同的几何记号
+     语言统一（线 + 点，同笔法），形状可辨 */
+  const s=size||34, h=s/2;
+  const LW=Math.max(1.4,s*0.072), LW2=Math.max(1.1,s*0.056), DOT=s*0.075;
+  const st=(d,lw,op)=>'<path d="'+d+'" fill="none" stroke="'+c.accent+
+    '" stroke-opacity="'+op+'" stroke-width="'+lw.toFixed(2)+
+    '" stroke-linecap="round" stroke-linejoin="round"/>';
+  const ci=(x,y,r,op)=>'<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+
+    '" r="'+r.toFixed(2)+'" fill="'+c.accent+'" fill-opacity="'+op+'"/>';
+  let g='';
+  if(c.badge==='jump'){
+    /* 弹道弧 + 三颗递减点 */
+    const x0=h-s*0.40, y0=h+s*0.20, cxq=h-s*0.06, cyq=h-s*0.34, x1=h+s*0.40, y1=h+s*0.02;
+    g+=st('M'+x0.toFixed(2)+' '+y0.toFixed(2)+' Q'+cxq.toFixed(2)+' '+cyq.toFixed(2)+' '+
+          x1.toFixed(2)+' '+y1.toFixed(2),LW,0.58);
+    g+=ci(h-s*0.26,h+s*0.02,DOT*1.35,0.74);
+    g+=ci(h-s*0.02,h-s*0.12,DOT*1.0,0.74);
+    g+=ci(h+s*0.20,h-s*0.05,DOT*0.72,0.74);
+  }else if(c.badge==='weave'){
+    /* 交叠双环 + 点 */
+    const r=s*0.30, off=s*0.17;
+    g+='<circle cx="'+(h-off*0.9).toFixed(2)+'" cy="'+h.toFixed(2)+'" r="'+r.toFixed(2)+
+      '" fill="none" stroke="'+c.accent+'" stroke-opacity="0.58" stroke-width="'+LW.toFixed(2)+'"/>';
+    g+='<circle cx="'+(h+off*0.9).toFixed(2)+'" cy="'+h.toFixed(2)+'" r="'+r.toFixed(2)+
+      '" fill="none" stroke="'+c.accent+'" stroke-opacity="0.34" stroke-width="'+LW2.toFixed(2)+'"/>';
+    g+=ci(h,h,DOT*1.15,0.74);
+  }else if(c.badge==='peak'){
+    /* 山形折线 + 地平线 + 点 */
+    g+=st('M'+(h-s*0.40).toFixed(2)+' '+(h+s*0.22).toFixed(2)+
+          ' L'+(h-s*0.12).toFixed(2)+' '+(h-s*0.14).toFixed(2)+
+          ' L'+(h+s*0.06).toFixed(2)+' '+(h+s*0.04).toFixed(2)+
+          ' L'+(h+s*0.20).toFixed(2)+' '+(h-s*0.10).toFixed(2),LW,0.58);
+    g+=st('M'+(h-s*0.40).toFixed(2)+' '+(h+s*0.22).toFixed(2)+
+          ' L'+(h+s*0.40).toFixed(2)+' '+(h+s*0.22).toFixed(2),LW2,0.34);
+    g+=ci(h+s*0.28,h-s*0.22,DOT*1.15,0.74);
+  }else{
+    /* 半圆 + 地平线 + 点 */
+    const r=s*0.30;
+    g+='<path d="M'+(h-r).toFixed(2)+' '+(h+s*0.10).toFixed(2)+
+      ' A'+r.toFixed(2)+' '+r.toFixed(2)+' 0 0 1 '+(h+r).toFixed(2)+' '+(h+s*0.10).toFixed(2)+
+      '" fill="none" stroke="'+c.accent+'" stroke-opacity="0.58" stroke-width="'+LW.toFixed(2)+
       '" stroke-linecap="round"/>';
-  };
-  return '<svg class="ccsvg" viewBox="0 0 '+s+' '+s+'" width="'+s+'" height="'+s+'" aria-hidden="true">'+
-    arc(s*0.40,Math.max(1.4,s*0.072),0.52)+
-    arc(s*0.26,Math.max(1.1,s*0.056),0.32)+
-    '<circle cx="'+h.toFixed(2)+'" cy="'+(h+s*0.30).toFixed(2)+'" r="'+(s*0.075).toFixed(2)+
-      '" fill="'+c.accent+'" fill-opacity="0.70"/>'+
-    '</svg>';
+    g+=st('M'+(h-s*0.40).toFixed(2)+' '+(h+s*0.10).toFixed(2)+
+          ' L'+(h+s*0.40).toFixed(2)+' '+(h+s*0.10).toFixed(2),LW2,0.34);
+    g+=ci(h,h-s*0.02,DOT*1.15,0.74);
+  }
+  return '<svg class="ccsvg" viewBox="0 0 '+s+' '+s+'" width="'+s+'" height="'+s+'" aria-hidden="true">'+g+'</svg>';
 }
 
 /* ================= 通用绘制工具 ================= */
@@ -1003,28 +1032,75 @@ function drawColBadge(ctx,c,G,pos){
   if(cx+half>G.W-edge) cx=G.W-edge-half;
   if(cy-half<edge) cy=edge+half;
   if(cy+half>G.H-edge) cy=G.H-edge-half;
-  /* v5.1 合集角标：纯几何点缀（同心双弧 + 实心点）
-     —— 之前四个合集各用一种外框（圆牌/方牌/旗牌/气泡牌）+ 各异的具象符号，
-        外框形状不统一、线宽不统一、抽象与具象混搭，一排看过去像东拼西凑的图标包
-     —— 现在统一成同一枚「同心双弧 + 落底实心点」的几何记号：
-        没有外框、没有具象图形，远看只是角落一抹主色，近看是一枚轻巧的记号
-     —— 四个合集靠主色区分，形状完全一致 —— 版式统一优先，图形退到配角 */
+  /* v5.2 合集角标：四个合集各一枚不同的几何记号（形状可辨 + 语言统一）
+     —— v5.1 统一成同一枚记号后，代价是「离开页面单看一张封面分不出合集」，
+        缩略图尺寸下 4 个主色区分度尤其弱（绿和蓝接近）—— 不可接受
+     —— v5.2 改回「形状可辨」，但不是回到 v5.0 那种图标包：
+        ① 无外框、无实心色块（不要贴纸感）
+        ② 四个记号共用同一套「线 + 点」语言：同尺寸、同线宽体系、同透明度阶梯、同圆点
+        ③ 全部由基础几何构成（弧 / 折线 / 环 / 点），不出现骰子剪刀这类具象图标
+        ④ 语义各归各位：跳跃 / 编织 / 远山 / 归家
+     —— 一排看过去仍是「一家子」（同一套笔法），但能一眼分家 */
   ctx.save();
   ctx.strokeStyle=c.accent; ctx.fillStyle=c.accent;
   ctx.lineCap='round'; ctx.lineJoin='round';
-  /* 同心双弧 + 一颗实心点：所有元素共享一条中轴，构图闭合、站得住
-     —— 不要外框（四个外框拼一起像图标包），不要具象图形（抽象与具象混搭不协调）
-     —— 双弧由外到内递减线宽与透明度，配一颗落底的实心点收住重心
-        远看只是角落一抹主色，近看是一枚轻巧的记号 —— 纯点缀，不抢标题 */
-  const ay=cy+sz*0.06;
-  ctx.globalAlpha=0.52;
-  ctx.lineWidth=Math.max(1.6,Math.round(3.0*k));
-  ctx.beginPath(); ctx.arc(cx,ay,sz*0.40,Math.PI*1.05,Math.PI*1.95); ctx.stroke();
-  ctx.globalAlpha=0.32;
-  ctx.lineWidth=Math.max(1.2,Math.round(2.2*k));
-  ctx.beginPath(); ctx.arc(cx,ay,sz*0.26,Math.PI*1.05,Math.PI*1.95); ctx.stroke();
-  ctx.globalAlpha=0.70;
-  ctx.beginPath(); ctx.arc(cx,cy+sz*0.30,sz*0.075,0,Math.PI*2); ctx.fill();
+  /* 统一的笔法规范：主形 alpha .58 / 粗线，副形 alpha .34 / 细线，实心点 alpha .74 */
+  const LW=Math.max(1.6,Math.round(3.0*k));      /* 主形线宽 */
+  const LW2=Math.max(1.2,Math.round(2.2*k));     /* 副形线宽 */
+  const DOT=sz*0.075;                            /* 圆点半径 */
+
+  if(c.badge==='jump'){
+    /* play 好玩法子：一道上抛的弹道弧 + 三颗递减点（越飞越远） */
+    ctx.globalAlpha=0.58; ctx.lineWidth=LW;
+    ctx.beginPath();
+    ctx.moveTo(cx-sz*0.40,cy+sz*0.20);
+    ctx.quadraticCurveTo(cx-sz*0.06,cy-sz*0.34,cx+sz*0.40,cy+sz*0.02);
+    ctx.stroke();
+    /* 三颗递减点沿弹道排布 */
+    const pts=[[cx-sz*0.26,cy+sz*0.02],[cx-sz*0.02,cy-sz*0.12],[cx+sz*0.20,cy-sz*0.05]];
+    const rs=[1.35,1.0,0.72];
+    ctx.globalAlpha=0.74;
+    for(let i=0;i<3;i++){
+      ctx.beginPath(); ctx.arc(pts[i][0],pts[i][1],DOT*rs[i],0,Math.PI*2); ctx.fill();
+    }
+  }else if(c.badge==='weave'){
+    /* craft 手工：两个交叠的环（编织的经纬）+ 交点一颗点 */
+    const r=sz*0.30, off=sz*0.17;
+    ctx.globalAlpha=0.58; ctx.lineWidth=LW;
+    ctx.beginPath(); ctx.arc(cx-off*0.9,cy,r,0,Math.PI*2); ctx.stroke();
+    ctx.globalAlpha=0.34; ctx.lineWidth=LW2;
+    ctx.beginPath(); ctx.arc(cx+off*0.9,cy,r,0,Math.PI*2); ctx.stroke();
+    ctx.globalAlpha=0.74;
+    ctx.beginPath(); ctx.arc(cx,cy,DOT*1.15,0,Math.PI*2); ctx.fill();
+  }else if(c.badge==='peak'){
+    /* travel 好去处：两段山形折线（远山）+ 山尖上一颗点（远处的光） */
+    ctx.globalAlpha=0.58; ctx.lineWidth=LW;
+    ctx.beginPath();
+    ctx.moveTo(cx-sz*0.40,cy+sz*0.22);
+    ctx.lineTo(cx-sz*0.12,cy-sz*0.14);
+    ctx.lineTo(cx+sz*0.06,cy+sz*0.04);
+    ctx.lineTo(cx+sz*0.20,cy-sz*0.10);
+    ctx.stroke();
+    ctx.globalAlpha=0.34; ctx.lineWidth=LW2;
+    ctx.beginPath();
+    ctx.moveTo(cx-sz*0.40,cy+sz*0.22);
+    ctx.lineTo(cx+sz*0.40,cy+sz*0.22);
+    ctx.stroke();
+    ctx.globalAlpha=0.74;
+    ctx.beginPath(); ctx.arc(cx+sz*0.28,cy-sz*0.22,DOT*1.15,0,Math.PI*2); ctx.fill();
+  }else{
+    /* daily 带娃日常：半圆（帐篷/屋顶）+ 地平线 + 一点（家里的灯） */
+    const r=sz*0.30;
+    ctx.globalAlpha=0.58; ctx.lineWidth=LW;
+    ctx.beginPath(); ctx.arc(cx,cy+sz*0.10,r,Math.PI,0); ctx.stroke();
+    ctx.globalAlpha=0.34; ctx.lineWidth=LW2;
+    ctx.beginPath();
+    ctx.moveTo(cx-sz*0.40,cy+sz*0.10);
+    ctx.lineTo(cx+sz*0.40,cy+sz*0.10);
+    ctx.stroke();
+    ctx.globalAlpha=0.74;
+    ctx.beginPath(); ctx.arc(cx,cy-sz*0.02,DOT*1.15,0,Math.PI*2); ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -1165,8 +1241,8 @@ function buildCols(){
   const cur=COLLECTIONS[state.col];
   const note=document.getElementById('colNote');
   if(note) note.innerHTML='<b style="color:'+cur.accent+'">'+cur.short+'</b> · '+
-    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为同款几何点缀，'+
-    '四个合集靠主色区分。<br>'+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为该合集专属几何记号，'+
+    '四个合集形状 + 主色双区分。<br>'+
     '点合集会连示例文案一起换；你自己写过标题后，系统就不再替你改。';
 }
 function buildTpls(){
