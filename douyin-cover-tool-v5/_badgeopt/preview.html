@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>封面左上角徽标 · 方案对比</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;font:14px/1.6 -apple-system,"PingFang SC",sans-serif;color:#1a1a1a;padding:18px}
+h1{font-size:20px;margin:0 0 4px}
+.hint{color:#666;font-size:13px;margin-bottom:16px}
+.row{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.rtitle{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.rtitle b{font-size:17px}
+.tag{font-size:12px;padding:2px 8px;border-radius:20px;background:#eef1f5;color:#555}
+.tag.rec{background:#e6f4ea;color:#1e7a3c}
+.tag.old{background:#fdecec;color:#a8332c}
+.desc{color:#666;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+.cell{background:#fafbfc;border:1px solid #e6e8eb;border-radius:8px;padding:6px;text-align:center}
+.cell img{width:100%;display:block;border-radius:5px}
+.cap{font-size:12px;color:#666;margin-top:5px}
+.badge{width:100%;margin-top:6px;border-radius:5px;background:#f0f1f3;border:1px solid #e3e5e8}
+a{color:#1a6fd4}
+</style>
+</head>
+<body>
+<h1>抖音封面工具 v5 · 左上角徽标方案对比</h1>
+<div class="hint">每行一个方案，4 列分别是 4 个合集（B5 版式 3:4）。上排大图是整张封面，下排小图是左上角徽标放大。点图片看大图。</div>
+
+<div class="row" id="rows"></div>
+
+<script>
+const COLS=[['play','好玩法子'],['craft','手工'],['travel','好去处'],['daily','带娃日常']];
+const ROWS=[
+ {k:'CUR',n:'现状（现在这版）',t:'旧',d:'圆形/圆角方/旗牌/气泡牌 四种外框；粗点 vs 细线；三个点和横线语义弱'},
+ {k:'V1',n:'方案 1 · 统一双环圆章 + 细线符号',t:'新',d:'形状线宽全统一，符号仍沿用原语义（点/剪刀/山/横线）'},
+ {k:'V2',n:'方案 2 · 实心圆角方 + 反白符号',t:'新',d:'小图辨识度第一，色块即锚点；偏 App 图标感'},
+ {k:'V3',n:'方案 3 · 邮戳齿边圆章 + 弧形文字',t:'新',d:'最有质感，弧形文字在九宫格里会糊'},
+ {k:'V4',n:'方案 4 · 纯几何点缀（弧线+递减点）',t:'新',d:'最好看但零辨识度，四个只换色'},
+ {k:'V5',n:'方案 A · 双环圆章 + 强语义符号',t:'新 ★推荐',d:'形状线宽统一 + 拼图/剪刀/山+太阳/奶瓶，符号一眼能懂，淡雅有质感'},
+ {k:'V6',n:'方案 B · 实心色块 + 强语义符号',t:'新',d:'小图辨识度最高，但块面偏重，抢主标题'}
+];
+document.getElementById('rows').innerHTML = ROWS.map(r=>`
+ <div class="row">
+  <div class="rtitle"><b>${r.n}</b><span class="tag ${r.t==='旧'?'old':(r.t.indexOf('推荐')>=0?'rec':'')}">${r.t}</span>
+   <span class="desc">${r.d}</span></div>
+  <div class="grid">
+   ${COLS.map(c=>`<div class="cell">
+     <img src="${r.k}-${c[0]}.jpg" loading="lazy" onclick="window.open(this.src,'_blank')">
+     <div class="cap">${c[1]}</div>
+     <img class="badge" src="B-${r.k}-${c[0]}.jpg" loading="lazy" onclick="window.open(this.src,'_blank')">
+   </div>`).join('')}
+  </div>
+ </div>`).join('');
+</script>
+</body>
+</html>
