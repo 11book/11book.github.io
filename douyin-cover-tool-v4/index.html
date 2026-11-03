@@ -266,16 +266,16 @@ function geo(id,scale){
 
 /* ---------- 5 款骨架（2 族） ---------- */
 const FAMILIES = [
-  {id:'A', name:'① 满图压字', desc:'图片满幅，文字压在图上', ids:['B1','B4','B12','B7']},
-  {id:'C', name:'② 圆形大图', desc:'纯色底 + 居中大圆图，文字在上', ids:['B2']}
+  {id:'A', name:'① 满图压字', desc:'图片满幅，文字压在图上', ids:['B1','B2','B3','B4']},
+  {id:'C', name:'② 圆形大图', desc:'纯色底 + 居中大圆图，文字在上', ids:['B5']}
 ];
 
 const LAYOUTS = [
-  {id:'B1',  fam:'A', name:'满图·底部白字', desc:'满幅图 + 底部压暗，白字'},
-  {id:'B4',  fam:'A', name:'满图·顶部白字', desc:'满幅图 + 顶部压暗，白字'},
-  {id:'B12', fam:'A', name:'满图·悬浮卡片', desc:'满幅图 + 图上一张深色圆角卡'},
-  {id:'B7',  fam:'A', name:'满图·底部色条', desc:'上图下纯色实条，条上排字'},
-  {id:'B2',  fam:'C', name:'大圆图·上文字',  desc:'纯色底，大圆图居中，标题在上'}
+  {id:'B1', fam:'A', name:'满图·底部白字', desc:'满幅图 + 底部压暗，白字'},
+  {id:'B2', fam:'A', name:'满图·顶部白字', desc:'满幅图 + 顶部压暗，白字'},
+  {id:'B3', fam:'A', name:'满图·底部色条', desc:'上图下纯色实条，条上排字'},
+  {id:'B4', fam:'A', name:'满图·悬浮卡片', desc:'满幅图 + 图上一张深色圆角卡'},
+  {id:'B5', fam:'C', name:'大圆图·上文字',  desc:'纯色底，大圆图居中，标题在上'}
 ];
 
 /* ---------- 合集视觉系统 ---------- */
@@ -284,19 +284,19 @@ const COLLECTIONS = {
     id:'play', name:'你带娃在玩啥呢？', icon:'🎮', sub:'日常游戏 + 有趣的小实验',
     g1:'#FFF4E2', g2:'#FFDCA8', ink:'#2B1D0E', ink2:'#7A6244', accent:'#E8871E',
     card:'#FFFFFF', img:'assets/cover-play.jpg',
-    rec:['B2','B1','B12']
+    rec:['B5','B1','B4']
   },
   talk: {
     id:'talk', name:'你听过娃冒出啥话？', icon:'💭', sub:'奇思妙想 · 小孩的金句',
     g1:'#241634', g2:'#432A61', ink:'#FFF3E4', ink2:'#C6B2DF', accent:'#F2A64E',
     card:'#2E1E42', img:'assets/cover-talk.jpg',
-    rec:['B4','B12','B1']
+    rec:['B2','B4','B1']
   },
   travel: {
     id:'travel', name:'你陪娃去过哪儿呢？', icon:'🗺️', sub:'乐小侠的去处地图',
     g1:'#F3EFE3', g2:'#D9E3D2', ink:'#262218', ink2:'#6B6A55', accent:'#5E6F52',
     card:'#FFFFFF', img:'assets/cover-travel.jpg',
-    rec:['B7','B2','B12']
+    rec:['B3','B5','B4']
   }
 };
 
@@ -305,26 +305,26 @@ const PRESETS = {
   play:{
     title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮',
     B1:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
-    B2:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
-    B4:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
-    B7:{title:'纸杯塔能有多高', sub:'亲子游戏 · 第 12 轮'},
-    B12:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
+    B2:{title:'纸杯塔能有多高', sub:'今天实验做到第 12 轮'},
+    B3:{title:'纸杯塔能有多高', sub:'亲子游戏 · 第 12 轮'},
+    B4:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
+    B5:{title:'纸杯塔能有多高', sub:'一个下午的意外发现'},
   },
   talk:{
     title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半',
     B1:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B2:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
-    B4:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B7:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
-    B12:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
+    B2:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B3:{title:'娃今天冒出啥话', sub:'金句预警 · 3 岁半'},
+    B4:{title:'娃今天冒出啥话', sub:'我脑子里住着恐龙'},
+    B5:{title:'娃今天冒出啥话', sub:'一句比一句离谱'},
   },
   travel:{
     title:'带娃去过哪儿呢', sub:'乐小侠的去处地图',
     B1:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
-    B2:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
-    B4:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
-    B7:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
-    B12:{title:'带娃去过哪儿呢', sub:'一路向北'},
+    B2:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B3:{title:'带娃去过哪儿呢', sub:'乐小侠的去处地图'},
+    B4:{title:'带娃去过哪儿呢', sub:'一路向北'},
+    B5:{title:'带娃去过哪儿呢', sub:'今年的第 6 个地方'},
   }
 };
 
@@ -434,19 +434,49 @@ function textBlock(ctx,d,o){
   const maxT=Math.round((o.titleSize||120)*k), minT=Math.round(40*k);
   const maxS=Math.round((o.subSize||46)*k),  minS=Math.round(26*k);
   const w=o.w;
+  const prevLS=ctx.letterSpacing;
+  ctx.letterSpacing='0px';
   const t=fitText(ctx,d.title,w,maxT,minT,900,o.lines||2);
   const lh=Math.round(t.size*(o.lh||1.30));
   const hasSub=!!(d.sub&&d.sub.trim()) && !o.noSub;
   /* 副标题字号必须跟随「实际渲染出的标题字号」：
      长标题被 fitText 缩到 minT 后，若副标题仍按 subSize 画，会与标题等大甚至反超，层级崩塌 */
-  const capS=Math.min(maxS, Math.round(t.size*0.45));
-  const st=hasSub?fitText(ctx,d.sub,w,capS,Math.min(minS,capS),600,1):null;
+  const capS=Math.min(maxS, Math.round(t.size*0.52));
+  /* 副标题字距（拉开字距，让副标题不再是一坨贴着的字）*/
+  const lsRatio=o.subSpacing||0;
+  let st=null;
+  if(hasSub){
+    /* 先按无字距找到能放下的最大字号，再按该字号的字距复测宽度 */
+    let s=capS;
+    for(;s>=minS;s-=2){
+      ctx.letterSpacing=Math.round(s*lsRatio)+'px';
+      ctx.font=F(600,s);
+      if(ctx.measureText(d.sub.trim()).width<=w) break;
+    }
+    if(s<minS){
+      /* 加字距后放不下：退化为无字距截断，保证绝不横向溢出 */
+      ctx.letterSpacing='0px';
+      s=capS;
+      st=fitText(ctx,d.sub.trim(),w,capS,minS,600,1);
+    }else{
+      ctx.letterSpacing=Math.round(s*lsRatio)+'px';
+      st={size:s,lines:[d.sub.trim()]};
+    }
+  }
   /* gap 语义：标题墨迹底 与 副标题墨迹顶 之间的「净空隙」(px)，越大越松弛 */
   const gap=Math.round((o.gap===undefined?48:o.gap)*k);
   const align=o.align||'left';
   const drawX = (align==='center') ? o.x + w/2 : o.x;
 
+  /* 装饰短线：位于主标题上方，不与主副标题之间的净空隙抢位置 */
+  const dc=o.deco?{
+    w:Math.round(o.deco.w*k), h:Math.round(o.deco.h*k),
+    gap:Math.round(o.deco.gap*k), color:o.deco.color||o.color||'#000'
+  }:null;
+  const decoTotal = dc ? dc.h + dc.gap : 0;   /* 装饰占用的顶部高度 */
+
   /* 用真实字体度量（actualBoundingBox）取代魔法系数 0.86，中文才准 */
+  ctx.letterSpacing='0px';
   ctx.font=F(900,t.size);
   const tm=ctx.measureText(t.lines[0]||'中');
   const tAsc=tm.actualBoundingBoxAscent||t.size*0.86;
@@ -454,6 +484,7 @@ function textBlock(ctx,d,o){
   const tDesc=tmL.actualBoundingBoxDescent||t.size*0.12;
   let sAsc=0,sDesc=0;
   if(st){
+    ctx.letterSpacing=Math.round(st.size*lsRatio)+'px';
     ctx.font=F(600,st.size);
     const sm=ctx.measureText(st.lines[0]);
     sAsc=sm.actualBoundingBoxAscent||st.size*0.86;
@@ -464,13 +495,13 @@ function textBlock(ctx,d,o){
   const lastBase=(b0)=> b0 + (nLines-1)*lh;              /* 标题最后一行的基线 */
   const subBaseOf=(lb)=> lb + tDesc + gap + sAsc;         /* 副标题基线 = 标题墨迹底 + 净空隙 + 副标题上高 */
 
-  /* anchor top: o.y 是标题墨迹顶；anchor bottom: o.y 是整块墨迹底 */
+  /* anchor top: o.y 是整块（含装饰线）顶；anchor bottom: o.y 是整块墨迹底 */
   let firstBase;
   if(o.anchor==='bottom'){
     const blockInkH = tAsc + (nLines-1)*lh + tDesc + (st? gap+sAsc+sDesc : 0);
     firstBase = o.y - blockInkH + tAsc;
   }else{
-    firstBase = o.y + tAsc;
+    firstBase = o.y + decoTotal + tAsc;
   }
 
   ctx.textAlign=align; ctx.textBaseline='alphabetic';
@@ -482,16 +513,27 @@ function textBlock(ctx,d,o){
   let subBottom = titleInkBottom;
   if(st){
     const sb=subBaseOf(titleBottom);
+    ctx.letterSpacing=Math.round(st.size*lsRatio)+'px';
     ctx.font=F(600,st.size); ctx.fillStyle=o.subColor||o.color||'#000';
     ctx.fillText(st.lines[0],drawX,sb);
     subBottom = sb + sDesc;
   }
+  /* 装饰短线：画在主标题墨迹顶上方 */
+  if(dc){
+    const lineTop = firstBase - tAsc - dc.gap - dc.h;
+    const lx = (align==='center') ? drawX - dc.w/2 : drawX;
+    ctx.letterSpacing='0px';
+    ctx.fillStyle=dc.color;
+    ctx.fillRect(lx, lineTop, dc.w, dc.h);
+  }
+  ctx.letterSpacing=prevLS||'0px';
   ctx.textAlign='left';
   return {
-    top: firstBase - tAsc,
+    top: firstBase - tAsc - decoTotal,
     bottom: subBottom,
     titleBottom: titleInkBottom,
-    size: t.size, subSize: st?st.size:0, lh:lh, gap:gap
+    size: t.size, subSize: st?st.size:0, lh:lh, gap:gap,
+    decoH: decoTotal
   };
 }
 /* 文字块高度预估（不落笔），用于先占位 */
@@ -515,26 +557,30 @@ B1(ctx,d,img,c,G){
   const by=Math.min(G.safe.bottom, Math.round(G.H*0.889));
   textBlock(ctx,d,{x:G.safe.left,y:by,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:122,subSize:46,gap:40,k:G.k});
+    titleSize:122,subSize:64,gap:60,k:G.k,
+    subSpacing:0.06,
+    deco:{w:150,h:8,gap:28,color:c.accent}});
 },
 
-/* B4 满图·顶部白字 */
-B4(ctx,d,img,c,G){
+/* B2 满图·顶部白字 */
+B2(ctx,d,img,c,G){
   drawCoverF(ctx,mainImg(img),0,0,G.W,G.H,0.12);
-  const g=ctx.createLinearGradient(0,0,0,G.H*0.52);
-  g.addColorStop(0,'rgba(0,0,0,.86)');
-  g.addColorStop(.55,'rgba(0,0,0,.42)');
+  const g=ctx.createLinearGradient(0,0,0,G.H*0.58);
+  g.addColorStop(0,'rgba(0,0,0,.90)');
+  g.addColorStop(.55,'rgba(0,0,0,.46)');
   g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g; ctx.fillRect(0,0,G.W,G.H*0.52);
-  /* 顶部文字：顶边锚在画布 12% 处（避开状态栏 UI），标题收窄、层级更紧凑 */
+  ctx.fillStyle=g; ctx.fillRect(0,0,G.W,G.H*0.58);
+  /* 顶部文字：整块（含装饰线）顶边锚在画布 12% 处（避开状态栏 UI） */
   const ty=Math.max(G.safe.top, Math.round(G.H*0.12));
   textBlock(ctx,d,{x:G.safe.left,y:ty,w:G.W-G.safe.left-G.safe.right,
     anchor:'top',align:'left',color:'#FFFFFF',subColor:'rgba(255,255,255,.9)',
-    titleSize:96,subSize:40,gap:36,k:G.k});
+    titleSize:96,subSize:50,gap:58,k:G.k,
+    subSpacing:0.06,
+    deco:{w:120,h:8,gap:26,color:c.accent}});
 },
 
-/* B7 满图·底部色条 */
-B7(ctx,d,img,c,G){
+/* B3 满图·底部色条 */
+B3(ctx,d,img,c,G){
   const bandTop=Math.round(G.H*0.70);
   drawCoverF(ctx,mainImg(img),0,0,G.W,bandTop,0.10);
   ctx.fillStyle=c.g1; ctx.fillRect(0,bandTop,G.W,G.H-bandTop);
@@ -542,16 +588,17 @@ B7(ctx,d,img,c,G){
   g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.18)');
   ctx.fillStyle=g; ctx.fillRect(0,bandTop-90*G.k,G.W,90*G.k);
   ctx.fillStyle=c.accent; ctx.fillRect(0,bandTop,G.W,Math.round(8*G.k));
-  /* 色条内文字：墨迹块在色条内垂直居中（色条 70%~100%，墨迹约 79%~91.5%，
-     上留白 ≈8.9%、下留白 ≈8.5%），文字不贴条底、不悬空 */
+  /* 色条内文字：整块墨迹（含装饰线）底边锚在画布 91.5% 处，块内垂直居中 */
   const by=Math.round(G.H*0.915);
   textBlock(ctx,d,{x:G.safe.left,y:by,w:G.W-G.safe.left-G.safe.right,
     anchor:'bottom',align:'left',color:c.ink,subColor:c.ink2,
-    titleSize:112,subSize:44,gap:34,k:G.k});
+    titleSize:112,subSize:58,gap:58,k:G.k,
+    subSpacing:0.06,
+    deco:{w:140,h:8,gap:26,color:c.accent}});
 },
 
-/* B12 满图·悬浮卡片 */
-B12(ctx,d,img,c,G){
+/* B4 满图·悬浮卡片 */
+B4(ctx,d,img,c,G){
   drawCoverF(ctx,mainImg(img),0,0,G.W,G.H,0.12);
   ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(0,0,G.W,G.H);
   /* 卡片收窄成「悬浮标签」而非横贯全屏的条幅，避免横向切断画面 */
@@ -559,9 +606,10 @@ B12(ctx,d,img,c,G){
   /* 卡片高度随文字块自适应 —— 上下等距内边距，文字视觉居中 */
   const padX=Math.round(48*G.k), padY=Math.round(40*G.k);
   const probeCtx=document.createElement('canvas').getContext('2d');
-  const GAP=48;
+  const GAP=58;
   const probe=textBlock(probeCtx,d,{x:mx+padX,y:0,w:mw-padX*2,anchor:'top',align:'left',
-    color:'#000',subColor:'#000',titleSize:96,subSize:40,gap:GAP,k:G.k});
+    color:'#000',subColor:'#000',titleSize:96,subSize:50,gap:GAP,k:G.k,
+    subSpacing:0.06,deco:{w:120,h:8,gap:26,color:'#000'}});
   const inkH=probe.bottom-probe.top;
   /* 卡片高度 = 文字墨迹 + 上下等距内边距 */
   const mh=Math.round(inkH+padY*2);
@@ -578,7 +626,8 @@ B12(ctx,d,img,c,G){
   /* 文字在卡片内垂直居中 */
   const ty=my+padY;
   textBlock(ctx,d,{x:mx+padX,y:ty,w:mw-padX*2,anchor:'top',align:'left',color:'#FFFFFF',
-    subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:40,gap:GAP,k:G.k});
+    subColor:'rgba(255,255,255,.88)',titleSize:96,subSize:50,gap:GAP,k:G.k,
+    subSpacing:0.06,deco:{w:120,h:8,gap:26,color:c.accent}});
 },
 
 /* ---- 族 B：分栏对切 ---- */
@@ -589,13 +638,15 @@ B12(ctx,d,img,c,G){
 
 /* ---- 族 C：卡片图形 ---- */
 
-/* B2 大圆图·上文字 —— 先排字，再按剩余空间放圆，绝不重叠 */
-B2(ctx,d,img,c,G){
+/* B5 大圆图·上文字 —— 先排字，再按剩余空间放圆，绝不重叠 */
+B5(ctx,d,img,c,G){
   gradBg(ctx,c,'v',G);
   const W=G.W;
   const t=textBlock(ctx,d,{x:G.safe.left,y:Math.round(G.H*0.08),
     w:W-G.safe.left-G.safe.right,anchor:'top',align:'center',
-    color:c.ink,subColor:c.ink2,titleSize:110,subSize:44,gap:32,k:G.k});
+    color:c.ink,subColor:c.ink2,titleSize:110,subSize:58,gap:58,k:G.k,
+    subSpacing:0.06,
+    deco:{w:140,h:8,gap:26,color:c.accent}});
   const gap=Math.round(G.H*0.055);
   const circleTop=t.bottom+gap;
   const maxR=Math.min((W-G.safe.left*2)/2, (G.H-circleTop-Math.round(G.H*0.06))/2);
@@ -634,7 +685,7 @@ function drawGuides(ctx,G){
 
 
 /* ================= 状态与交互 ================= */
-const state={col:'play',layout:'B2',ratio:'3x4',title:'',sub:'',img:null,
+const state={col:'play',layout:'B5',ratio:'3x4',title:'',sub:'',img:null,
   cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
   objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
   exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
