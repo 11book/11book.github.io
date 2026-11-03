@@ -473,12 +473,13 @@ function measureBlur(){
     W:Gg.W, H:Gg.H
   };
 }
-/* 放大倍率的观感分级：
-   ≤1.10 肉眼几乎无差别；≤1.50 可接受；>1.50 明显发软 */
+/* 放大倍率的观感分级（措辞统一，都带「放大系数 X」，方便两处对照）：
+   ≤1.00 无损；≤1.10 肉眼无差；≤1.50 可接受；>1.50 明显发软 */
 function blurNote(blur){
-  if(blur>1.5) return '<span class="warn">⚠ 放大 '+blur.toFixed(2)+' 倍 —— 源像素明显不足，边缘会发软</span>';
-  if(blur>1.1)  return '<span style="color:#b45309;font-weight:700">● 放大 '+blur.toFixed(2)+' 倍 —— 尚可接受，细看略糊</span>';
-  return '<span class="ok">✓ 清晰</span> —— 源像素足够铺满画布（放大 '+blur.toFixed(2)+'×，肉眼无差）';
+  if(blur>1.5) return '<span class="warn">⚠ 放大系数 '+blur.toFixed(2)+' —— 源像素明显不足，边缘会发软</span>';
+  if(blur>1.1) return '<span style="color:#b45309;font-weight:700">● 放大系数 '+blur.toFixed(2)+' —— 尚可接受，细看略糊</span>';
+  if(blur>1.0) return '<span class="ok">✓ 清晰</span> —— 放大系数 '+blur.toFixed(2)+'，肉眼无差';
+  return '<span class="ok">✓ 无损</span> —— 源像素充足（放大系数 '+blur.toFixed(2)+'，还有余量）';
 }
 
 /* 裁剪区提示：选框源像素 + 当前倍率下的清晰度 */
@@ -507,7 +508,7 @@ function updateScaleQ(up){
     const sw=Math.round(c.w*im.width), sh=Math.round(c.h*im.height);
     const blur=up*sc;
     q+='<br>原图 '+im.width+'×'+im.height+' · 选框 '+sw+'×'+sh;
-    q+='<br>图片区域将放大 <b>'+blur.toFixed(2)+'</b> 倍 ';
+    q+='<br>图片区域放大系数 <b>'+blur.toFixed(2)+'</b> ';
     q+= blur>1.5  ? '<span class="warn">→ 明显发软，建议换更大原图</span>'
        : blur>1.1 ? '<span style="color:#b45309;font-weight:700">→ 略糊但可用</span>'
                   : '<span class="ok">✓ 清晰</span>';
