@@ -51,6 +51,18 @@ label .hint{font-size:11px;color:#a6acb4;margin-top:3px}
 .cropbox .ct{font-size:12px;font-weight:700;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .cropbox .ct .info{font-weight:400;color:#8a9099;font-size:11px}
 .cropcv{width:100%;max-width:300px;border-radius:8px;background:#222;display:block;touch-action:none;cursor:crosshair;margin-bottom:9px}
+.cropwrap{position:relative}
+.croplock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;background:rgba(250,251,252,.86);color:#6b7280;font-size:12px;font-weight:700;text-align:center;
+  border-radius:8px;pointer-events:none}
+.croplock span{font-weight:400;font-size:11px;color:#9aa1a9}
+.cropbox.locked .croplock{display:flex}
+.cropbox:not(.locked) .croplock{display:none}
+.cropbox.locked .cropcv{opacity:.5;cursor:not-allowed}
+.cropbox.locked #cropRatios,.cropbox.locked .croprow .sbtn{opacity:.45;pointer-events:none}
+.sbtn.cropon{margin-left:auto;font-weight:700}
+.sbtn.cropon.on{background:#111;border-color:#111;color:#fff}
+.cropcv{user-select:none;-webkit-user-drag:none}
 .croprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .croprow .lb{font-size:11px;color:#8a9099;margin-right:2px}
 .sbtn{padding:4px 10px;border:1px solid #dcdfe4;border-radius:999px;font-size:11px;cursor:pointer;background:#fff;font-family:inherit}
@@ -223,9 +235,15 @@ details.sumcard .note{margin:11px 0 0}
       </div>
       <div class="stage">
         <div class="workbench">
-          <div class="cropbox hide" id="cropBox">
-            <div class="ct">✂️ 裁剪要显示的区域 <span class="info" id="cropSrcInfo"></span></div>
-            <canvas class="cropcv" id="cropCv" height="220"></canvas>
+          <div class="cropbox hide locked" id="cropBox">
+            <div class="ct">✂️ 裁剪要显示的区域
+              <span class="info" id="cropSrcInfo"></span>
+              <button class="sbtn cropon" id="cropBtn" type="button">🔒 启用裁剪</button>
+            </div>
+            <div class="cropwrap">
+              <canvas class="cropcv" id="cropCv" height="220" draggable="false"></canvas>
+              <div class="croplock" id="cropLock">🔒 裁剪已锁定<br><span>点上面「启用裁剪」才能拖动选框</span></div>
+            </div>
             <div class="croprow">
               <span class="lb">比例</span>
               <span id="cropRatios"></span>
@@ -1026,6 +1044,7 @@ function drawColBadge(ctx,c,G,pos){
 /* ================= 状态与交互 ================= */
 const state={col:'play',layout:'B5',ratio:'3x4',title:'',sub:'',img:null,
   autoText:true,               /* true=标题还是合集自带示例文案，切合集时自动跟着换；用户一旦手改就置 false */
+  cropOn:false,                /* 裁剪开关：默认锁住，防止手滑拖坏图；要裁先点「启用裁剪」 */
   cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
   objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
   exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
@@ -1349,6 +1368,7 @@ function cropHit(pt){
   return null;
 }
 function cropStart(ev){
+  if(!state.cropOn) return;          /* 未启用裁剪 → 不响应，防止误拖 */
   const pt=cropPointer(ev); if(!pt) return;
   const hit=cropHit(pt);
   if(!hit){ /* 点框外 → 以该点为中心开新选框 */
@@ -1400,11 +1420,13 @@ function cropApplyDrag(pt){
   }
 }
 function cropMove(ev){
+  if(!state.cropOn) return;
   const d=state.cropDrag; if(!d) return;
   const pt=cropPointer(ev); if(!pt) return;
   cropApplyDrag(pt);
 }
 function cropEnd(){
+  if(!state.cropOn){ state.cropDrag=null; return; }
   if(!state.cropDrag) return;
   state.cropDrag=null;
   drawCropUI(); refresh();
@@ -1481,6 +1503,18 @@ document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.targ
 (function(){
   const cv=document.getElementById('cropCv');
   if(!cv) return;
+  /* 裁剪开关：默认锁住，避免手滑把图拖坏；要裁先点按钮 */
+  const cbtn=document.getElementById('cropBtn');
+  const cbox=document.getElementById('cropBox');
+  if(cbtn){
+    cbtn.onclick=()=>{
+      state.cropOn=!state.cropOn;
+      cbox.classList.toggle('locked',!state.cropOn);
+      cbtn.classList.toggle('on',state.cropOn);
+      cbtn.textContent=state.cropOn?'✓ 裁剪已启用 · 点此关闭':'🔒 启用裁剪';
+      if(state.cropOn){ drawCropUI(); }
+    };
+  }
   cv.addEventListener('pointerdown',cropStart);
   cv.addEventListener('pointermove',cropMove);
   window.addEventListener('pointerup',cropEnd);
