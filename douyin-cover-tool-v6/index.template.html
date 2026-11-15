@@ -240,6 +240,11 @@ details.sumcard .note{margin:11px 0 0}
 .vidstrip{display:flex;gap:6px;overflow-x:auto;padding:8px;margin-top:8px;background:var(--soft-bg);border-radius:9px}
 .vidstrip canvas{flex:0 0 auto;height:72px;border-radius:5px;cursor:pointer;border:2px solid transparent;background:#000}
 .vidstrip canvas.on{border-color:var(--sel-ring);box-shadow:0 0 0 2px var(--sel-ring)}
+/* v6：手机端把 8 帧缩略图排成 4×2 网格，一屏看全，不用横滑 */
+@media(max-width:560px){
+  .vidstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;overflow-x:visible}
+  .vidstrip canvas{width:100%;height:auto;aspect-ratio:9/16}
+}
 #vidBody.hide{display:none}
 
 /* ============ 移动端适配 ============ */
