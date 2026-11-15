@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>抖音封面工具 v6 · 视频取帧</title>
+<style>
+*{box-sizing:border-box}
+/* ---------- 主题变量：亮色（默认）/ 暗色（跟随系统 + 手动覆盖） ----------
+   关键设计：选中态用 --sel-bg/--sel-fg，亮色是「深底白字」、暗色是「亮底深字」——
+   永远是卡片的最高对比色，绝不会糊在底色里。 */
+
+:root{
+  --mtop-bg:rgba(255,255,255,.96);
+  --bg:#f2f3f5;--card:#fff;--line:#e6e8eb;--line2:#dcdfe4;
+  --txt:#222;--txt2:#333;--muted:#8a9099;--muted2:#a6acb4;
+  --sel-bg:#111;--sel-fg:#fff;--sel-ring:#111;
+  --input-bg:#fafbfc;--soft-bg:#f7f8fa;--soft-bg2:#f5f5f5;--drop-bg:#fafbfc;--drop-bd:#c9ced6;
+  --thumb-bg:#eee;--overlay:rgba(250,251,252,.86);--overlay-tx:#6b7280;
+  --chip-bg:#fff;--ph:#a6acb4;
+  --shadow:rgba(0,0,0,.13);--shadow2:rgba(0,0,0,.08);
+  --link:#3b6ef6;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --mtop-bg:rgba(24,27,33,.94);
+    --bg:#111418;--card:#1b1e24;--line:#2b3038;--line2:#3b414a;
+    --txt:#e8eaed;--txt2:#dde0e5;--muted:#98a0a9;--muted2:#7c848e;
+    --sel-bg:#f2f4f7;--sel-fg:#15181c;--sel-ring:#f2f4f7;
+    --input-bg:#23272e;--soft-bg:#21252b;--soft-bg2:#282d34;--drop-bg:#23272e;--drop-bd:#3b414a;
+    --thumb-bg:#2a2f36;--overlay:rgba(28,32,38,.88);--overlay-tx:#b8c0c9;
+  --chip-bg:#23272e;--ph:#8b939c;
+    --chip-bg:#23272e;--ph:#8b939c;
+    --shadow:rgba(0,0,0,.55);--shadow2:rgba(0,0,0,.4);
+    --link:#6b9bff;
+  }
+}
+/* 手动指定：跟随系统 / 强制亮 / 强制暗 */
+html[data-theme="dark"]{
+  --mtop-bg:rgba(24,27,33,.94);
+  --bg:#111418;--card:#1b1e24;--line:#2b3038;--line2:#3b414a;
+  --txt:#e8eaed;--txt2:#dde0e5;--muted:#98a0a9;--muted2:#7c848e;
+  --sel-bg:#f2f4f7;--sel-fg:#15181c;--sel-ring:#f2f4f7;
+  --input-bg:#23272e;--soft-bg:#21252b;--soft-bg2:#282d34;--drop-bg:#23272e;--drop-bd:#3b414a;
+  --thumb-bg:#2a2f36;--overlay:rgba(28,32,38,.88);--overlay-tx:#b8c0c9;
+  --shadow:rgba(0,0,0,.55);--shadow2:rgba(0,0,0,.4);
+  --link:#6b9bff;
+}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-text-size-adjust:100%}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:11px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:9;flex-wrap:wrap}
+header h1{font-size:17px;margin:0}
+header .v{background:var(--sel-bg);color:var(--sel-fg);font-size:11px;padding:3px 9px;border-radius:999px;font-weight:700;letter-spacing:.5px}
+header span{color:var(--muted);font-size:12px}
+header a{color:var(--link);text-decoration:none;font-size:12px;border:1px solid var(--line2);padding:4px 10px;border-radius:999px}
+header a:hover{border-color:var(--link)}
+#themeBtn{border:1px solid var(--line2);background:var(--card);color:var(--txt2);
+  border-radius:999px;padding:4px 11px;font-size:12px;cursor:pointer;font-family:inherit}
+#themeBtn:hover{border-color:var(--sel-ring);color:var(--txt)}
+.wrap{max-width:1340px;margin:0 auto;padding:16px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px}
+.wrap>div{min-width:0}
+.card{min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}
+.card.wide{grid-column:1/-1}
+.card h2{font-size:12px;color:var(--muted);margin:0 0 10px;font-weight:700;letter-spacing:.6px}
+label{display:block;margin-bottom:11px;font-size:13px;color:var(--txt2)}
+label input{width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--line2);border-radius:8px;font-size:14px;background:var(--input-bg);color:var(--txt);font-family:inherit}
+label input:focus{outline:none;border-color:var(--sel-ring);background:var(--card)}
+label .hint{font-size:11px;color:var(--muted2);margin-top:3px}
+label input::placeholder{color:var(--ph);opacity:1}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:7px 13px;border:1px solid var(--line2);border-radius:999px;cursor:pointer;font-size:13px;background:var(--card);color:var(--txt)}
+.chip:not(.on){background:var(--chip-bg)}
+.chip.on{background:var(--sel-bg);border-color:var(--sel-bg);color:var(--sel-fg);font-weight:700;box-shadow:0 0 0 2px var(--sel-ring)}
+.chip b{font-weight:700}
+.chip small{display:block;font-size:10px;opacity:.65;margin-top:1px}
+.drop{border:2px dashed var(--drop-bd);border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;background:var(--drop-bg)}
+.drop:hover,.drop.hot{border-color:var(--sel-ring);color:var(--txt);background:var(--soft-bg2)}
+.drop img{max-width:100%;max-height:110px;border-radius:8px;margin-bottom:8px}
+.drop.mini{border-width:1.5px;padding:0;height:40px;border-radius:9px;font-size:12px;
+  display:flex;align-items:center;justify-content:center;flex:1;min-width:190px}
+.drop.mini #dropTxt{display:flex;align-items:center;gap:8px;line-height:1.2}
+.drop.mini img{max-width:96px;max-height:26px;border-radius:5px;margin:0;flex:0 0 auto}
+.cropbox{border:1px solid var(--line);border-radius:10px;padding:11px;background:var(--drop-bg)}
+.workbench{display:flex;gap:14px;align-items:flex-start;flex:1 1 auto;min-width:0}
+.workbench .cropbox{flex:1 1 300px;min-width:270px;max-width:460px}
+.workbench .pv.main{flex:0 0 auto}
+#pv{cursor:zoom-in}
+.zoomhint{font-size:10px;color:var(--muted2);font-weight:400;margin-left:6px}
+.pv.main:hover .zoomhint{color:var(--txt)}
+#lb{position:fixed;inset:0;z-index:60;background:rgba(10,10,12,.94);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px}
+#lb.hide{display:none}
+#lb img{max-width:94vw;max-height:86vh;object-fit:contain;border-radius:8px;
+  box-shadow:0 12px 50px rgba(0,0,0,.7)}
+#lb .lbclose{color:#fff;font-size:12px;opacity:.7}
+.cropbox.hide{display:none}
+.cropbox .ct{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cropbox .ct .info{font-weight:400;color:var(--muted);font-size:11px}
+.cropcv{width:100%;max-width:300px;border-radius:8px;background:var(--thumb-bg);display:block;touch-action:none;cursor:crosshair;margin-bottom:9px}
+.cropwrap{position:relative}
+.croplock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;background:var(--overlay);color:var(--overlay-tx);font-size:12px;font-weight:700;text-align:center;
+  border-radius:8px;pointer-events:none}
+.croplock span{font-weight:400;font-size:11px;color:var(--muted2)}
+.cropbox.locked .croplock{display:flex}
+.cropbox:not(.locked) .croplock{display:none}
+.cropbox.locked .cropcv{opacity:.5;cursor:not-allowed}
+.cropbox.locked #cropRatios,.cropbox.locked .croprow .sbtn{opacity:.45;pointer-events:none}
+.sbtn.cropon{margin-left:auto;font-weight:700}
+.cropmodes{display:flex;gap:5px;margin:-2px 0 8px}
+.cropmodes .sbtn{flex:1 1 0;text-align:center}
+.cropmodes .sbtn.on{background:var(--sel-bg);border-color:var(--sel-bg);color:var(--sel-fg);font-weight:700;box-shadow:0 0 0 2px var(--sel-ring)}
+.sbtn.cropon.on{background:var(--sel-bg);border-color:var(--sel-bg);color:var(--sel-fg);box-shadow:0 0 0 2px var(--sel-ring)}
+.cropcv{user-select:none;-webkit-user-drag:none}
+.croprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.croprow .lb{font-size:11px;color:var(--muted);margin-right:2px}
+.sbtn{padding:4px 10px;border:1px solid var(--line2);border-radius:999px;font-size:11px;cursor:pointer;background:var(--card);color:var(--txt);font-family:inherit}
+.sbtn.on{background:var(--sel-bg);border-color:var(--sel-bg);color:var(--sel-fg);font-weight:700;box-shadow:0 0 0 2px var(--sel-ring)}
+.sbtn:hover{border-color:var(--sel-ring)}
+.cropres{margin-top:8px;font-size:11px;color:var(--muted);line-height:1.55}
+.cropres b{color:var(--txt2)}
+.cropres .warn{color:#c2410c;font-weight:700}
+.cropres .ok{color:#12a150;font-weight:700}
+.scalebox{margin-top:11px;border-top:1px solid var(--line);padding-top:11px}
+.scalebox .st{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:7px}
+.scaleq{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.55}
+.scaleq b{color:var(--txt2)}
+.scaleq .warn{color:#c2410c;font-weight:700}
+.scaleq .ok{color:#12a150;font-weight:700}
+.pxbtns{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.pxbtns .sbtn{flex:1 1 auto;text-align:center}
+.pxpanel{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.pxpanel[hidden]{display:none}
+.pxinfo{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:7px}
+.pxinfo b{color:var(--txt2)}
+.pxwrap{max-height:300px;overflow:auto;background:var(--thumb-bg);border:1px solid var(--line);border-radius:6px}
+.pxwrap canvas{display:block}
+.pxcmp{display:flex;gap:9px;margin-top:9px;flex-wrap:wrap}
+.pxcmp figure{margin:0;flex:0 0 auto}
+.pxcmp canvas{border:1px solid var(--line);border-radius:4px;display:block;background:var(--thumb-bg)}
+.pxcmp figcaption{font-size:10px;color:var(--muted);margin-top:4px;text-align:center}
+.chip.unsafe{border-color:#f0b49a}
+.chip.unsafe b{color:#c2410c}
+.chip .wmark{font-size:10px;color:#c2410c;font-weight:700;margin-left:3px}
+.famh{display:flex;align-items:baseline;gap:8px;margin:16px 0 8px;font-size:12px;color:var(--txt2);font-weight:700}
+.famh:first-child{margin-top:0}
+.famh span{font-weight:400;color:var(--muted2);font-size:11px}
+.famh i{font-style:normal;background:var(--sel-bg);color:var(--sel-fg);font-size:10px;padding:2px 8px;border-radius:999px}
+.tpl{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;min-width:0}
+.tpl .t{min-width:0}
+.t{border:2px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;background:var(--card);position:relative;min-width:0}
+.t canvas{width:100%;display:block;background:var(--thumb-bg)}
+.t.on{border-color:var(--sel-ring);box-shadow:0 0 0 2px var(--sel-ring),0 4px 14px var(--shadow)}
+.t .n{padding:4px 6px;font-size:11px;color:var(--txt2);display:flex;justify-content:space-between;align-items:center;gap:4px;line-height:1.35}
+.t.on .n{color:var(--txt);font-weight:700}
+.t .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec{background:var(--sel-bg);color:var(--sel-fg);font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;flex:0 0 auto}
+.stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.stage>*{min-width:0}
+.pv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.pv h4{margin:0 0 9px;font-size:11px;color:var(--muted);font-weight:700}
+.pv canvas{display:block;border-radius:6px}
+.pv.main canvas{width:300px;max-width:100%;box-shadow:0 6px 20px var(--shadow2)}
+.pv.mini canvas{width:132px;max-width:100%;box-shadow:0 3px 10px var(--shadow2)}
+.pv.mini{text-align:center;min-width:0}
+.pv.mini .cap{font-size:11px;color:var(--muted);margin-top:6px}
+.btns{display:flex;flex-direction:column;gap:9px;min-width:200px}
+button.big{background:var(--sel-bg);color:var(--sel-fg);border:none;border-radius:9px;padding:13px 15px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+button.big:hover{background:var(--sel-ring);filter:brightness(.92)}
+button.ghost{background:var(--card);color:var(--txt2);border:1px solid var(--line2);border-radius:9px;padding:11px 15px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left}
+button.ghost:hover{border-color:var(--sel-ring)}
+button.ghost b{float:right;color:var(--txt)}
+.tips{font-size:12px;color:var(--muted);line-height:1.9}
+.ok{color:#12a150}.bad{color:#e5484d}
+.note{font-size:12px;color:var(--muted);background:var(--soft-bg);border-radius:9px;padding:10px 12px;line-height:1.8;margin-bottom:11px}
+.note b{color:var(--txt2)}
+/* ---------- 选中态强化：颜色之外再加形状标记 ----------
+   原因：暗色模式下「深底选中块」容易糊进深色卡片，单看颜色分不出选中没选中。
+   方案：① 选中块用卡片的最高对比色（暗色下自动反色成亮底深字）
+         ② 再加一个 ✓ 标记 —— 黑白打印、色弱、暗色下都还能分辨
+         ③ 再加一圈 2px 同色描边（ring），边界永远清晰 */
+.chip.on::before,.sbtn.on::before,.colchip.on::before{content:'✓';font-size:10px;margin-right:3px;font-weight:700}
+.chip.on,.sbtn.on{position:relative}
+.chip.on:hover,.sbtn.on:hover,.colchip.on:hover{border-color:var(--sel-bg)}
+.t.on::after{content:'✓';position:absolute;top:0;right:0;z-index:2;
+  width:20px;height:20px;line-height:20px;text-align:center;font-size:12px;font-weight:700;
+  background:var(--sel-bg);color:var(--sel-fg);border-bottom-left-radius:8px}
+
+/* ---------- v5.2：标题条置顶全宽 + 左控制列 / 右工作列 ---------- */
+.titlestrip{grid-column:1/-1;grid-row:1;margin-bottom:14px;padding:13px 16px}
+.colL{grid-column:1;grid-row:2;min-width:0}
+.colR{grid-column:2;grid-row:2;min-width:0}
+/* 桌面端：预览卡现在装着 主图/裁剪/导出，内容高，不再吸顶 */
+.sumcard{grid-column:1/-1;grid-row:3}
+
+/* ---------- v5.2：标题条（整页最上方，最该被改的东西） ---------- */
+.titlestrip .tshead{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.titlestrip .tshead h2{margin:0;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.6px}
+.titlestrip .tsnote{font-size:11.5px;color:var(--muted2)}
+.titlestrip .tsrow{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px}
+.titlestrip label{margin:0;font-size:12px;color:var(--txt2);font-weight:700}
+.titlestrip label .hint{font-weight:400;display:block}
+.titlestrip input{font-size:15px;font-weight:600;padding:11px 13px}
+.titlestrip .tssub input{font-weight:400;font-size:14px}
+.titlestrip .tsfoot{font-size:11.5px;color:var(--muted2);margin-top:9px}
+.ratiowrap{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:-2px 0 12px}
+.ratiowrap .lb{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px}
+.ratiowrap .chip{padding:5px 12px;font-size:12px}
+.ratiowrap .chip small{display:inline;margin-left:6px;opacity:.7}
+/* ---------- v5：合集选择（并入预览卡，和「输出尺寸」同一排） ---------- */
+.colchips{gap:6px}
+.colchip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 5px;
+  border:1px solid var(--line2);border-radius:999px;background:var(--card);cursor:pointer;
+  font-family:inherit;font-size:12px;color:var(--txt2);line-height:1;white-space:nowrap}
+.colchip:hover{border-color:var(--muted2)}
+.colchip .ccsvg{display:block;flex:0 0 auto}
+.colchip.on{border-color:var(--acc);background:var(--c1);color:#241c10;font-weight:700;
+  box-shadow:0 0 0 2px var(--acc),0 2px 8px var(--shadow2)}
+.colnote{font-size:11px;color:var(--muted);line-height:1.7;margin:-2px 0 10px}
+/* ---------- v5：尺寸说明（折叠置底） ---------- */
+details.sumcard{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:13px 15px;margin-bottom:6px}
+details.sumcard>summary{cursor:pointer;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.6px;list-style:none}
+details.sumcard>summary::-webkit-details-marker{display:none}
+details.sumcard>summary::before{content:'▸ ';display:inline-block}
+details.sumcard>summary b{color:var(--txt2)}
+details.sumcard .note{margin:11px 0 0}
+/* v5：版式缩略图 4 列，族内排满一行 */
+.tpl{grid-template-columns:repeat(4,minmax(0,1fr))}
+/* ---------- v6：视频取帧面板 ---------- */
+.vidhint{font-size:11.5px;color:var(--muted2);margin:-2px 0 10px;line-height:1.7}
+.vidwrap{display:flex;gap:10px;align-items:flex-start}
+.vidwrap video{flex:0 0 auto;max-width:132px;max-height:210px;border-radius:8px;background:#000;display:block}
+.vidmeta{font-size:11.5px;color:var(--muted);line-height:1.85;min-width:0;word-break:break-all}
+.vidmeta b{color:var(--txt2)}
+.vidseek{margin:10px 0 8px}
+.vidseek input[type=range]{width:100%;height:auto;padding:0;border:none;background:none}
+.vidrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.vidtime{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.vidstat{font-size:11px;color:var(--acc);font-weight:700}
+.vidstrip{display:flex;gap:6px;overflow-x:auto;padding:8px;margin-top:8px;background:var(--soft-bg);border-radius:9px}
+.vidstrip canvas{flex:0 0 auto;height:72px;border-radius:5px;cursor:pointer;border:2px solid transparent;background:#000}
+.vidstrip canvas.on{border-color:var(--sel-ring);box-shadow:0 0 0 2px var(--sel-ring)}
+#vidBody.hide{display:none}
+
+/* ============ 移动端适配 ============ */
+#mtop{display:none;position:fixed;left:0;right:0;top:0;z-index:21;align-items:center;gap:10px;padding:7px 10px;background:var(--mtop-bg,rgba(255,255,255,.96));backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+#mtop .mtp{width:44px;height:59px;border-radius:5px;overflow:hidden;box-shadow:0 2px 6px var(--shadow2);flex:0 0 auto;background:var(--thumb-bg)}
+#mtop .mtp canvas{width:100%;height:100%;display:block}
+#mtop .mti{flex:1;min-width:0}
+#mtop .mti b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mtop .mti span{display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mtop button{border:1px solid var(--line2);background:var(--card);color:var(--txt);border-radius:8px;font-family:inherit;font-size:12px;padding:7px 11px;cursor:pointer;flex:0 0 auto}
+#mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:var(--mtop-bg,rgba(255,255,255,.96));backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+#mbar button{border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;padding:12px 14px;cursor:pointer}
+#mExport{background:var(--sel-bg);color:var(--sel-fg);flex:1}
+@media(max-width:900px){
+  html,body{max-width:100%;overflow-x:hidden}
+  #mtop{display:flex}
+  #mbar{display:flex}
+  header{display:none}
+  .wrap{grid-template-columns:minmax(0,1fr);max-width:100%;padding:80px 10px 84px;gap:10px}
+  .colL,.colR{display:contents}
+  .sumcard{grid-column:1;grid-row:auto}
+  #cardText{order:1}#cardVid{order:2}#cardPv{order:3}
+  #cardTpl{order:4}#cardSize{order:5}
+  .titlestrip{margin-bottom:10px;padding:12px}
+  .titlestrip .tsrow{grid-template-columns:minmax(0,1fr);gap:9px}
+  .titlestrip input{font-size:16px;padding:10px 12px}
+  .titlestrip .tssub input{font-size:15px}
+  .pv.mini{display:none}
+  .pv.main canvas{width:min(52vw,230px)}
+  body{font-size:15px}
+  .card{padding:12px;margin-bottom:10px;border-radius:10px}
+  .card h2{font-size:11px;margin-bottom:9px}
+  label input{font-size:16px;padding:10px 12px}
+  .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:100%}
+  .t .n{padding:5px 6px;font-size:11px}
+  .pv.main{position:static;z-index:6;padding:8px;box-shadow:0 4px 18px var(--shadow2)}
+  .pv.main canvas{width:min(46vw,200px);margin:0 auto}
+  .pv.main h4{margin-bottom:6px;font-size:10px;text-align:center}
+  .pv.main label{margin-top:6px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px}
+  .pv.main label input{width:auto;margin:0}
+  .stage{gap:10px}
+  /* 手机上：裁剪画布与封面预览并排一行，比例/按钮/说明另起整行铺满 */
+  .workbench{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 8px;align-items:start}
+  .workbench .cropbox{display:contents}
+  .workbench .cropbox .ct{grid-column:1/-1;grid-row:1;font-size:11px;gap:4px;margin:0}
+  .workbench .cropwrap{grid-column:1;grid-row:2;border:1px solid var(--line);border-radius:10px;padding:6px;background:var(--drop-bg)}
+  .workbench .cropcv{width:100%;display:block}
+  .workbench .cropbox .croprow{grid-column:1/-1;gap:5px;margin:0}
+  .workbench .cropbox .cropres{grid-column:1/-1;font-size:10.5px}
+  .workbench .pv.main{grid-column:2;grid-row:2;padding:6px;width:auto}
+  .pv.main canvas{width:min(40vw,146px)!important;margin:0 auto}
+  .pv.main h4{font-size:9.5px}
+  .btns{min-width:100%;flex-direction:row;flex-wrap:wrap;gap:8px}
+  .btns button.big{flex:1 1 100%}
+  .btns button.ghost{flex:1 1 calc(50% - 4px);text-align:center;padding:11px 8px;font-size:12.5px}
+  .btns button.ghost b{float:none;display:block;margin-top:2px}
+  .tips{flex:1 1 100%;font-size:11.5px;line-height:1.75}
+}
+@media(max-width:560px){
+  .tpl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  .workbench{gap:6px}
+  .workbench .cropwrap{padding:5px}
+  .workbench .pv.main{padding:5px}
+  .pv.main canvas{width:min(38vw,136px)!important}
+  .cropbox .ct{font-size:10.5px}
+  .cropbox .ct .info{display:none}
+  .sbtn{padding:3px 7px;font-size:10.5px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>抖音封面工具</h1><span class="v">v6 视频取帧</span>
+  <span>上传视频 → 逐帧挑一帧 → 直接当封面底图 · 不截图不失真</span>
+  <a href="../douyin-cover-tool-v5/">← v5</a>
+  <button id="themeBtn" type="button" title="切换深色/浅色">🌗 主题</button>
+</header>
+<div class="wrap">
+
+  <div class="card titlestrip" id="cardText">
+    <div class="tshead">
+      <h2>① 封面标题</h2>
+      <span class="tsnote">切合集会带示例文案；你手改过，就永远以你写的为准</span>
+    </div>
+    <div class="tsrow">
+      <label class="tsmain">主标题
+        <input id="title" placeholder="例：纸杯塔能有多高（4–8 字）" autocomplete="off"></label>
+      <label class="tssub">副标题
+        <input id="sub" placeholder="例：今天实验做到第 12 轮（一句）" autocomplete="off"></label>
+    </div>
+  </div>
+
+  <div class="colL">
+
+    <div class="card vidcard" id="cardVid">
+      <h2>🎬 视频取帧（可选）</h2>
+      <div class="vidhint">不想单独截图？直接传视频进来，逐帧挑一张当封面底图 —— 抽的是原始像素，不缩放不重编码，和下面的图片裁剪完全同一套。</div>
+      <div class="drop mini" id="vidDrop">
+        <div id="vidDropTxt">点击选视频 · 或拖进来 · 支持 MP4 / WebM</div>
+        <input type="file" id="vidFile" accept="video/*" hidden>
+      </div>
+      <div id="vidBody" class="hide">
+        <div class="vidwrap">
+          <video id="vid" playsinline muted preload="metadata"></video>
+          <div class="vidmeta" id="vidMeta"></div>
+        </div>
+        <div class="vidseek"><input type="range" id="vidSeek" min="0" max="1000" value="0"></div>
+        <div class="vidrow">
+          <button class="sbtn" id="vidPrev1" type="button">◀ 上一帧</button>
+          <button class="sbtn" id="vidPlay" type="button">▶ 播放</button>
+          <button class="sbtn" id="vidNext1" type="button">下一帧 ▶</button>
+          <span class="vidtime" id="vidTime">00:00.00 / 00:00.00</span>
+        </div>
+        <div class="vidstrip" id="vidStrip"></div>
+        <div class="vidrow">
+          <button class="sbtn on" id="vidUse" type="button">⬇ 用这一帧做封面</button>
+          <button class="sbtn" id="vidSave" type="button">⬇ 导出这一帧原图</button>
+          <span class="vidstat" id="vidStat"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="cardTpl">
+      <h2>③ 版式（5 款骨架，分 2 大族；带「荐」的是该合集推荐）</h2>
+      <div id="fams"></div>
+    </div>
+
+  </div>
+
+  <div class="colR">
+
+    <div class="card" id="cardPv">
+      <h2>预览 · 主图 · 导出</h2>
+      <div class="ratiowrap">
+        <span class="lb">输出尺寸</span>
+        <div class="chips" id="ratiosMini"></div>
+      </div>
+      <div class="ratiowrap" style="margin:-2px 0 8px">
+        <span class="lb">合集</span>
+        <div class="chips colchips" id="cols"></div>
+      </div>
+      <div class="colnote" id="colNote"></div>
+      <div class="ratiowrap" style="margin:0 0 8px">
+        <span class="lb">主图</span>
+        <div class="drop mini" id="drop">
+          <div id="dropTxt">点击选图 / 选视频 · 或拖进来 · 不传则用合集示例图</div>
+          <input type="file" id="file" accept="image/*,video/*" hidden>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="workbench">
+          <div class="cropbox hide locked" id="cropBox">
+            <div class="ct">✂️ 裁剪要显示的区域
+              <span class="info" id="cropSrcInfo"></span>
+              <button class="sbtn cropon" id="cropBtn" type="button">🔒 启用裁剪</button>
+            </div>
+            <div class="cropmodes" id="cropModes">
+              <button class="sbtn" id="cropFitFull" type="button">看全图</button>
+              <button class="sbtn on" id="cropFitWide" type="button">按宽取景</button>
+            </div>
+            <div class="cropwrap">
+              <canvas class="cropcv" id="cropCv" height="220" draggable="false"></canvas>
+              <div class="croplock" id="cropLock">🔒 裁剪已锁定<br><span>点上面「启用裁剪」才能拖动选框</span></div>
+            </div>
+            <div class="croprow">
+              <span class="lb">比例</span>
+              <span id="cropRatios"></span>
+            </div>
+            <div class="croprow">
+              <span class="lb">操作</span>
+              <button class="sbtn" id="cropReset">重置裁剪</button>
+              <button class="sbtn" id="cropFull">用整张图</button>
+            </div>
+            <div class="cropres" id="cropRes"></div>
+          </div>
+          <div class="pv main" id="pvMain">
+            <h4 id="pvTitle">封面 1080×1440 <span class="zoomhint" id="zoomHint">🔍 点击放大</span></h4>
+            <canvas id="pv" width="1080" height="1440"></canvas>
+            <label style="margin:8px 0 0;font-size:12px"><input type="checkbox" id="guides" style="width:auto;margin-right:5px">显示安全区参考线</label>
+          </div>
+        </div>
+        <div class="pv mini">
+          <h4>信息流缩略图实际大小</h4>
+          <canvas id="mini" width="132" height="176"></canvas>
+          <div class="cap">132px 宽 · 还认得出吗？</div>
+        </div>
+        <div class="btns">
+          <button class="big" id="expNow">导出当前尺寸 PNG</button>
+          <button class="ghost" id="expJpg">导出当前尺寸 JPG<b>小体积</b></button>
+          <button class="ghost" id="expAll">导出 5 款拼图<b>当前尺寸</b></button>
+          <button class="ghost" id="expThree">导出三尺寸各一张<b>3:4 / 9:16 / 16:9</b></button>
+          <div class="scalebox">
+            <div class="st">导出清晰度</div>
+            <div class="chips" id="scales"></div>
+            <div class="scaleq" id="scaleQ"></div>
+            <div class="pxbtns">
+              <button class="sbtn" id="pxInspect">🔍 像素检视</button>
+              <button class="sbtn" id="pxSafe">⚡ 选最大无损倍率</button>
+            </div>
+            <div class="pxpanel" id="pxPanel" hidden>
+              <div class="pxinfo" id="pxInfo"></div>
+              <div class="pxwrap"><canvas id="pxCv"></canvas></div>
+              <div class="pxcmp">
+                <figure><canvas id="pxA" width="300" height="300"></canvas><figcaption id="pxALab">1× 导出 · 局部 1:1</figcaption></figure>
+                <figure><canvas id="pxB" width="300" height="300"></canvas><figcaption id="pxBLab">当前倍率 · 同区域</figcaption></figure>
+              </div>
+            </div>
+          </div>
+          <div class="tips" id="check"></div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <details class="sumcard" id="cardSize">
+    <summary><b>④ 尺寸说明</b> · 抖音封面有两版竖版，选对才不浪费画面</summary>
+    <div class="note" id="ratioNote" style="margin:11px 0 0"></div>
+  </details>
+</div>
+
+<script>
+__ENGINE__/* ================= 状态与交互 ================= */
+const state={col:'play',layout:'B5',ratio:'3x4',title:'',sub:'',img:null,
+  autoText:true,               /* true=标题还是合集自带示例文案，切合集时自动跟着换；用户一旦手改就置 false */
+  cropOn:false,                /* 裁剪开关：默认锁住，防止手滑拖坏图；要裁先点「启用裁剪」 */
+  cropFit:'wide',              /* 取景模式：wide=按宽度取景（竖图可上下拖动），full=看全图 */
+  cropPan:0,                   /* 按宽取景时的纵向滚动偏移（画布像素） */
+  cropLock:'ratio',             /* ratio=跟随当前尺寸 / free=自由 / 1:1 / 3:4 / 9:16 / 16:9 */
+  objUrl:null,                  /* 当前上传图的 ObjectURL，换图时释放 */
+  exportScale:1,                /* 导出倍率：1=标准 2=超清 3=超高 */
+  srcInfo:null,                 /* 上传原图信息 {w,h,name,size} */
+  cropDrag:null};               /* 裁剪拖拽会话 */
+let CURSTAT=null;               /* 本次渲染统计（放大倍率等） */
+const imgs={};
+
+function D(){
+  const pc=PRESETS[state.col]||{};
+  const p=pc[state.layout]||pc;
+  return {col:state.col,layout:state.layout,
+    title:state.title||p.title||'', sub:state.sub||p.sub||''};
+}
+function G(){ return geo(state.ratio); }
+
+function drawDesign(ctx,id,guides,Gg,stat){
+  const img=state.img||imgs[state.col]||null;
+  const c=COLLECTIONS[state.col];
+  const prevStat=CURSTAT;
+  CURSTAT=stat||null;
+  try{ RENDER[id](ctx,D(),img,c,Gg); }
+  catch(e){ console.error('render',id,e);
+    ctx.fillStyle='#3a1f1f';ctx.fillRect(0,0,Gg.W,Gg.H);
+    ctx.fillStyle='#ffb4b4';ctx.font=F(700,44);ctx.textAlign='center';
+    ctx.fillText('渲染出错：'+id,Gg.W/2,Gg.H/2);ctx.textAlign='left'; }
+  finally{ CURSTAT=prevStat; }
+  if(guides) drawGuides(ctx,Gg);
+}
+
+/* 缩略图：当前尺寸 contain 适配 */
+function drawThumb(ctx,id,Gg,tw,th){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,tw,th);
+  ctx.fillStyle='#eee'; ctx.fillRect(0,0,tw,th);
+  const s=Math.min(tw/Gg.W, th/Gg.H);
+  const w=Gg.W*s, h=Gg.H*s;
+  ctx.setTransform(s,0,0,s,(tw-w)/2,(th-h)/2);
+  drawDesign(ctx,id,false,Gg);
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+function refresh(){
+  const Gg=G();
+  const c=document.getElementById('pv');
+  if(c.width!==Gg.W||c.height!==Gg.H){ c.width=Gg.W; c.height=Gg.H; }
+  const x=c.getContext('2d');
+  x.setTransform(1,0,0,1,0,0);
+  x.clearRect(0,0,Gg.W,Gg.H);
+  drawDesign(x,state.layout,document.getElementById('guides').checked,Gg);
+  document.getElementById('pvTitle').textContent='封面 '+Gg.W+'×'+Gg.H+'（'+RATIOS[state.ratio].label+'）';
+  /* 信息流缩略图：3:4 中心裁切 */
+  const m=document.getElementById('mini'),mx=m.getContext('2d');
+  mx.clearRect(0,0,132,176);
+  const tr=3/4, sr=Gg.W/Gg.H;
+  let sw,mh;
+  if(sr>tr){ sw=Gg.H*tr; mh=Gg.H; } else { sw=Gg.W; mh=Gg.W/tr; }
+  mx.drawImage(c,(Gg.W-sw)/2,(Gg.H-mh)/2,sw,mh,0,0,132,176);
+  /* 预览 = 所见即所得：预览画布不再叠加任何徽标/提示文字，和导出文件完全一致 */
+  check();
+}
+function check(){
+  const d=D(),Gg=G(),o=[];
+  const n=(d.title||'').replace(/\s/g,'').length;
+  o.push(n===0?['bad','还没填主标题']:(n<=8?['ok','主标题 '+n+' 字 ✓']:['bad','主标题 '+n+' 字，建议 ≤8 字（缩略图看不清）']));
+  o.push([(d.sub||'').length<=20?'ok':'bad','副标题 '+(d.sub||'').length+' 字，建议 ≤20 字']);
+  const est=(d.title.length*(d.title.length>8?130:170)*(d.title.length>6?2:1))/(Gg.W*Gg.H);
+  o.push([est<0.40?'ok':'bad','文字占比约 '+Math.round(est*100)+'%（应 <40%）']);
+  o.push(['ok','安全区已内缩：上下 '+Gg.safe.top+'/'+(Gg.H-Gg.safe.bottom)+'px，左右 '+Gg.safe.left+'px']);
+  const banned=['爆款','热播','强推','第一','全网最低','国家级','绝对','天花板','yyds'];
+  const hit=banned.filter(w=>((d.title+d.sub).includes(w)));
+  o.push(hit.length?['bad','命中敏感词：'+hit.join('、')]:['ok','无违禁/绝对化用词 ✓']);
+  o.push(['ok','AI 素材：发布页勾「含有 AI 生成内容」+ 官方 AI 标识工具']);
+  document.getElementById('check').innerHTML=o.map(v=>`<div class="${v[0]}">${v[0]==='ok'?'✓':'⚠'} ${v[1]}</div>`).join('');
+}
+
+function buildRatios(){
+  const hosts=[document.getElementById('ratiosMini'),document.getElementById('ratios')].filter(Boolean);
+  hosts.forEach(box=>box.innerHTML='');
+  Object.keys(RATIOS).forEach(k=>{
+    const r=RATIOS[k];
+    const b=document.createElement('div');
+    b.className='chip'+(state.ratio===k?' on':'');
+    b.innerHTML='<b>'+r.label+'</b><small>'+r.w+'×'+r.h+'</small>';
+    b.onclick=()=>{
+      state.ratio=k;buildRatios();buildTpls();buildScales();refresh();
+      /* 「跟随尺寸」时，选框比例要跟着当前尺寸走 */
+      if(state.cropLock==='ratio'&&state.img){
+        const r=RATIOS[k], asp=r.w/r.h;
+        const c=getCrop();
+        const cxp=c.x+c.w/2, cyp=c.y+c.h/2;
+        let nw=c.w, nh=c.h;
+        if(nw/nh>asp) nh=nw/asp; else nw=nh*asp;
+        setCrop({x:cxp-nw/2,y:cyp-nh/2,w:nw,h:nh});
+      }
+      drawCropUI(); updateCropRes();
+    };
+    hosts.forEach(h=>h.appendChild(b));
+  });
+  const rn=document.getElementById('ratioNote');
+  if(rn) rn.innerHTML=
+    '<b>怎么选：</b>抖音竖版封面有 <b>3:4（1080×1440）</b> 和 <b>9:16（1080×1920）</b> 两种。'+
+    '3:4 在信息流/主页里展示面积最大，知识口播类首选；9:16 占满全屏，沉浸感强，上下要留更多白。'+
+    '横版 16:9（1920×1080）给横屏原片。'+
+    '<br><b>本工具对三种尺寸分别独立排版</b>，不是拉伸、也不是模糊补边——切到哪个尺寸，文字和图片都按那个尺寸重新算位置。';
+}
+function buildCols(){
+  const box=document.getElementById('cols');box.innerHTML='';
+  Object.keys(COLLECTIONS).forEach(k=>{
+    const c=COLLECTIONS[k];
+    const b=document.createElement('button');
+    b.className='colchip'+(state.col===k?' on':'');
+    b.style.setProperty('--c1',c.g1); b.style.setProperty('--c2',c.g2); b.style.setProperty('--acc',c.accent);
+    b.title=c.name+'\n'+c.desc+'\n推荐版式：'+c.rec.join(' / ');
+    b.innerHTML=colBadgeSVG(c,17)+'<span>'+c.short+'</span>';
+    b.onclick=()=>{
+      state.col=k; state.layout=c.rec[0];
+      /* 标题还是"合集自带示例文案"时，跟随合集自动换；用户自己写过的一律不动 */
+      if(state.autoText){
+        const pc=PRESETS[k]||{};
+        const pd=pc[state.layout]||pc;
+        state.title=pd.title||''; state.sub=pd.sub||'';
+        const ti=document.getElementById('title'),si=document.getElementById('sub');
+        if(ti) ti.value=state.title; if(si) si.value=state.sub;
+      }
+      buildCols(); buildTpls(); refresh();
+    };
+    box.appendChild(b);
+  });
+  const cur=COLLECTIONS[state.col];
+  const note=document.getElementById('colNote');
+  if(note) note.innerHTML='<b style="color:'+cur.accent+'">'+cur.short+'</b> · '+
+    '主色 <b style="color:'+cur.accent+'">'+cur.accent+'</b> · 左上角为该合集专属几何记号，'+
+    '四个合集形状 + 主色双区分。<br>'+
+    '点合集会连示例文案一起换；你自己写过标题后，系统就不再替你改。';
+}
+function buildTpls(){
+  const host=document.getElementById('fams');host.innerHTML='';
+  const rec=COLLECTIONS[state.col].rec;
+  const Gg=G();
+  FAMILIES.forEach(fam=>{
+    const h=document.createElement('div');
+    h.className='famh';
+    h.innerHTML='<i>'+fam.id+'</i>'+fam.name+'<span>'+fam.desc+'</span>';
+    host.appendChild(h);
+    const grid=document.createElement('div');
+    grid.className='tpl';
+    fam.ids.forEach(id=>{
+      const l=LAYOUTS.find(x=>x.id===id); if(!l) return;
+      const d=document.createElement('div');
+      d.className='t'+(state.layout===l.id?' on':'');
+      const c=document.createElement('canvas');c.width=240;c.height=320;
+      drawThumb(c.getContext('2d'),l.id,Gg,240,320);
+      const n=document.createElement('div');n.className='n';
+      n.innerHTML='<span>'+l.id+' '+l.name+'</span>';
+      if(rec.includes(l.id)){const r=document.createElement('span');r.className='rec';r.textContent='荐';n.appendChild(r);}
+      n.title=l.desc;
+      d.appendChild(c);d.appendChild(n);
+      d.onclick=()=>{state.layout=l.id;buildTpls();refresh();};
+      grid.appendChild(d);
+    });
+    host.appendChild(grid);
+  });
+}
+/* ================= 上传 · 裁剪 · 高清导出 ================= */
+
+/* 比例锁：'ratio'=跟随当前尺寸；free=自由；'1:1'/'3:4'/'9:16'/'16:9'=固定 */
+const CROP_LOCKS=[{k:'ratio',t:'跟随尺寸'},{k:'free',t:'自由'},{k:'1:1',t:'1:1'},
+                  {k:'3:4',t:'3:4'},{k:'9:16',t:'9:16'},{k:'16:9',t:'16:9'}];
+
+function lockAspect(){
+  const k=state.cropLock;
+  if(k==='ratio'){ const r=RATIOS[state.ratio]; return r.w/r.h; }
+  if(k==='free') return null;
+  const p=k.split(':').map(Number); return p[0]/p[1];
+}
+
+/* 当前裁剪区（归一化）。没有上传图则返回整张 */
+function getCrop(){
+  const im=state.img;
+  if(!im||!im.width) return {x:0,y:0,w:1,h:1};
+  return im.__crop||{x:0,y:0,w:1,h:1};
+}
+function setCrop(c){
+  if(!state.img) return;
+  /* 夹紧在 0~1，且不小于最小比例 */
+  const MIN=0.06;
+  let w=Math.max(MIN,Math.min(1,c.w)), h=Math.max(MIN,Math.min(1,c.h));
+  let x=Math.max(0,Math.min(1-w,c.x)), y=Math.max(0,Math.min(1-h,c.y));
+  state.img.__crop={x:x,y:y,w:w,h:h};
+}
+
+/* 裁剪预览画布：显示原图 + 可拖拽的选框 */
+/* 宽取景：选区最多一屏高，并始终完整可见；上下移动选区 = 在长图里找位置 */
+/* v6：竖版源 + 比例锁时，把裁剪视口加高，让锁定的选框能一次看全
+   （否则选框被视口压扁 → 源像素被裁掉 → 放大系数虚高，看着像失真） */
+function cropTallH(W){
+  if(!state.img) return 0;
+  const asp=lockAspect();
+  if(!asp) return 0;
+  const iw=state.img.width, ih=state.img.height;
+  if(!iw||!ih) return 0;
+  const sa=iw/ih;                      /* 源的宽/高 */
+  if(sa>=0.85) return 0;               /* 不算特别高，不用加 */
+  const ch=sa/asp;                     /* 选框高（归一化） */
+  const dh=Math.round(W*ih/iw);
+  return Math.min(500, Math.ceil(ch*dh/0.88*1.03));
+}
+function cropVH(){
+  const cv=document.getElementById('cropCv');
+  const W=cv.clientWidth||300;
+  const mob=window.innerWidth<=900;
+  let H=mob?Math.max(220,Math.min(430,Math.round(window.innerHeight*0.46)))
+           :Math.max(120,Math.min(220,Math.round(W*0.72)));
+  if(!mob){ const th=cropTallH(W); if(th>H) H=th; }
+  return {W:W,H:H,dh:state.img?Math.round(W*state.img.height/state.img.width):H};
+}
+function clampCropWide(){
+  if(!state.img) return;
+  const V=cropVH();
+  const c=getCrop();
+  let w=Math.max(0.06,Math.min(1,c.w));
+  let h=Math.max(0.06,Math.min(c.h, V.H*0.88/Math.max(1,V.dh)));
+  /* v6：锁了比例时保持宽高比 —— 以前只夹高度，选框被压扁，
+     drawCoverF 再把它硬拉成输出尺寸，放大系数虚高 */
+  const asp=lockAspect();
+  if(asp){ if(w/h>asp) w=h*asp; else h=w/asp; }
+  let y=Math.max(0,Math.min(1-h,c.y));
+  let x=Math.max(0,Math.min(1-w,c.x));
+  setCrop({x:x,y:y,w:w,h:h});
+}
+function drawCropUI(){
+  const box=document.getElementById('cropBox');
+  const im=state.img;
+  if(!im||!im.width){ box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  const cv=document.getElementById('cropCv');
+  const W=cv.clientWidth||300;
+  /* 画布高度：桌面按宽度比例；手机竖屏时给足高度，方便框选竖图 */
+  const mob=window.innerWidth<=900;
+  let H=mob?Math.max(220,Math.min(430,Math.round(window.innerHeight*0.46)))
+           :Math.max(120,Math.min(220,Math.round(W*0.72)));
+  if(!mob){ const th=cropTallH(W); if(th>H) H=th; }
+  cv.width=W; cv.height=H;
+  const x=cv.getContext('2d');
+  const iw=im.width, ih=im.height;
+  let dw,dh,ox,oy;
+  const wideFit = state.cropFit==='wide' && (ih/iw) > (H/W)*1.15;
+  if(wideFit){
+    /* 按宽度取景：竖图按真实宽度铺满，选区居中显示，可在长图里上下移动 */
+    clampCropWide();
+    dw=W; dh=Math.round(W*ih/iw); ox=0;
+    const maxPan=Math.max(0,dh-H);
+    const c0=getCrop();
+    const center=c0.y*dh+c0.h*dh/2;
+    state.cropPan=Math.max(0,Math.min(maxPan, center-H/2));
+    oy=-state.cropPan;
+  }else{
+    /* 看全图：完整显示原图，四周留底色 */
+    const s=Math.min(W/iw,H/ih);
+    dw=iw*s; dh=ih*s; ox=(W-dw)/2; oy=(H-dh)/2;
+    state.cropPan=0;
+  }
+  x.fillStyle='#1a1a1a'; x.fillRect(0,0,W,H);
+  x.drawImage(im,ox,oy,dw,dh);
+  /* 选框（归一化 → 画布像素） */
+  const c=getCrop();
+  const cx=ox+c.x*dw, cy=oy+c.y*dh, cw=c.w*dw, ch=c.h*dh;
+  /* 框外压暗 */
+  x.fillStyle='rgba(0,0,0,.55)';
+  x.fillRect(0,0,W,Math.max(0,cy)); x.fillRect(0,cy+ch,W,Math.max(0,H-(cy+ch)));
+  x.fillRect(0,cy,Math.max(0,cx),ch); x.fillRect(cx+cw,cy,Math.max(0,W-(cx+cw)),ch);
+  x.strokeStyle='#fff'; x.lineWidth=2; x.strokeRect(cx,cy,cw,ch);
+  /* 画布外的选框部分补一条视口边界线，提示还能往下拖 */
+  if(cy+ch>H){ x.strokeStyle='rgba(255,255,255,.6)'; x.setLineDash([4,4]); x.beginPath(); x.moveTo(cx,H); x.lineTo(cx+cw,H); x.stroke(); x.setLineDash([]); }
+  /* 三分线 */
+  x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=1;
+  for(let i=1;i<3;i++){
+    x.beginPath(); x.moveTo(cx+cw*i/3,cy); x.lineTo(cx+cw*i/3,cy+ch); x.stroke();
+    x.beginPath(); x.moveTo(cx,cy+ch*i/3); x.lineTo(cx+cw,cy+ch*i/3); x.stroke();
+  }
+  /* 角把手 */
+  x.fillStyle='#fff';
+  [[cx,cy],[cx+cw,cy],[cx,cy+ch],[cx+cw,cy+ch]].forEach(p=>{
+    if(p[0]<-4||p[0]>W+4||p[1]<-4||p[1]>H+4) return;
+    x.fillRect(p[0]-4,p[1]-4,8,8);
+  });
+  if(wideFit && dh>H+4){
+    const barW=6, bx=W-barW-3;
+    const trackH=H-8;
+    const th=Math.max(24,Math.round(trackH*(H/dh)));
+    const tp=Math.round((trackH-th)*(state.cropPan/Math.max(1,dh-H)));
+    x.fillStyle='rgba(255,255,255,.22)';
+    x.fillRect(bx,4,barW,trackH);
+    x.fillStyle='rgba(255,255,255,.85)';
+    x.fillRect(bx,4+tp,barW,th);
+  }
+  cv._map={ox:ox,oy:oy,dw:dw,dh:dh,W:W,H:H,wide:wideFit,barW:wideFit?9:0};
+  /* 文字反馈 */
+  const info=document.getElementById('cropSrcInfo');
+  if(info) info.textContent='原图 '+iw+'×'+ih;
+  updateCropRes();
+}
+
+/* ---- 清晰度度量（唯一真源）----
+   引擎里 drawCoverF 用 cover 贴合：源选框 (sw,sh) 贴进容器 (w,h)
+   缩放系数 s = max(w/sw, h/sh)，s>1 即「被放大」= 源像素不够 = 会软。
+   CURSTAT.up 记录的就是这个 s（1× 画布下的值）。
+   导出倍率 sc 时容器整体放大 sc 倍 → 放大系数 = up * sc。 */
+var _measCv=null;
+function measureBlur(){
+  /* 上传图优先；没上传时用内置示例图，照样能算出放大系数 */
+  const im=state.img||imgs[state.col]||null;
+  if(!im||!im.width) return null;
+  const Gg=G();
+  if(!_measCv) _measCv=document.createElement('canvas');
+  if(_measCv.width!==Gg.W||_measCv.height!==Gg.H){ _measCv.width=Gg.W; _measCv.height=Gg.H; }
+  const stat={up:0};
+  drawDesign(_measCv.getContext('2d'),state.layout,false,Gg,stat);
+  const c=state.img?getCrop():{x:0,y:0,w:1,h:1};
+  return {
+    up:stat.up||1,
+    sw:Math.round(c.w*im.width),
+    sh:Math.round(c.h*im.height),
+    iw:im.width, ih:im.height,
+    W:Gg.W, H:Gg.H
+  };
+}
+/* 放大倍率的观感分级（措辞统一，都带「放大系数 X」，方便两处对照）：
+   ≤1.00 无损；≤1.10 肉眼无差；≤1.50 可接受；>1.50 明显发软 */
+function blurNote(blur){
+  if(blur>1.5) return '<span class="warn">⚠ 放大系数 '+blur.toFixed(2)+' —— 源像素明显不足，边缘会发软</span>';
+  if(blur>1.1) return '<span style="color:#b45309;font-weight:700">● 放大系数 '+blur.toFixed(2)+' —— 尚可接受，细看略糊</span>';
+  if(blur>1.0) return '<span class="ok">✓ 清晰</span> —— 放大系数 '+blur.toFixed(2)+'，肉眼无差';
+  return '<span class="ok">✓ 无损</span> —— 源像素充足（放大系数 '+blur.toFixed(2)+'，还有余量）';
+}
+
+/* 裁剪区提示：选框源像素 + 当前倍率下的清晰度 */
+function updateCropRes(){
+  const el=document.getElementById('cropRes');
+  if(!el) return;
+  const m=measureBlur();
+  if(!m){ el.innerHTML=''; updateScaleQ(null); return; }
+  const sc=state.exportScale;
+  const blur=m.up*sc;
+  el.innerHTML='选框源像素 <b>'+m.sw+'×'+m.sh+'</b>（原图 '+m.iw+'×'+m.ih+'）<br>'+
+    '当前版式（'+state.layout+' · '+state.ratio+'）下：'+blurNote(blur);
+  updateScaleQ(m.up);
+}
+
+/* ---------- v5.3 清晰度可视化 ---------- */
+/* 当前倍率的清晰度档案：放大系数 / 最大无损倍率 / 建议原图像素 */
+function blurProfile(){
+  const sc=state.exportScale;
+  const needW0=Math.round(G().W*sc), needH0=Math.round(G().H*sc);
+  const m=measureBlur();
+  if(!m) return {up:1,sc:sc,blur:1,sw:0,sh:0,iw:0,ih:0,
+    needW:needW0,needH:needH0,safe:3,ready:false};
+  const blur=m.up*sc;
+  const needW=Math.round(G().W*sc), needH=Math.round(G().H*sc);
+  /* 想要不糊，选框源像素至少要等于输出像素 */
+  const gapW=Math.max(0,needW-m.sw), gapH=Math.max(0,needH-m.sh);
+  return {
+    up:m.up, sc:sc, blur:blur,
+    sw:m.sw, sh:m.sh, iw:m.iw, ih:m.ih,
+    needW:needW, needH:needH,
+    safe:Math.max(1,Math.floor((1/m.up)+1e-6)),   /* 最大无损倍率（只取 1/2/3） */
+    needMoreW:gapW, needMoreH:gapH,
+    ready:true
+  };
+}
+
+
+/* 1:1 像素检视 + 同区域对比 */
+function pxRender(){
+  const p=blurProfile();
+  const sc=state.exportScale;
+  const Gg=G();
+  const info=document.getElementById('pxInfo');
+  /* ① 当前倍率整张 1:1 */
+  const cv=document.getElementById('pxCv');
+  const Gs=geo(state.ratio,sc);
+  cv.width=Gs.W; cv.height=Gs.H;
+  cv.style.width=Gs.W+'px';
+  const x=cv.getContext('2d');
+  x.setTransform(1,0,0,1,0,0);
+  x.clearRect(0,0,cv.width,cv.height);
+  drawDesign(x,state.layout,false,Gs);
+  /* ② 局部对比：1× 与当前倍率取同一块画面区域 */
+  const A=document.getElementById('pxA'), B=document.getElementById('pxB');
+  const S=300;
+  const rx=Math.round(Gg.W*0.18), ry=Math.round(Gg.H*0.30);
+  const rw=Math.min(S,Math.round(Gg.W*0.9)-rx), rh=Math.min(S,Math.round(Gg.H*0.9)-ry);
+  const one=document.createElement('canvas'); one.width=Gg.W; one.height=Gg.H;
+  const ox=one.getContext('2d');
+  ox.setTransform(1,0,0,1,0,0); ox.clearRect(0,0,Gg.W,Gg.H);
+  drawDesign(ox,state.layout,false,Gg);
+  const ax=A.getContext('2d');
+  ax.imageSmoothingEnabled=false;
+  ax.clearRect(0,0,A.width,A.height);
+  ax.drawImage(one,rx,ry,rw,rh,0,0,A.width,A.height);
+  const bx=B.getContext('2d');
+  bx.imageSmoothingEnabled=true;
+  if('imageSmoothingQuality' in bx) bx.imageSmoothingQuality='high';
+  bx.clearRect(0,0,B.width,B.height);
+  bx.drawImage(cv,rx*sc,ry*sc,rw*sc,rh*sc,0,0,B.width,B.height);
+  document.getElementById('pxALab').textContent='1× 标准导出 · 局部 1:1';
+  document.getElementById('pxBLab').textContent=sc+'× 导出 · 同一区域';
+  if(info){
+    const blur=p.blur;
+    const ready=p.ready?'':'<br><span class="warn">图片还在加载，放大系数稍后自动更新</span>';
+    info.innerHTML='当前导出 <b>'+sc+'×</b> · 输出 <b>'+p.needW+'×'+p.needH+'</b> px（1:1 显示，可滚动看真实像素）<br>'+
+      '放大系数 <b>'+blur.toFixed(2)+'</b> '+(blur>1.5?'<span class="warn">→ 明显发软</span>':blur>1.1?'<span style="color:#b45309;font-weight:700">→ 略糊但可用</span>':'<span class="ok">✓ 清晰</span>')+
+      (p.ready?('<br>左＝1× 标准导出的局部，右＝当前 '+sc+'× 导出的同一区域：右图每个像素更松软，说明这只是「变大」不是「变清楚」。'):'')+ready;
+  }
+}
+
+/* 导出倍率提示 */
+function updateScaleQ(up){
+  const el=document.getElementById('scaleQ');
+  if(!el) return;
+  const Gg=G(), sc=state.exportScale;
+  const needW=Math.round(Gg.W*sc), needH=Math.round(Gg.H*sc);
+  let q='导出 <b>'+needW+'×'+needH+'</b> px';
+  const p=blurProfile();
+  const im=state.img||imgs[state.col];
+  if(p.ready&&im&&im.width){
+    const sw=p.sw, sh=p.sh;
+    const blur=p.blur;
+    q+='<br>'+(state.img?'原图':'示例图')+' '+im.width+'×'+im.height+' · 选框 '+sw+'×'+sh;
+    q+='<br>图片区域放大系数 <b>'+blur.toFixed(2)+'</b> ';
+    q+= blur>1.5  ? '<span class="warn">→ 明显发软，建议换更大原图</span>'
+       : blur>1.1 ? '<span style="color:#b45309;font-weight:700">→ 略糊但可用</span>'
+                  : '<span class="ok">✓ 清晰</span>';
+    /* 建议原图最低像素阈值 + 最大无损倍率 */
+    const safe=p.safe;
+    q+='<br>最大无损倍率：<b>'+safe+'×</b>';
+    if(sc>safe) q+='（当前 '+sc+'× 会放大 '+blur.toFixed(2)+' 倍）';
+    if(sw<needW||sh<needH){
+      q+='<br><span class="warn">要 '+sc+'× 不糊，裁剪选框至少需 '+needW+'×'+needH+' 源像素</span>';
+      q+='<br>当前选框 '+sw+'×'+sh+'，还差 '+(needW-sw)+'×'+(needH-sh)+' px → 换更大原图，或点「选最大无损倍率」';
+    }else{
+      q+='<br><span class="ok">✓ 源像素已达 '+sc+'× 门槛，够清晰</span>';
+    }
+  }else{
+    q+='<br>'+(im&&im.width?'图片加载中…':'未上传图片时使用内置示例图');
+    q+='<br>上传原图后这里会给出「放大系数」和「不糊所需最低像素」';
+  }
+  el.innerHTML=q;
+}
+
+/* 裁剪交互：拖拽选框 / 角把手 */
+function cropPointer(ev){
+  const cv=document.getElementById('cropCv');
+  const m=cv._map; if(!m) return null;
+  const r=cv.getBoundingClientRect();
+  const px=(ev.clientX-r.left)*(cv.width/r.width);
+  const py=(ev.clientY-r.top)*(cv.height/r.height);
+  return {px:px,py:py,clientY:ev.clientY,map:m};
+}
+function cropHit(pt){
+  const m=pt.map, c=getCrop();
+  const cx=m.ox+c.x*m.dw, cy=m.oy+c.y*m.dh, cw=c.w*m.dw, ch=c.h*m.dh;
+  const T=12;
+  if(Math.abs(pt.px-cx)<T&&Math.abs(pt.py-cy)<T) return 'nw';
+  if(Math.abs(pt.px-(cx+cw))<T&&Math.abs(pt.py-cy)<T) return 'ne';
+  if(Math.abs(pt.px-cx)<T&&Math.abs(pt.py-(cy+ch))<T) return 'sw';
+  if(Math.abs(pt.px-(cx+cw))<T&&Math.abs(pt.py-(cy+ch))<T) return 'se';
+  if(pt.px>=cx&&pt.px<=cx+cw&&pt.py>=cy&&pt.py<=cy+ch) return 'move';
+  return null;
+}
+function cropStart(ev){
+  if(!state.cropOn) return;          /* 未启用裁剪 → 不响应，防止误拖 */
+  const pt=cropPointer(ev); if(!pt) return;
+  const hit=cropHit(pt);
+  const wide=pt.map.wide;
+  if(wide && pt.px>pt.map.W-(pt.map.barW||0)){
+    state.cropDrag={mode:'pan',py0:ev.clientY,pan0:state.cropPan,bar:true};
+    ev.preventDefault();
+    return;
+  }
+  if(!hit && wide){
+    /* 按宽取景时，点框外 = 上下平移取景器（不是新建选框） */
+    state.cropDrag={mode:'pan',py0:ev.clientY,pan0:state.cropPan};
+    ev.preventDefault();
+    return;
+  }
+  if(!hit){ /* 点框外 → 以该点为中心开新选框 */
+    const m=pt.map;
+    state.cropDrag={mode:'new',ox:m.ox,oy:m.oy,dw:m.dw,dh:m.dh,px:pt.px,py:pt.py,c:getCrop()};
+    cropApplyDrag(pt);
+    return;
+  }
+  /* 移动模式：在按下时就固定锚点，避免首次 pointermove 跳动 */
+  state.cropDrag={mode:hit,c:getCrop(),px0:pt.px,py0:pt.py};
+  ev.preventDefault();
+}
+function cropApplyDrag(pt){
+  const d=state.cropDrag; if(!d) return;
+  const m=pt.map;
+  const c=d.c;
+  let nx=c.x, ny=c.y, nw=c.w, nh=c.h;
+  if(d.mode==='pan'){
+    const maxPan=Math.max(0,m.dh-m.H);
+    if(d.bar){
+      /* 右侧滚动条：直接定位选区中心 */
+      const track=m.H-8;
+      const frac=Math.max(0,Math.min(1,(pt.clientY-4)/Math.max(1,track-24)));
+      const c=getCrop();
+      const target=(frac*maxPan+m.H/2)/m.dh - c.h/2;
+      setCrop({x:c.x,y:Math.max(0,Math.min(1-c.h,target)),w:c.w,h:c.h});
+    }else{
+      /* 空白处拖动 = 在长图里上下移动选区 */
+      const c=getCrop();
+      const dy=(d.py0-pt.clientY)/m.dh;
+      setCrop({x:c.x,y:Math.max(0,Math.min(1-c.h,c.y+dy)),w:c.w,h:c.h});
+    }
+    drawCropUI();
+    refresh();
+    return;
+  }
+  if(d.mode==='move'){
+    nx=c.x+(pt.px-d.px0)/m.dw; ny=c.y+(pt.py-d.py0)/m.dh;
+  }else{
+    /* 角把手：以画布像素计算新框，再转归一化 */
+    const cx=m.ox+c.x*m.dw, cy=m.oy+c.y*m.dh, cw=c.w*m.dw, ch=c.h*m.dh;
+    let L=cx,Tp=cy,R=cx+cw,B=cy+ch;
+    if(d.mode==='nw'){ L=pt.px; Tp=pt.py; }
+    else if(d.mode==='ne'){ R=pt.px; Tp=pt.py; }
+    else if(d.mode==='sw'){ L=pt.px; B=pt.py; }
+    else if(d.mode==='se'){ R=pt.px; B=pt.py; }
+    else if(d.mode==='new'){ L=Math.min(d.px,pt.px); Tp=Math.min(d.py,pt.py); R=Math.max(d.px,pt.px); B=Math.max(d.py,pt.py); }
+    let aw=Math.max(1,R-L), ah=Math.max(1,B-Tp);
+    /* 比例锁：仅角把手与新建时生效，拖动内部时不改比例 */
+    const asp=lockAspect();
+    if(asp && d.mode!=='move'){
+      if(aw/ah > asp) ah=aw/asp; else aw=ah*asp;
+      /* 以拖动的角为锚点 */
+      if(d.mode==='nw'){ L=R-aw; Tp=B-ah; }
+      else if(d.mode==='ne'){ R=L+aw; Tp=B-ah; }
+      else if(d.mode==='sw'){ L=R-aw; B=Tp+ah; }
+      else if(d.mode==='se'){ R=L+aw; B=Tp+ah; }
+      else { const cxx=(L+R)/2, cyy=(Tp+B)/2; L=cxx-aw/2; R=cxx+aw/2; Tp=cyy-ah/2; B=cyy+ah/2; }
+    }
+    nx=(L-m.ox)/m.dw; ny=(Tp-m.oy)/m.dh; nw=aw/m.dw; nh=ah/m.dh;
+  }
+  setCrop({x:nx,y:ny,w:nw,h:nh});
+  drawCropUI();
+  refresh();
+  /* 清晰度提示较重（要跑一次渲染），节流到下一帧 */
+  if(!window.__cropRaf){
+    window.__cropRaf=requestAnimationFrame(function(){ window.__cropRaf=0; updateCropRes(); });
+  }
+}
+function cropMove(ev){
+  if(!state.cropOn) return;
+  const d=state.cropDrag; if(!d) return;
+  const pt=cropPointer(ev); if(!pt) return;
+  cropApplyDrag(pt);
+}
+function cropEnd(){
+  if(!state.cropOn){ state.cropDrag=null; return; }
+  if(!state.cropDrag) return;
+  state.cropDrag=null;
+  drawCropUI(); refresh();
+}
+
+/* 比例锁按钮 */
+function buildCropRatios(){
+  const box=document.getElementById('cropRatios');
+  if(!box) return;
+  box.innerHTML='';
+  CROP_LOCKS.forEach(l=>{
+    const b=document.createElement('button');
+    b.className='sbtn'+(state.cropLock===l.k?' on':'');
+    b.textContent=l.t;
+    b.onclick=()=>{
+      state.cropLock=l.k;
+      buildCropRatios();
+      /* 切换比例时，把当前选框调整为新比例（以中心为锚） */
+      const asp=lockAspect();
+      if(asp){
+        const c=getCrop();
+        const cxp=c.x+c.w/2, cyp=c.y+c.h/2;
+        let nw=c.w, nh=c.h;
+        if(nw/nh>asp) nh=nw/asp; else nw=nh*asp;
+        setCrop({x:cxp-nw/2,y:cyp-nh/2,w:nw,h:nh});
+      }
+      drawCropUI(); refresh();
+    };
+    box.appendChild(b);
+  });
+}
+
+/* 导出倍率按钮 */
+const SCALES=[{v:1,t:'1× 标准'},{v:2,t:'2× 超清'},{v:3,t:'3× 超高'}];
+function buildScales(){
+  const box=document.getElementById('scales');
+  if(!box) return;
+  box.innerHTML='';
+  const up=(measureBlur()||{}).up||1;
+  const safe=Math.max(1,Math.floor((1/up)+1e-6));
+  SCALES.forEach(sc=>{
+    const b=document.createElement('div');
+    const blur=up*sc.v;
+    const unsafe=sc.v>safe;
+    b.className='chip'+(state.exportScale===sc.v?' on':'')+(unsafe?' unsafe':'');
+    b.innerHTML='<b>'+sc.t+(unsafe?'<span class="wmark">⚠糊</span>':'')+'</b>'+
+      '<small>'+Math.round(G().W*sc.v)+'×'+Math.round(G().H*sc.v)+
+      ' · 放大'+blur.toFixed(2)+'×</small>';
+    b.onclick=()=>{ state.exportScale=sc.v; buildScales(); updateCropRes(); refresh(); if(pxOpen()) pxRender(); };
+    box.appendChild(b);
+  });
+  /* 不要在这里用固定值覆盖清晰度提示 —— 交给 updateCropRes 用实测倍率 */
+  updateCropRes();
+}
+
+function useFile(f){
+  /* v6：视频分流 —— 走取帧流程，不进图片流水线 */
+  if(f && f.type && f.type.indexOf('video/')===0){ vidLoad(f); return; }
+  /* 释放上一张的 ObjectURL，避免内存泄漏 */
+  if(state.objUrl){ try{URL.revokeObjectURL(state.objUrl);}catch(e){} state.objUrl=null; }
+  const u=URL.createObjectURL(f); state.objUrl=u;
+  const im=new Image();
+  im.onload=()=>{
+    state.img=im;
+    im.__crop={x:0,y:0,w:1,h:1};
+    const kb=(f.size/1024).toFixed(0);
+    state.srcInfo={w:im.naturalWidth||im.width,h:im.naturalHeight||im.height,name:f.name,size:f.size};
+    document.getElementById('dropTxt').innerHTML='<img src="'+u+'"><div style="font-size:12px;color:#12a150">已使用上传图片 · 再次点击可换</div>';
+    buildTpls(); buildCropRatios(); refresh();
+    /* 等布局稳定后画裁剪面板（clientWidth 需要元素已可见） */
+    setTimeout(()=>{ drawCropUI(); updateCropRes(); },30);
+  };
+  im.onerror=()=>{
+    document.getElementById('dropTxt').innerHTML=
+      '<div style="font-size:12px;color:#c2410c">无法读取该图片<br><span style="font-size:11px">可能是 HEIC/RAW 格式，请先转成 JPG/PNG</span></div>';
+  };
+  im.src=u;
+}
+document.getElementById('drop').onclick=()=>document.getElementById('file').click();
+document.getElementById('file').onchange=e=>{if(e.target.files[0])useFile(e.target.files[0]);};
+/* 裁剪面板交互 */
+(function(){
+  const cv=document.getElementById('cropCv');
+  if(!cv) return;
+  /* 裁剪开关：默认锁住，避免手滑把图拖坏；要裁先点按钮 */
+  const cbtn=document.getElementById('cropBtn');
+  const cbox=document.getElementById('cropBox');
+  /* 取景模式：看全图 / 按宽取景 */
+  const fFull=document.getElementById('cropFitFull'), fWide=document.getElementById('cropFitWide');
+  function setFit(v){
+    state.cropFit=v; state.cropPan=0;
+    if(fFull) fFull.classList.toggle('on',v==='full');
+    if(fWide) fWide.classList.toggle('on',v==='wide');
+    drawCropUI();
+  }
+  if(fFull) fFull.onclick=()=>setFit('full');
+  if(fWide) fWide.onclick=()=>setFit('wide');
+  if(cbtn){
+    cbtn.onclick=()=>{
+      state.cropOn=!state.cropOn;
+      cbox.classList.toggle('locked',!state.cropOn);
+      cbtn.classList.toggle('on',state.cropOn);
+      cbtn.textContent=state.cropOn?'✓ 裁剪已启用 · 点此关闭':'🔒 启用裁剪';
+      if(state.cropOn){ drawCropUI(); }
+    };
+  }
+  cv.addEventListener('pointerdown',cropStart);
+  cv.addEventListener('pointermove',cropMove);
+  window.addEventListener('pointerup',cropEnd);
+  document.getElementById('cropReset').onclick=()=>{
+    if(!state.img) return;
+    setCrop({x:0,y:0,w:1,h:1}); drawCropUI(); refresh();
+  };
+  document.getElementById('cropFull').onclick=()=>{
+    if(!state.img) return;
+    setCrop({x:0,y:0,w:1,h:1}); drawCropUI(); refresh();
+  };
+})();
+['dragover','dragenter'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.add('hot');}));
+['dragleave','drop'].forEach(ev=>document.getElementById('drop').addEventListener(ev,e=>{e.preventDefault();document.getElementById('drop').classList.remove('hot');}));
+document.getElementById('drop').addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f&&(f.type.startsWith('image/')||f.type.startsWith('video/')))useFile(f);});
+/* ================= v6：视频取帧（纯前端 · 原始像素） ================= */
+const VID={url:null,fps:30,dur:0,w:0,h:0,idx:0,busy:false};
+
+function vidEl(id){ return document.getElementById(id); }
+function vidFmt(t){
+  if(!isFinite(t)||t<0) t=0;
+  const m=Math.floor(t/60), s=t-m*60;
+  return (m<10?'0':'')+m+':'+(s<10?'0':'')+s.toFixed(2);
+}
+function vidEsc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function vidRevokeUrl(){
+  if(VID.url){ try{URL.revokeObjectURL(VID.url);}catch(e){} VID.url=null; }
+}
+function vidStat(t){ const e=vidEl('vidStat'); if(e) e.textContent=t||''; }
+
+/* 载入视频：ObjectURL + 元数据 + 帧率标定 */
+function vidLoad(f){
+  if(!f) return;
+  if((f.type||'').indexOf('video/')!==0){
+    vidStat('这不是视频文件'); return;
+  }
+  vidRevokeUrl();
+  const v=vidEl('vid');
+  VID.url=URL.createObjectURL(f);
+  vidEl('vidBody').classList.remove('hide');
+  vidEl('vidDropTxt').innerHTML='<div style="font-size:12px;color:#12a150">已载入：'+vidEsc(f.name)+' · 解码中…</div>';
+  vidStat('解码中…');
+  v.onloadedmetadata=function(){
+    VID.dur=v.duration||0; VID.w=v.videoWidth||0; VID.h=v.videoHeight||0;
+    vidEl('vidMeta').innerHTML='源视频 <b>'+vidEsc(f.name)+'</b><br>'+
+      '分辨率 <b>'+VID.w+'×'+VID.h+'</b> · 时长 <b>'+vidFmt(VID.dur)+'</b> · 帧率 <b id="vidFps">检测中…</b><br>'+
+      '抽帧取原始像素，不缩放不插值 —— 和直接截图不同，不会失真。';
+    vidCalibrate(v).then(function(){
+      const fp=vidEl('vidFps'); if(fp) fp.textContent=VID.fps+' fps';
+      vidBuildStrip();
+      vidSyncUI();
+    });
+  };
+  v.onerror=function(){
+    vidStat('');
+    vidEl('vidDropTxt').innerHTML='<div style="font-size:12px;color:#c2410c">浏览器无法解码该视频<br><span style="font-size:11px">可能是 HEVC / MOV 等编码，请转成 MP4(H.264) 后重试</span></div>';
+  };
+  v.src=VID.url;
+  v.load();
+  /* 从主图入口选到视频时，把视频面板滚到可见处 */
+  const card=vidEl('cardVid');
+  if(card && card.scrollIntoView) card.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* 帧率标定：短播一小段，用 requestVideoFrameCallback 数帧 */
+function vidCalibrate(v){
+  return new Promise(function(res){
+    const oldT=v.currentTime;
+    let fps=30;
+    const done=function(){
+      v.pause();
+      VID.fps=fps;
+      try{ v.currentTime=oldT||0; }catch(e){}
+      res(fps);
+    };
+    if(typeof v.requestVideoFrameCallback!=='function'){ done(); return; }
+    const t0=performance.now(); let n=0;
+    const cb=function(now,meta){
+      n++;
+      if(n>=15 || performance.now()-t0>1600){ done(); return; }
+      v.requestVideoFrameCallback(cb);
+    };
+    try{ const pr=v.play(); if(pr&&pr.catch) pr.catch(()=>done()); }
+    catch(e){ done(); return; }
+    v.requestVideoFrameCallback(cb);
+    setTimeout(done,2200);
+  });
+}
+
+/* 定位到某个时间点（等 seeked 落定） */
+function vidSeek(t){
+  const v=vidEl('vid');
+  return new Promise(function(res){
+    if(!v || !VID.dur) return res(false);
+    t=Math.max(0,Math.min(t, VID.dur-0.002));
+    let settled=false;
+    const fin=function(ok){ if(settled) return; settled=true; v.removeEventListener('seeked',onSeek); res(ok); };
+    const onSeek=function(){ fin(true); };
+    v.addEventListener('seeked',onSeek);
+    try{ v.currentTime=t; }catch(e){ fin(false); return; }
+    setTimeout(function(){ fin(false); },4000);
+  });
+}
+
+/* 抽帧：按视频原始分辨率取当前帧（无缩放 / 无插值 / 无重编码） */
+function vidGrabFrame(){
+  const v=vidEl('vid');
+  if(!v || !v.videoWidth) return null;
+  const c=document.createElement('canvas');
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  const x=c.getContext('2d');
+  x.drawImage(v,0,0,c.width,c.height);
+  return c;
+}
+
+/* 用当前帧当封面底图：塞进 state.img，走 v5 的裁剪 / 版式 / 导出流水线 */
+function vidUseFrame(){
+  const c=vidGrabFrame();
+  if(!c){ vidStat('还没解出帧'); return; }
+  c.__crop={x:0,y:0,w:1,h:1};
+  state.img=c;
+  state.srcInfo={w:c.width,h:c.height,name:'视频帧 @ '+vidFmt(vidEl('vid').currentTime),size:0};
+  /* 换底图了，之前上传图片的 ObjectURL 就可以释放 */
+  if(state.objUrl){ try{URL.revokeObjectURL(state.objUrl);}catch(e){} state.objUrl=null; }
+  /* 初始裁剪 = 当前输出比例在源帧里的最大内接区域（居中），保证源像素不被放大 */
+  const r=RATIOS[state.ratio], ta=r.w/r.h, sa=c.width/c.height;
+  let cw=1,ch=1;
+  if(sa>ta) cw=ta/sa; else ch=sa/ta;
+  c.__crop={x:(1-cw)/2,y:(1-ch)/2,w:cw,h:ch};
+  /* 竖版源（9:16）很高：「按宽取景」会把选框压到视口高度，源像素被裁掉 → 看着像失真。
+     切「看全图」，整帧可见，3:4 选框能拿满 1080×1440 原始像素（放大系数 1.0）。 */
+  if(c.height/c.width>1.2){
+    state.cropFit='full';
+    const fFull=vidEl('cropFitFull'), fWide=vidEl('cropFitWide');
+    if(fFull) fFull.classList.add('on');
+    if(fWide) fWide.classList.remove('on');
+  }
+  state.cropPan=0;
+  /* 自动打开裁剪面板 */
+  state.cropOn=true;
+  const cbox=vidEl('cropBox'); if(cbox) cbox.classList.remove('locked');
+  const cb=vidEl('cropBtn'); if(cb){ cb.classList.add('on'); cb.textContent='✓ 裁剪已启用 · 点此关闭'; }
+  buildTpls(); buildCropRatios(); refresh();
+  setTimeout(function(){ drawCropUI(); updateCropRes(); },30);
+  vidEl('vidDropTxt').innerHTML='<div style="font-size:12px;color:#12a150">✓ 已用视频帧作底图 · 在右侧裁剪</div>';
+  vidStat('已设为底图');
+}
+
+/* 导出当前帧原图（不做任何缩放） */
+function vidSaveFrame(){
+  const c=vidGrabFrame();
+  if(!c){ vidStat('还没解出帧'); return; }
+  c.toBlob(function(b){
+    dl(b,'frame-'+vidFmt(vidEl('vid').currentTime).replace(/[:.]/g,'-')+'.png');
+  },'image/png');
+}
+
+/* filmstrip：均匀采样若干帧做缩略图，串行 seek 保证不错帧 */
+async function vidBuildStrip(){
+  const v=vidEl('vid'), host=vidEl('vidStrip');
+  if(!v || !VID.dur || !host) return;
+  if(VID.busy) return;
+  VID.busy=true;
+  const N=8, keep=v.currentTime;
+  host.innerHTML='';
+  for(let i=0;i<N;i++){
+    vidStat('取缩略图 '+(i+1)+'/'+N);
+    const t=VID.dur*(i+0.5)/N;
+    await vidSeek(t);
+    const c=document.createElement('canvas');
+    const th=72, tw=Math.max(24,Math.round(th*(v.videoWidth||9)/(v.videoHeight||16)));
+    c.width=tw; c.height=th;
+    try{ c.getContext('2d').drawImage(v,0,0,tw,th); }catch(e){}
+    c.dataset.t=t;
+    c.title=vidFmt(t)+' · 点此跳到这一帧';
+    c.onclick=function(){ vidGoTo(parseFloat(this.dataset.t)); };
+    host.appendChild(c);
+  }
+  await vidSeek(keep);
+  VID.busy=false;
+  vidStat('');
+  vidMarkStrip();
+}
+
+/* 时间 / 帧号同步 */
+function vidSyncUI(){
+  const v=vidEl('vid'); if(!v) return;
+  const t=v.currentTime||0, d=VID.dur||v.duration||0;
+  const el=vidEl('vidTime');
+  if(el) el.textContent=vidFmt(t)+' / '+vidFmt(d)+' · 帧 '+(VID.idx+1)+'/'+Math.max(1,Math.round(d*VID.fps));
+  const sk=vidEl('vidSeek');
+  if(sk && d) sk.value=Math.round(t/d*1000);
+}
+function vidMarkStrip(){
+  const host=vidEl('vidStrip'), v=vidEl('vid');
+  if(!host) return;
+  const t=v?(v.currentTime||0):0;
+  const kids=host.children; let best=-1,bd=1e9;
+  for(let i=0;i<kids.length;i++){
+    const dt=Math.abs(parseFloat(kids[i].dataset.t||0)-t);
+    if(dt<bd){ bd=dt; best=i; }
+  }
+  for(let j=0;j<kids.length;j++) kids[j].classList.toggle('on', j===best);
+}
+
+/* 跳到指定时间 */
+async function vidGoTo(t){
+  const v=vidEl('vid');
+  if(!v||!VID.dur) return;
+  v.pause();
+  await vidSeek(t);
+  VID.idx=Math.max(0,Math.floor((v.currentTime||0)*VID.fps+1e-6));
+  vidSyncUI(); vidMarkStrip();
+}
+
+/* 逐帧步进（按标定出来的真实 fps） */
+function vidStep(dir){
+  const v=vidEl('vid');
+  if(!v||!VID.dur) return;
+  const fps=VID.fps||30;
+  const cur=Math.floor((v.currentTime||0)*fps+1e-6);
+  const max=Math.max(0,Math.round(VID.dur*fps)-1);
+  const idx=Math.max(0,Math.min(max,cur+dir));
+  vidGoTo((idx+0.5)/fps);   /* 落在目标帧中点，避免踩到帧边界 */
+}
+
+/* ---- 视频面板事件绑定 ---- */
+(function(){
+  const drop=vidEl('vidDrop'), file=vidEl('vidFile');
+  if(!drop||!file) return;
+  drop.onclick=()=>file.click();
+  file.onchange=e=>{ if(e.target.files[0]) vidLoad(e.target.files[0]); };
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hot');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('hot');}));
+  drop.addEventListener('drop',e=>{
+    const f=e.dataTransfer.files[0];
+    if(f && (f.type||'').indexOf('video/')===0) vidLoad(f);
+  });
+  const v=vidEl('vid');
+  if(v){
+    v.addEventListener('timeupdate',function(){ VID.idx=Math.max(0,Math.floor((v.currentTime||0)*VID.fps+1e-6)); vidSyncUI(); vidMarkStrip(); });
+    v.addEventListener('seeked',function(){ vidSyncUI(); vidMarkStrip(); });
+    v.addEventListener('play',function(){ const b=vidEl('vidPlay'); if(b) b.textContent='⏸ 暂停'; });
+    v.addEventListener('pause',function(){ const b=vidEl('vidPlay'); if(b) b.textContent='▶ 播放'; });
+  }
+  const sk=vidEl('vidSeek');
+  if(sk) sk.onchange=function(){ vidGoTo((this.value/1000)*VID.dur); };
+  const pb=vidEl('vidPlay');
+  if(pb) pb.onclick=function(){ const v2=vidEl('vid'); if(!v2) return; if(v2.paused) v2.play(); else v2.pause(); };
+  const p1=vidEl('vidPrev1'), n1=vidEl('vidNext1');
+  if(p1) p1.onclick=()=>vidStep(-1);
+  if(n1) n1.onclick=()=>vidStep(1);
+  const use=vidEl('vidUse'), save=vidEl('vidSave');
+  if(use) use.onclick=vidUseFrame;
+  if(save) save.onclick=vidSaveFrame;
+  /* 方向键逐帧 */
+  document.addEventListener('keydown',function(e){
+    if(!VID.dur) return;
+    const tag=(e.target&&e.target.tagName)||'';
+    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
+    if(e.key==='ArrowLeft'){ vidStep(-1); e.preventDefault(); }
+    else if(e.key==='ArrowRight'){ vidStep(1); e.preventDefault(); }
+  });
+})();
+
+['title','sub'].forEach(k=>{
+  document.getElementById(k).oninput=e=>{state[k]=e.target.value;state.autoText=false;refresh();};
+});
+document.getElementById('guides').onchange=refresh;
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+function renderFull(id,ratioId,scale){
+  const Gg=geo(ratioId||state.ratio,scale||1);
+  const t=document.createElement('canvas');t.width=Gg.W;t.height=Gg.H;
+  drawDesign(t.getContext('2d'),id,false,Gg);return t;
+}
+/* 导出文件名字里带真实像素，避免 2×/3× 时仍写着 1080×1440 */
+function exportName(ext){
+  const Gg=geo(state.ratio,state.exportScale);
+  return 'cover-v6-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.'+ext;
+}
+function exportNow(type,name){
+  const src=renderFull(state.layout,null,state.exportScale);
+  src.toBlob(b=>dl(b,name),type||'image/png',0.95);
+}
+document.getElementById('expNow').onclick=()=>{
+  exportNow('image/png',exportName('png'));
+};
+document.getElementById('expJpg').onclick=()=>{
+  exportNow('image/jpeg',exportName('jpg'));
+};
+document.getElementById('expAll').onclick=()=>{
+  const ids=LAYOUTS.map(l=>l.id);
+  const cols=3, rows=Math.ceil(ids.length/cols);
+  /* 5 款拼图是大画布：限制总像素，避免 3× 时 canvas 撑爆内存 */
+  const MAXPX=40e6;
+  let sc=state.exportScale;
+  let Gg=geo(state.ratio,sc);
+  while(sc>1 && (Gg.W*cols)*(Gg.H*rows) > MAXPX){ sc--; Gg=geo(state.ratio,sc); }
+  if(sc!==state.exportScale){
+    alert('5 款拼图画布过大，倍率自动降为 '+sc+'×（'+Gg.W+'×'+Gg.H+'）。\n单张导出仍可用 '+state.exportScale+'×。');
+  }
+  const c=document.createElement('canvas');c.width=Gg.W*cols;c.height=Gg.H*rows;const x=c.getContext('2d');
+  ids.forEach((id,i)=>{const s=renderFull(id,null,sc);x.drawImage(s,(i%cols)*Gg.W,Math.floor(i/cols)*Gg.H);});
+  c.toBlob(b=>dl(b,'layouts-v5-5-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
+};
+document.getElementById('expThree').onclick=()=>{
+  ['3x4','9x16','16x9'].forEach(r=>{
+    const Gg=geo(r,state.exportScale);
+    const c=document.createElement('canvas');c.width=Gg.W;c.height=Gg.H;
+    drawDesign(c.getContext('2d'),state.layout,false,Gg);
+    c.toBlob(b=>dl(b,'cover-v6-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png'),'image/png');
+  });
+};
+/* ---------- v5.3 像素检视按钮 ---------- */
+function pxOpen(){ const el=document.getElementById('pxPanel'); return el && !el.hidden; }
+(function(){
+  var btn=document.getElementById('pxInspect');
+  var panel=document.getElementById('pxPanel');
+  var safe=document.getElementById('pxSafe');
+  if(btn&&panel){
+    btn.onclick=function(){
+      panel.hidden=!panel.hidden;
+      btn.textContent=panel.hidden?'🔍 像素检视':'🔍 收起检视';
+      if(!panel.hidden) pxRender();
+    };
+  }
+  if(safe){
+    safe.onclick=function(){
+      var p=blurProfile();
+      var v=p?p.safe:1;
+      state.exportScale=v;
+      buildScales(); updateCropRes(); refresh();
+      if(pxOpen()) pxRender();
+      alert('已切到最大无损倍率 '+v+'×（更高倍率会把源像素放大，导出发软）');
+    };
+  }
+})();
+
+/* ---------- 主题：跟随系统 / 手动覆盖 / 记忆选择 ----------
+   需求：暗色模式下按钮看不出选中。
+   做法：① 引入 CSS 变量，整套配色可切（见 :root / [data-theme="dark"]）
+        ② 选中态用 --sel-bg/--sel-fg + ✓ 标记 + 2px ring，不靠单一颜色区分
+        ③ 三态：auto（跟系统）/ light / dark，选择记忆到 localStorage */
+(function(){
+  var KEY='cover-v5-theme'; /* 'auto' | 'light' | 'dark' */
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  function isDark(){
+    var v=localStorage.getItem(KEY)||'auto';
+    if(v==='dark') return true;
+    if(v==='light') return false;
+    return mq.matches;
+  }
+  function apply(){
+    var v=localStorage.getItem(KEY)||'auto';
+    if(v==='auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme',v);
+    var d=isDark();
+    var label=v==='auto' ? ('🌗 跟随系统'+(d?'（深）':'（浅）')) : (v==='dark'?'🌙 深色':'☀️ 浅色');
+    ['themeBtn','mtTheme'].forEach(function(id){
+      var el=document.getElementById(id); if(!el) return;
+      if(id==='themeBtn') el.textContent=label;
+      else el.textContent=d?'🌙':'☀️';
+      el.setAttribute('aria-label','当前主题：'+label);
+    });
+  }
+  function cycle(){
+    var order=['auto','light','dark'];
+    var cur=localStorage.getItem(KEY)||'auto';
+    var next=order[(order.indexOf(cur)+1)%order.length];
+    localStorage.setItem(KEY,next);
+    apply();
+  }
+  var tb=document.getElementById('themeBtn');
+  if(tb) tb.onclick=cycle;
+  var mt=document.getElementById('mtTheme');
+  if(mt) mt.onclick=cycle;
+  if(mq.addEventListener) mq.addEventListener('change',apply);
+  apply();
+})();
+buildRatios();buildCols();buildTpls();buildScales();buildCropRatios();
+let pending=Object.keys(COLLECTIONS).length;
+Object.keys(COLLECTIONS).forEach(k=>{
+  const im=new Image();
+  im.onload=()=>{imgs[k]=im;if(--pending===0){buildTpls();refresh();buildScales();updateCropRes();if(pxOpen())pxRender();}};
+  im.onerror=()=>{imgs[k]=null;if(--pending===0){buildTpls();refresh();}};
+  im.src=COLLECTIONS[k].img;
+});
+refresh();
+</script>
+
+<div id="lb" class="hide">
+  <img id="lbImg" alt="封面放大预览">
+  <div class="lbclose">点击任意处关闭 · 按 ESC 退出</div>
+</div>
+<script>
+/* 点击预览图 → 全屏放大查看 */
+(function(){
+  var lb=document.getElementById('lb'), img=document.getElementById('lbImg');
+  var pv=document.getElementById('pv');
+  if(!lb||!img||!pv) return;
+  function open(){ try{ img.src=pv.toDataURL('image/png'); }catch(e){ return; } lb.classList.remove('hide'); }
+  function close(){ lb.classList.add('hide'); }
+  pv.addEventListener('click',open);
+  pv.setAttribute('title','点击放大查看');
+  lb.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+</script>
+<div id="mtop">
+  <div class="mtp"></div>
+  <div class="mti"><b id="mtName">B2 大圆图·上文字</b><span id="mtCol">你带娃在玩啥呢？</span></div>
+  <button id="mtBtn">放大看</button>
+  <button id="mtTheme" type="button" title="切换深色/浅色">🌗</button>
+</div>
+<div id="mbar">
+  <button id="mExport">导出封面</button>
+</div>
+<script>
+(function(){
+  var mExport=document.getElementById('mExport');
+  var mtp=document.querySelector('#mtop .mtp');
+  var mtName=document.getElementById('mtName'), mtCol=document.getElementById('mtCol');
+  var mtBtn=document.getElementById('mtBtn');
+  var miniCv=document.createElement('canvas');miniCv.width=1080;miniCv.height=1440;
+  mtp.appendChild(miniCv);
+  function syncTop(){
+    var src=document.getElementById('pv');
+    var Gg=geo(state.ratio);
+    miniCv.width=Gg.W; miniCv.height=Gg.H;
+    var cx=miniCv.getContext('2d');
+    cx.clearRect(0,0,Gg.W,Gg.H);
+    cx.drawImage(src,0,0);
+    var L=LAYOUTS.find(function(x){return x.id===state.layout;});
+    mtName.textContent=(L?L.id+' '+L.name:'')+' · '+Gg.W+'×'+Gg.H;
+    mtCol.textContent=COLLECTIONS[state.col].name+' — '+D().title;
+  }
+  var _refresh=refresh;
+  refresh=function(){_refresh();syncTop();};
+  mExport.onclick=function(){
+    var Gg=geo(state.ratio,state.exportScale);
+    var src=renderFull(state.layout,null,state.exportScale);
+    src.toBlob(function(b){dl(b,'cover-v6-'+COLLECTIONS[state.col].id+'-'+state.layout+'-'+Gg.W+'x'+Gg.H+'.png');},'image/png',0.95);
+  };
+  mtBtn.onclick=function(){document.getElementById('pv').scrollIntoView({behavior:'smooth',block:'center'});};
+  setTimeout(syncTop,100);
+  setTimeout(syncTop,800);
+})();
+</script>
+</body>
+</html>
