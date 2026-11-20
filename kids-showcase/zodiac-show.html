@@ -219,43 +219,164 @@ body.readmode #cards{display:none!important}
 <script>
 /* ============ 角色定义 ============ */
 const Z = {
-  shu:{cn:'鼠',c:'#9fabc0',c2:'#cdd7e6',
-    ears:'<circle cx="42" cy="46" r="17" fill="#cdd7e6"/><circle cx="118" cy="46" r="17" fill="#cdd7e6"/><circle cx="42" cy="46" r="9" fill="#f3b6c8"/><circle cx="118" cy="46" r="9" fill="#f3b6c8"/>',
-    extra:'<path d="M124 150 q30 6 20 32 q-9 20 -28 12" stroke="#9fabc0" stroke-width="8" fill="none" stroke-linecap="round"/>'},
-  niu:{cn:'牛',c:'#eec27c',c2:'#f7ddb0',
-    ears:'<path d="M40 46 q-16 -26 6 -30 q12 14 8 30z" fill="#f7ddb0"/><path d="M120 46 q16 -26 -6 -30 q-12 14 -8 30z" fill="#f7ddb0"/>',
-    extra:'<ellipse cx="80" cy="102" rx="30" ry="20" fill="#f7ddb0"/><ellipse cx="70" cy="102" rx="4" ry="6" fill="#b8813f"/><ellipse cx="90" cy="102" rx="4" ry="6" fill="#b8813f"/><circle cx="80" cy="128" r="9" fill="#ff5f6d"/><path d="M80 137 v10" stroke="#c9a24a" stroke-width="3"/>'},
-  hu:{cn:'虎',c:'#f7a83c',c2:'#ffd08a',
-    ears:'<circle cx="44" cy="44" r="13" fill="#f7a83c"/><circle cx="116" cy="44" r="13" fill="#f7a83c"/>',
-    extra:'<text x="80" y="62" font-size="20" font-weight="900" text-anchor="middle" fill="#7a3d05">王</text><path d="M46 140 h12 M62 152 h14 M96 138 h14 M112 152 h12" stroke="#c97c12" stroke-width="7" stroke-linecap="round"/><path d="M52 60 l-8 10 M108 60 l8 10" stroke="#c97c12" stroke-width="5" stroke-linecap="round"/>'},
-  tu:{cn:'兔',c:'#f6f4f2',c2:'#ffffff',
-    ears:'<ellipse cx="56" cy="24" rx="11" ry="30" fill="#f6f4f2" transform="rotate(-9 56 24)"/><ellipse cx="104" cy="24" rx="11" ry="30" fill="#f6f4f2" transform="rotate(9 104 24)"/><ellipse cx="56" cy="26" rx="5" ry="22" fill="#ffc7d6" transform="rotate(-9 56 26)"/><ellipse cx="104" cy="26" rx="5" ry="22" fill="#ffc7d6" transform="rotate(9 104 26)"/>',
-    extra:'<circle cx="80" cy="100" r="7" fill="#ff9ab5"/><path d="M56 140 h14 M90 142 h14" stroke="#e4ded9" stroke-width="6" stroke-linecap="round"/>'},
-  long:{cn:'龙',c:'#4fa3e3',c2:'#a9d6ff',
-    ears:'<path d="M46 44 q-10 -28 10 -30 q8 12 6 28z" fill="#7cc0f5"/><path d="M114 44 q10 -28 -10 -30 q-8 12 -6 28z" fill="#7cc0f5"/><circle cx="40" cy="38" r="6" fill="#ffd45e"/><circle cx="120" cy="38" r="6" fill="#ffd45e"/>',
-    extra:'<path d="M40 92 q-20 -6 -28 6 M120 92 q20 -6 28 6" stroke="#ffd45e" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="80" cy="100" rx="24" ry="15" fill="#cfe8ff"/><circle cx="68" cy="98" r="3.5" fill="#2b3a55"/><circle cx="92" cy="98" r="3.5" fill="#2b3a55"/><path d="M56 138 q24 12 48 0" stroke="#7cc0f5" stroke-width="6" fill="none"/>'},
-  she:{cn:'蛇',c:'#66c06a',c2:'#a9e3a4',
-    ears:'',
-    extra:'<ellipse cx="80" cy="140" rx="52" ry="34" fill="#66c06a"/><circle cx="52" cy="140" r="9" fill="#4ea152"/><circle cx="80" cy="150" r="9" fill="#4ea152"/><circle cx="108" cy="140" r="9" fill="#4ea152"/><path d="M80 118 v14 M80 132 l-9 8 M80 132 l9 8" stroke="#ff5f6d" stroke-width="4" fill="none" stroke-linecap="round"/>'},
-  ma:{cn:'马',c:'#d78a58',c2:'#f0b184',
-    ears:'<path d="M52 44 q-8 -22 8 -22 q10 4 6 22z" fill="#d78a58"/><path d="M108 44 q8 -22 -8 -22 q-10 4 -6 22z" fill="#d78a58"/>',
-    extra:'<path d="M46 56 q-14 26 4 44" stroke="#7d4a26" stroke-width="10" fill="none" stroke-linecap="round"/><ellipse cx="80" cy="100" rx="27" ry="19" fill="#f0b184"/><circle cx="68" cy="98" r="4" fill="#5b3418"/><circle cx="92" cy="98" r="4" fill="#5b3418"/><path d="M52 142 h14 M94 142 h16" stroke="#b06c3d" stroke-width="7" stroke-linecap="round"/>'},
-  yang:{cn:'羊',c:'#f7f2e3',c2:'#ffffff',
-    ears:'<circle cx="44" cy="42" r="14" fill="#e6dcc4"/><circle cx="116" cy="42" r="14" fill="#e6dcc4"/><path d="M40 34 q-16 -6 -10 -18 q14 -2 16 14z" fill="#cbb894"/><path d="M120 34 q16 -6 10 -18 q-14 -2 -16 14z" fill="#cbb894"/>',
-    extra:'<circle cx="54" cy="142" r="13" fill="#fffdf6"/><circle cx="80" cy="150" r="14" fill="#fffdf6"/><circle cx="106" cy="142" r="13" fill="#fffdf6"/><circle cx="66" cy="134" r="11" fill="#fffdf6"/><circle cx="94" cy="134" r="11" fill="#fffdf6"/><ellipse cx="80" cy="98" rx="24" ry="15" fill="#ffe9e4"/>'},
-  hou:{cn:'猴',c:'#c98a4b',c2:'#efc48f',
-    ears:'<circle cx="42" cy="66" r="15" fill="#e2a86a"/><circle cx="118" cy="66" r="15" fill="#e2a86a"/><circle cx="42" cy="66" r="8" fill="#ffd9b3"/><circle cx="118" cy="66" r="8" fill="#ffd9b3"/>',
-    extra:'<ellipse cx="80" cy="98" rx="27" ry="19" fill="#ffd9b3"/><path d="M80 106 v12" stroke="#a06a33" stroke-width="4" stroke-linecap="round"/><path d="M126 146 q26 4 18 26" stroke="#c98a4b" stroke-width="7" fill="none" stroke-linecap="round"/>'},
-  ji:{cn:'鸡',c:'#f7d774',c2:'#fff0b8',
-    ears:'<path d="M62 42 q4 -20 18 -22 q4 12 2 20z" fill="#f7d774"/><path d="M82 40 q8 -20 22 -18 q2 12 -2 20z" fill="#f7d774"/><path d="M100 44 q12 -14 22 -8 q-4 10 -14 12z" fill="#f7d774"/>',
-    extra:'<path d="M74 96 l14 8 l-14 10z" fill="#ff9f43"/><path d="M78 112 q8 12 16 2 q-4 14 -16 10z" fill="#ff5f6d"/><path d="M56 140 q12 -8 22 0 M100 140 q10 -8 18 0" stroke="#e0bf52" stroke-width="6" fill="none" stroke-linecap="round"/>'},
-  gou:{cn:'狗',c:'#c08a5a',c2:'#e6bb8b',
-    ears:'<ellipse cx="42" cy="60" rx="14" ry="24" fill="#a06b3c" transform="rotate(-12 42 60)"/><ellipse cx="118" cy="60" rx="14" ry="24" fill="#a06b3c" transform="rotate(12 118 60)"/>',
-    extra:'<ellipse cx="80" cy="100" rx="25" ry="18" fill="#f0d3ae"/><ellipse cx="80" cy="94" rx="9" ry="7" fill="#3a2a1c"/><path d="M60 142 q20 12 40 0" stroke="#a06b3c" stroke-width="6" fill="none"/><g transform="translate(112,150) rotate(-20)"><rect x="-12" y="-4" width="24" height="9" rx="4" fill="#fff"/><circle cx="-12" cy="0" r="6" fill="#fff"/><circle cx="12" cy="0" r="6" fill="#fff"/></g>'},
-  zhu:{cn:'猪',c:'#f5a9b8',c2:'#ffd0dc',
-    ears:'<path d="M44 46 q-14 -18 6 -22 q12 4 10 22z" fill="#ff9fb4"/><path d="M116 46 q14 -18 -6 -22 q-12 4 -10 22z" fill="#ff9fb4"/>',
-    extra:'<ellipse cx="80" cy="100" rx="27" ry="19" fill="#ffb9cb"/><ellipse cx="70" cy="100" rx="4" ry="6" fill="#c4586e"/><ellipse cx="90" cy="100" rx="4" ry="6" fill="#c4586e"/><path d="M126 152 q22 -10 14 -26 q-8 -14 -22 -6" stroke="#f5a9b8" stroke-width="7" fill="none" stroke-linecap="round"/>'}
+shu:{cn:'鼠',body:`
+<path d="M112 152 C142 148 152 118 136 100" fill="none" stroke="#8a94a6" stroke-width="8" stroke-linecap="round"/>
+<ellipse cx="76" cy="132" rx="34" ry="30" fill="#9aa5b8"/>
+<ellipse cx="76" cy="138" rx="20" ry="17" fill="#c3ccdb"/>
+<circle cx="50" cy="52" r="19" fill="#9aa5b8"/><circle cx="50" cy="52" r="11" fill="#f2a9bd"/>
+<circle cx="102" cy="52" r="19" fill="#9aa5b8"/><circle cx="102" cy="52" r="11" fill="#f2a9bd"/>
+<circle cx="76" cy="82" r="31" fill="#9aa5b8"/>
+<ellipse cx="76" cy="97" rx="19" ry="14" fill="#dde4ee"/>
+<circle cx="76" cy="95" r="5" fill="#f28ba4"/>
+<g class="blink"><circle cx="64" cy="76" r="5.5" fill="#2b2b2b"/><circle cx="88" cy="76" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="66" cy="74" r="2" fill="#fff"/><circle cx="90" cy="74" r="2" fill="#fff"/>
+<path class="mouth" d="M68 103 q8 7 16 0" stroke="#5b6472" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M58 92 L38 86 M58 99 L40 101 M94 92 L114 86 M94 99 L112 101" stroke="#cfd7e3" stroke-width="2.5" stroke-linecap="round"/>`},
+niu:{cn:'牛',body:`
+<ellipse cx="80" cy="142" rx="40" ry="32" fill="#eec27c"/>
+<ellipse cx="80" cy="148" rx="24" ry="18" fill="#f9e3bd"/>
+<path d="M50 54 C36 46 24 28 30 12 C44 18 52 34 54 52 Z" fill="#f7ddb0"/>
+<path d="M110 54 C124 46 136 28 130 12 C116 18 108 34 106 52 Z" fill="#f7ddb0"/>
+<ellipse cx="44" cy="76" rx="13" ry="9" fill="#dfa95f"/>
+<ellipse cx="116" cy="76" rx="13" ry="9" fill="#dfa95f"/>
+<ellipse cx="80" cy="76" rx="38" ry="33" fill="#eec27c"/>
+<ellipse cx="80" cy="95" rx="30" ry="21" fill="#f9e3bd"/>
+<ellipse cx="68" cy="95" rx="4.5" ry="6" fill="#b8813f"/>
+<ellipse cx="92" cy="95" rx="4.5" ry="6" fill="#b8813f"/>
+<g class="blink"><circle cx="64" cy="63" r="5.5" fill="#2b2b2b"/><circle cx="96" cy="63" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="66" cy="61" r="2" fill="#fff"/><circle cx="98" cy="61" r="2" fill="#fff"/>
+<path class="mouth" d="M73 109 q7 6 14 0" stroke="#b8813f" stroke-width="3" fill="none" stroke-linecap="round"/>
+<circle cx="80" cy="120" r="9" fill="#e04b4b"/><path d="M80 129 v7" stroke="#c9a24a" stroke-width="3"/>`},
+hu:{cn:'虎',body:`
+<path d="M116 150 C148 144 152 112 134 94" stroke="#f0932b" stroke-width="14" fill="none" stroke-linecap="round"/>
+<path d="M128 134 l10 7 M137 112 l10 8" stroke="#c96f18" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="78" cy="138" rx="38" ry="34" fill="#f7a83c"/>
+<path d="M48 124 l15 6 M46 144 l16 3 M94 122 l15 7 M96 148 l15 -5" stroke="#c96f18" stroke-width="7" stroke-linecap="round"/>
+<path d="M46 66 L54 42 L72 56 Z" fill="#f7a83c"/>
+<path d="M110 66 L102 42 L84 56 Z" fill="#f7a83c"/>
+<circle cx="78" cy="80" r="38" fill="#f7a83c"/>
+<text x="78" y="74" font-size="24" font-weight="900" text-anchor="middle" fill="#a2570f">王</text>
+<ellipse cx="78" cy="98" rx="24" ry="16" fill="#ffe0b8"/>
+<path d="M78 90 l-6 6 h12 z" fill="#8a4a12"/>
+<g class="blink"><circle cx="63" cy="74" r="5.5" fill="#2b2b2b"/><circle cx="93" cy="74" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="65" cy="72" r="2" fill="#fff"/><circle cx="95" cy="72" r="2" fill="#fff"/>
+<path class="mouth" d="M68 102 q10 9 20 0" stroke="#8a4a12" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+tu:{cn:'兔',body:`
+<ellipse cx="80" cy="148" rx="30" ry="30" fill="#f6f4f2"/>
+<ellipse cx="80" cy="152" rx="18" ry="16" fill="#ffffff"/>
+<ellipse cx="58" cy="26" rx="10" ry="30" fill="#f6f4f2" transform="rotate(-10 58 26)"/>
+<ellipse cx="58" cy="28" rx="5" ry="22" fill="#ffc2d4" transform="rotate(-10 58 28)"/>
+<ellipse cx="102" cy="26" rx="10" ry="30" fill="#f6f4f2" transform="rotate(10 102 26)"/>
+<ellipse cx="102" cy="28" rx="5" ry="22" fill="#ffc2d4" transform="rotate(10 102 28)"/>
+<circle cx="80" cy="100" r="30" fill="#f6f4f2"/>
+<g class="blink"><circle cx="69" cy="94" r="5.5" fill="#2b2b2b"/><circle cx="91" cy="94" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="71" cy="92" r="2" fill="#fff"/><circle cx="93" cy="92" r="2" fill="#fff"/>
+<path d="M80 101 l-4 4 h8 z" fill="#f28ba4"/>
+<path class="mouth" d="M72 108 h4 v9 h-4 z M84 108 h4 v9 h-4 z" fill="#ffffff" stroke="#d9d2cc" stroke-width="1"/>
+<circle cx="56" cy="142" r="12" fill="#ffffff"/>`},
+long:{cn:'龙',body:`
+<path d="M38 178 C96 178 130 148 118 116 C108 90 66 96 70 122" fill="none" stroke="#3f8fd8" stroke-width="26" stroke-linecap="round"/>
+<path d="M38 178 C96 178 130 148 118 116 C108 90 66 96 70 122" fill="none" stroke="#9fd0f5" stroke-width="11" stroke-linecap="round" opacity=".65"/>
+<path d="M52 160 l11 -12 l6 15 z" fill="#2f6fae"/>
+<path d="M98 152 l13 -10 l4 15 z" fill="#2f6fae"/>
+<path d="M120 126 l12 -8 l2 15 z" fill="#2f6fae"/>
+<path d="M56 44 C42 30 46 12 64 10 C58 26 62 40 66 50 z" fill="#6fb3ec"/>
+<path d="M100 44 C114 30 110 12 92 10 C98 26 94 40 90 50 z" fill="#6fb3ec"/>
+<path d="M50 40 l-10 -18 M54 36 l0 -20 M106 40 l10 -18 M102 36 l0 -20" stroke="#6fb3ec" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="72" cy="70" rx="34" ry="26" fill="#4a90d9"/>
+<path d="M38 76 C18 70 10 86 20 94 M106 76 C126 70 134 86 124 94" stroke="#ffd45e" stroke-width="4" fill="none" stroke-linecap="round"/>
+<g class="blink"><circle cx="59" cy="63" r="5.5" fill="#2b2b2b"/><circle cx="85" cy="63" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="61" cy="61" r="2" fill="#fff"/><circle cx="87" cy="61" r="2" fill="#fff"/>
+<ellipse cx="72" cy="82" rx="21" ry="13" fill="#cfe8ff"/>
+<circle cx="63" cy="80" r="3.2" fill="#2b3a55"/><circle cx="81" cy="80" r="3.2" fill="#2b3a55"/>
+<path class="mouth" d="M62 90 q10 7 20 0" stroke="#1f4f7d" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+she:{cn:'蛇',body:`
+<path d="M28 170 C80 170 134 158 132 122 C130 94 76 100 78 128 C80 146 108 148 112 132" fill="none" stroke="#5cb85f" stroke-width="24" stroke-linecap="round"/>
+<path d="M28 170 C80 170 134 158 132 122 C130 94 76 100 78 128 C80 146 108 148 112 132" fill="none" stroke="#b7e6a0" stroke-width="9" stroke-linecap="round" opacity=".6"/>
+<path d="M40 158 l11 -6 M66 162 l11 -6 M96 150 l10 -7 M122 132 l9 -9" stroke="#3f9c46" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="112" cy="106" rx="27" ry="21" fill="#5cb85f"/>
+<path d="M132 106 C148 104 150 116 140 118 M134 112 C150 112 152 124 142 126" stroke="#ff5f6d" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<g class="blink"><circle cx="102" cy="99" r="5" fill="#2b2b2b"/><circle cx="120" cy="99" r="5" fill="#2b2b2b"/></g>
+<circle cx="104" cy="97" r="2" fill="#fff"/><circle cx="122" cy="97" r="2" fill="#fff"/>
+<path class="mouth" d="M103 114 q9 6 17 0" stroke="#2f6b32" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+ma:{cn:'马',body:`
+<path d="M118 150 C148 146 154 116 140 100" stroke="#b9703c" stroke-width="16" fill="none" stroke-linecap="round"/>
+<ellipse cx="76" cy="138" rx="40" ry="32" fill="#d98c5f"/>
+<ellipse cx="76" cy="144" rx="24" ry="17" fill="#f2b98f"/>
+<path d="M50 48 L46 22 L68 40 z" fill="#d98c5f"/>
+<path d="M102 46 L112 22 L88 38 z" fill="#d98c5f"/>
+<path d="M62 42 C56 22 66 8 82 6 C76 22 76 34 78 46 z" fill="#7d4a26"/>
+<ellipse cx="86" cy="76" rx="30" ry="39" fill="#d98c5f" transform="rotate(-8 86 76)"/>
+<ellipse cx="95" cy="104" rx="20" ry="15" fill="#f2b98f" transform="rotate(-8 95 104)"/>
+<ellipse cx="86" cy="99" rx="4.5" ry="5.5" fill="#7d4a26" transform="rotate(-8 86 99)"/>
+<ellipse cx="98" cy="101" rx="4.5" ry="5.5" fill="#7d4a26" transform="rotate(-8 98 101)"/>
+<g class="blink"><circle cx="74" cy="62" r="5.5" fill="#2b2b2b"/><circle cx="94" cy="59" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="76" cy="60" r="2" fill="#fff"/><circle cx="96" cy="57" r="2" fill="#fff"/>
+<path class="mouth" d="M80 117 q9 5 15 0" stroke="#7d4a26" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+yang:{cn:'羊',body:`
+<circle cx="58" cy="134" r="27" fill="#f7f3e8"/>
+<circle cx="100" cy="132" r="27" fill="#f7f3e8"/>
+<circle cx="80" cy="148" r="27" fill="#f7f3e8"/>
+<circle cx="58" cy="134" r="14" fill="#fffdf6"/>
+<circle cx="100" cy="132" r="14" fill="#fffdf6"/>
+<path d="M52 78 C34 78 28 60 42 54 C52 60 54 70 56 80 z" fill="#cbb894"/>
+<path d="M108 78 C126 78 132 60 118 54 C108 60 106 70 104 80 z" fill="#cbb894"/>
+<ellipse cx="80" cy="90" rx="26" ry="24" fill="#efe3cb"/>
+<ellipse cx="80" cy="100" rx="16" ry="13" fill="#fdf7ea"/>
+<g class="blink"><circle cx="70" cy="84" r="5" fill="#2b2b2b"/><circle cx="90" cy="84" r="5" fill="#2b2b2b"/></g>
+<circle cx="72" cy="82" r="1.8" fill="#fff"/><circle cx="92" cy="82" r="1.8" fill="#fff"/>
+<path class="mouth" d="M74 104 q6 5 12 0" stroke="#b09a72" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M80 112 q9 18 -1 25 q-9 -12 1 -25z" fill="#f7f3e8"/>`},
+hou:{cn:'猴',body:`
+<path d="M112 154 C144 152 150 122 132 110" stroke="#b87b3f" stroke-width="9" fill="none" stroke-linecap="round"/>
+<ellipse cx="78" cy="140" rx="34" ry="30" fill="#c88a4b"/>
+<circle cx="44" cy="64" r="15" fill="#c88a4b"/><circle cx="116" cy="64" r="15" fill="#c88a4b"/>
+<circle cx="44" cy="64" r="8" fill="#f0c28a"/><circle cx="116" cy="64" r="8" fill="#f0c28a"/>
+<circle cx="80" cy="78" r="38" fill="#c88a4b"/>
+<path d="M80 58 C96 58 105 76 96 94 C92 102 68 102 64 94 C55 76 64 58 80 58z" fill="#f7d7ae"/>
+<g class="blink"><circle cx="65" cy="72" r="5.5" fill="#2b2b2b"/><circle cx="95" cy="72" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="67" cy="70" r="2" fill="#fff"/><circle cx="97" cy="70" r="2" fill="#fff"/>
+<ellipse cx="72" cy="88" rx="3.5" ry="2.5" fill="#8a5a2b"/><ellipse cx="88" cy="88" rx="3.5" ry="2.5" fill="#8a5a2b"/>
+<path class="mouth" d="M68 96 q12 9 24 0" stroke="#8a5a2b" stroke-width="3.5" fill="none" stroke-linecap="round"/>`},
+ji:{cn:'鸡',body:`
+<path d="M112 140 C144 134 154 104 138 84 C148 106 140 126 120 128z" fill="#e8b93c"/>
+<path d="M120 132 C148 122 154 96 142 80" stroke="#f0c64a" stroke-width="9" fill="none" stroke-linecap="round"/>
+<ellipse cx="74" cy="132" rx="34" ry="30" fill="#f7d774"/>
+<ellipse cx="74" cy="138" rx="20" ry="16" fill="#fff0b8"/>
+<path d="M56 64 C54 44 66 40 72 50 C74 34 88 32 92 46 C100 42 106 52 100 64z" fill="#e5453f"/>
+<circle cx="76" cy="78" r="26" fill="#ffe9a8"/>
+<path d="M100 76 L128 84 L100 92z" fill="#f5a623"/>
+<path d="M100 94 q-5 17 6 17 q9 0 5 -17z" fill="#e5453f"/>
+<g class="blink"><circle cx="69" cy="72" r="5" fill="#2b2b2b"/><circle cx="87" cy="72" r="5" fill="#2b2b2b"/></g>
+<circle cx="71" cy="70" r="1.8" fill="#fff"/><circle cx="89" cy="70" r="1.8" fill="#fff"/>
+<path d="M62 162 L62 178 M86 162 L86 178 M62 178 L51 184 M62 178 L73 184 M86 178 L75 184 M86 178 L97 184" stroke="#f5a623" stroke-width="5" stroke-linecap="round" fill="none"/>`},
+gou:{cn:'狗',body:`
+<path d="M116 148 C144 144 150 118 136 102" stroke="#a96b38" stroke-width="12" fill="none" stroke-linecap="round"/>
+<ellipse cx="76" cy="140" rx="36" ry="30" fill="#c88a5c"/>
+<ellipse cx="76" cy="144" rx="22" ry="16" fill="#e6bb8b"/>
+<ellipse cx="48" cy="78" rx="15" ry="31" fill="#a96b38" transform="rotate(-8 48 78)"/>
+<ellipse cx="112" cy="78" rx="15" ry="31" fill="#a96b38" transform="rotate(8 112 78)"/>
+<circle cx="80" cy="74" r="32" fill="#c88a5c"/>
+<ellipse cx="80" cy="98" rx="22" ry="16" fill="#f0d3ae"/>
+<ellipse cx="80" cy="88" rx="9" ry="7" fill="#3a2a1c"/>
+<g class="blink"><circle cx="68" cy="66" r="5.5" fill="#2b2b2b"/><circle cx="92" cy="66" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="70" cy="64" r="2" fill="#fff"/><circle cx="94" cy="64" r="2" fill="#fff"/>
+<path d="M80 104 q0 12 -8 12" stroke="#3a2a1c" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path class="mouth" d="M72 114 q8 12 16 0 q-8 16 -16 0z" fill="#ff8fa6"/>`},
+zhu:{cn:'猪',body:`
+<path d="M118 154 C138 152 142 134 130 126 C124 122 120 128 126 134" stroke="#f4a3b6" stroke-width="7" fill="none" stroke-linecap="round"/>
+<ellipse cx="78" cy="138" rx="40" ry="34" fill="#f7b0c2"/>
+<ellipse cx="78" cy="144" rx="26" ry="20" fill="#ffd3de"/>
+<path d="M52 62 C42 44 50 34 64 42 C66 52 60 58 58 64z" fill="#f08fa6"/>
+<path d="M108 62 C118 44 110 34 96 42 C94 52 100 58 102 64z" fill="#f08fa6"/>
+<circle cx="80" cy="80" r="32" fill="#f7b0c2"/>
+<ellipse cx="80" cy="96" rx="24" ry="18" fill="#ff9fb8"/>
+<ellipse cx="70" cy="96" rx="5" ry="6.5" fill="#c4586e"/><ellipse cx="90" cy="96" rx="5" ry="6.5" fill="#c4586e"/>
+<g class="blink"><circle cx="67" cy="68" r="5" fill="#2b2b2b"/><circle cx="93" cy="68" r="5" fill="#2b2b2b"/></g>
+<circle cx="69" cy="66" r="1.8" fill="#fff"/><circle cx="95" cy="66" r="1.8" fill="#fff"/>
+<path class="mouth" d="M70 108 q10 7 20 0" stroke="#c4586e" stroke-width="3" fill="none" stroke-linecap="round"/>`}
 };
+
 const ORDER = ['shu','niu','hu','tu','long','she','ma','yang','hou','ji','gou','zhu'];
 const ROLENAME = {all:'全体（合）', aud:'观众', narr:'旁白', music:'配乐'};
 for(const k in Z) ROLENAME[k]=Z[k].cn;
@@ -263,22 +384,8 @@ for(const k in Z) ROLENAME[k]=Z[k].cn;
 function svgFor(key){
   const z=Z[key];
   return `<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="80" cy="188" rx="46" ry="9" fill="rgba(0,0,0,.28)"/>
-  <ellipse cx="80" cy="140" rx="46" ry="42" fill="${z.c2}"/>
-  <ellipse cx="80" cy="146" rx="32" ry="30" fill="rgba(255,255,255,.45)"/>
-  ${z.extra}
-  <circle cx="80" cy="80" r="46" fill="${z.c}"/>
-  <circle cx="80" cy="72" r="40" fill="${z.c2}" opacity=".55"/>
-  ${z.ears}
-  <g class="blink">
-    <ellipse cx="63" cy="76" rx="7.5" ry="9.5" fill="#2b2b2b"/>
-    <ellipse cx="97" cy="76" rx="7.5" ry="9.5" fill="#2b2b2b"/>
-    <circle cx="65.5" cy="72.5" r="2.8" fill="#fff"/><circle cx="99.5" cy="72.5" r="2.8" fill="#fff"/>
-  </g>
-  <circle cx="50" cy="92" r="8" fill="rgba(255,120,140,.35)"/>
-  <circle cx="110" cy="92" r="8" fill="rgba(255,120,140,.35)"/>
-  <ellipse class="mouth" cx="80" cy="99" rx="10" ry="8" fill="#7a2b3a"/>
-  <ellipse class="mouth" cx="80" cy="96" rx="6" ry="4" fill="#ff8fa6"/>
+  <ellipse cx="80" cy="188" rx="44" ry="8" fill="rgba(0,0,0,.28)"/>
+  ${z.body}
 </svg>`;
 }
 
