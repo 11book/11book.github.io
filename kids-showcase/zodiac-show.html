@@ -588,7 +588,7 @@ const DURATIONS=[11.695, 4.051, 0.964, 0.488, 0.464, 1.042, 0.557, 0.657, 0.459,
 /* ---- 预加载为 Blob：切句时直接换 blob URL，无需等待网络 ---- */
 const blobCache=new Map();      // idx -> blobURL
 const loading=new Map();        // idx -> Promise
-const PRELOAD_AHEAD=3;
+const PRELOAD_AHEAD=8;
 
 function fetchBlob(i){
   if(blobCache.has(i)) return Promise.resolve(blobCache.get(i));
@@ -606,11 +606,13 @@ function fetchBlob(i){
   return p;
 }
 function preloadAhead(i){
+  const jobs=[];
   for(let k=1;k<=PRELOAD_AHEAD;k++){
     const n=i+k;
     if(n>=DURATIONS.length) break;
-    if(!blobCache.has(n) && !loading.has(n)) fetchBlob(n).catch(()=>{});
+    if(!blobCache.has(n) && !loading.has(n)) jobs.push(fetchBlob(n).catch(()=>{}));
   }
+  if(jobs.length) Promise.all(jobs);
 }
 function releaseOld(i){
   // 保留窗口内，其余释放，避免内存无限增长
@@ -631,7 +633,7 @@ function getPlayer(){
 }
 let curAudio=null, curIdx=-1;
 // 页面加载即预热前几首，避免首句等待
-for(let k=0;k<4;k++) fetchBlob(k).catch(()=>{});
+for(let k=0;k<10;k++) fetchBlob(k).catch(()=>{});
 function stopSpeak(){
   if(player){ try{ player.pause(); }catch(e){} }
   Object.values(actors).forEach(a=>a.classList.remove('talking'));
