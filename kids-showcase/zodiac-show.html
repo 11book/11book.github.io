@@ -132,6 +132,10 @@ header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 #cue{font-size:clamp(12px,1.5vw,19px);color:var(--txt2);min-height:1.2em}
 #cue b{color:var(--pink)}
 
+/* 提示气泡 */
+#toast{position:fixed;left:50%;top:74px;transform:translate(-50%,-14px);background:rgba(20,16,38,.93);color:#fff;padding:11px 20px;border-radius:999px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.28s;z-index:99;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
 /* ---------- 控制条 ---------- */
 #controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
 .btn{padding:.55em 1.1em;border-radius:999px;border:1px solid var(--panel-b);background:var(--panel);color:var(--txt);
@@ -575,66 +579,59 @@ const ACTS=[0,1,2,3,4];
 ACTS.forEach(a=>{const b=document.createElement('button');b.className='act';b.textContent=A[a+1].replace('第','第');
   b.onclick=()=>{const i=LINES.findIndex(l=>l.a===a);if(i>=0)show(i);};$('#acts').appendChild(b);});
 
-/* ============ 配音系统（Web Speech API） ============ */
-const VOICE={
-  shu :{p:1.75,r:1.15,v:'小老鼠'},
-  niu :{p:0.62,r:0.85,v:'老黄牛'},
-  hu  :{p:0.80,r:0.95,v:'大老虎'},
-  tu  :{p:1.85,r:1.20,v:'小兔子'},
-  long:{p:0.55,r:0.88,v:'老龙王'},
-  she :{p:1.05,r:0.92,v:'小蛇蛇'},
-  ma  :{p:1.00,r:1.12,v:'老马'},
-  yang:{p:1.50,r:1.00,v:'小羊羊'},
-  hou :{p:1.70,r:1.25,v:'小猴'},
-  ji  :{p:1.80,r:1.22,v:'大公鸡'},
-  gou :{p:1.05,r:1.06,v:'小狗'},
-  zhu :{p:0.78,r:0.82,v:'小猪'},
-  all :{p:1.05,r:1.00,v:'全体'},
-  aud :{p:1.25,r:1.10,v:'观众'},
-  narr:{p:0.88,r:0.95,v:'画外音'},
-  music:{p:1,r:1,v:'配乐'}
-};
-let zhVoice=null, zhVoices=[];
-// 角色 -> 中文音色索引（不同动物尽量用不同系统语音）
-const VOICE_PICK={shu:0,tu:1,hou:2,ji:3,yang:4,ma:5,gou:6,she:7,hu:8,long:9,niu:10,zhu:11};
-function pickZhVoice(){
-  if(!('speechSynthesis' in window)) return null;
-  const vs=speechSynthesis.getVoices()||[];
-  zhVoices = vs.filter(v=>/^zh/i.test(v.lang));
-  if(!zhVoices.length) zhVoices = vs.filter(v=>/zh|cmn/i.test(v.lang));
-  zhVoice = zhVoices[0]||null;
-  return zhVoice;
+/* ============ 配音系统（真实音频文件） ============ */
+const AUDIO_DIR='zodiac-audio/';
+const DURATIONS=[3.812, 2.447, 0.474, 0.627, 0.566, 0.45, 0.604, 0.574, 0.491, 0.524, 0.458, 0.454, 0.502, 0.626, 1.771, 1.163, 2.971, 1.242, 1.273, 0.905, 0.637, 1.159, 0.435, 1.647, 0.747, 1.084, 1.92, 3.244, 0.833, 0.458, 1.92, 0.363, 2.157, 2.127, 0.534, 1.982, 1.527, 1.244, 1.939, 1.121, 1.486, 0.92, 0.655, 1.752, 1.325, 3.254, 1.131, 2.192, 0.607, 2.336, 0.607, 2.662, 0.488, 0.947, 0.739, 0.906, 1.459, 0.807, 2.623, 0.613, 2.035, 0.518, 1.561, 1.552, 0.539, 1.332, 0.363, 1.182, 0.513, 2.204, 0.375, 1.813, 1.645, 1.783, 2.998, 1.069, 1.271, 0.749, 3.799, 1.702, 1.527, 1.159, 0.559, 2.619, 0.461, 0.648, 1.751, 0.377, 0.439, 1.789, 1.041, 2.577, 0.63, 1.758, 0.63, 1.431, 1.269, 0.782, 0.716, 1.844, 0.628, 5.664, 0.401, 7.041, 0.401, 2.343, 0.559, 2.103, 1.183, 1.628, 2.793, 0.485, 1.615, 1.7, 0.512, 1.708, 1.856, 3.201, 0.521, 1.151, 0.903, 2.258, 0.576, 0.676, 3.544, 2.059, 1.641, 1.83, 0.582, 2.642, 0.513, 4.243, 0.374, 2.697, 1.403, 0.938, 1.395, 1.171, 0.855, 1.394, 1.317, 0.704, 0.691, 0.513, 0.535, 1.081, 1.697, 1.185, 1.604];
+const audCache={};
+function getAudio(i){
+  if(!audCache[i]){
+    const a=new Audio(AUDIO_DIR+i+'.mp3');
+    a.preload='auto';
+    audCache[i]=a;
+  }
+  return audCache[i];
 }
-if('speechSynthesis' in window){
-  pickZhVoice();
-  speechSynthesis.onvoiceschanged=pickZhVoice;
-}
+let curAudio=null, curIdx=-1;
 function stopSpeak(){
-  if(utter){ const u=utter; utter=null; try{u.onend=null;u.onerror=null;}catch(e){} speechSynthesis.cancel(); }
+  if(curAudio){ try{ curAudio.pause(); curAudio.currentTime=0; }catch(e){} curAudio=null; }
   Object.values(actors).forEach(a=>a.classList.remove('talking'));
 }
-function speakLine(L0){
-  if(!voiceOn || !('speechSynthesis' in window)) return false;
+function actorsFor(r){
+  if(r==='all') return Object.values(actors);
+  const a=actors[r]; return a?[a]:[];
+}
+function speakLine(L0, index){
+  if(!voiceOn) return false;
   stopSpeak();
-  if(L0.r==='music') return false;
-  const cfg=VOICE[L0.r]||{p:1,r:1};
-  const u=new SpeechSynthesisUtterance(L0.t);
-  if(!zhVoice) pickZhVoice();
-  const vi = (L0.r in VOICE_PICK) ? VOICE_PICK[L0.r] : 0;
-  const v = zhVoices.length ? zhVoices[vi % zhVoices.length] : zhVoice;
-  if(v) u.voice=v;
-  u.lang='zh-CN';
-  u.pitch=Math.max(0.1,Math.min(2,cfg.p));
-  u.rate=Math.max(0.5,Math.min(2,cfg.r*speed));
-  u.volume=1;
-  const actor=actors[L0.r];
-  const crowd = (L0.r==='all') ? Object.values(actors) : (actor?[actor]:[]);
-  utter=u;
-  u.onstart=()=>{ if(utter===u) crowd.forEach(a=>a.classList.add('talking')); };
-  u.onend=()=>{ crowd.forEach(a=>a.classList.remove('talking')); if(utter===u){utter=null; if(voiceOn&&playing) advance();} };
-  u.onerror=()=>{ crowd.forEach(a=>a.classList.remove('talking')); if(utter===u){utter=null; if(voiceOn&&playing) advance();} };
-  try{ speechSynthesis.speak(u); }catch(e){ return false; }
+  const crowd=actorsFor(L0.r);
+  const a=getAudio(index);
+  curAudio=a; curIdx=index;
+  a.onplaying=()=>{ crowd.forEach(x=>x.classList.add('talking')); };
+  a.onended=()=>{
+    crowd.forEach(x=>x.classList.remove('talking'));
+    if(curAudio===a){ curAudio=null; }
+    if(voiceOn && playing) advance();
+  };
+  a.onerror=()=>{
+    crowd.forEach(x=>x.classList.remove('talking'));
+    if(curAudio===a) curAudio=null;
+    if(voiceOn && playing) advance();
+  };
+  a.currentTime=0;
+  const pr=a.play();
+  if(pr && pr.catch) pr.catch(()=>{
+    crowd.forEach(x=>x.classList.remove('talking'));
+    if(curAudio===a) curAudio=null;
+    if(voiceOn && playing) advance();
+  });
   return true;
+}
+function toast(msg,ms=3000){
+  let t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm=setTimeout(()=>t.classList.remove('show'),ms);
 }
 
 /* ============ 渲染 ============ */
@@ -686,8 +683,7 @@ function show(i,keepScroll){
   // 撒花
   if(L0.a===4 && r==='all') burstConfetti();
   // 配音
-  const spoke = speakLine(L0);
-  if(spoke){ clearTimeout(timer); }
+  if(voiceOn){ clearTimeout(timer); speakLine(L0, idx); }
   else { schedule(); }
 }
 
@@ -717,7 +713,7 @@ function advance(){
 function schedule(){
   clearTimeout(timer);
   if(!playing||readMode) return;
-  if(voiceOn && ('speechSynthesis' in window)) return; // 配音模式下由语音结束驱动
+  if(voiceOn) return; // 配音模式下由音频结束驱动
   const L0=LINES[idx];
   let dur;
   if(L0.r==='music') dur=4000;
@@ -728,7 +724,7 @@ function togglePlay(){
   playing=!playing;
   $('#play').textContent=playing?'⏸ 暂停':'▶ 播放';
   if(!playing){ stopSpeak(); clearTimeout(timer); }
-  else if(voiceOn){ speakLine(LINES[idx]); }
+  else if(voiceOn){ speakLine(LINES[idx], idx); }
   else schedule();
 }
 function jumpToActor(k){
@@ -743,11 +739,12 @@ $('#prev').onclick=()=>show(idx-1);
 $('#loop').onclick=e=>{loopAct=!loopAct;e.target.classList.toggle('on',loopAct);schedule();};
 $('#voice').onclick=e=>{
   voiceOn=!voiceOn;
-  if(voiceOn && !('speechSynthesis' in window)){ alert('当前浏览器不支持语音合成，建议用 Chrome 或 Safari 打开'); }
   e.target.classList.toggle('on',voiceOn);
-  e.target.textContent=voiceOn?'🔊 配音中':'🔊 配音朗读';
-  if(!voiceOn){ stopSpeak(); schedule(); }
-  else if(playing){ show(idx,true); }
+  e.target.textContent=voiceOn?'🔊 配音中 (再点关闭)':'🔊 配音朗读';
+  if(!voiceOn){ stopSpeak(); if(playing) schedule(); return; }
+  // 开启后立即从头朗读
+  idx=0; show(0);
+  playing=true; $('#play').textContent='⏸ 暂停';
 };
 $('#read').onclick=e=>{readMode=!readMode;e.target.classList.toggle('on',readMode);
   if(readMode){playing=false;$('#play').textContent='▶ 播放';clearTimeout(timer);}
