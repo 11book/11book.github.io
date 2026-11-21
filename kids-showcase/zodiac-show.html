@@ -597,74 +597,41 @@ const blobCache=new Map();      // idx -> blobURL
 const loading=new Map();        // idx -> Promise
 const PRELOAD_AHEAD=8;
 
-function fetchBlob(i){
-  if(blobCache.has(i)) return Promise.resolve(blobCache.get(i));
-  if(loading.has(i)) return loading.get(i);
-  const p=fetch(AUDIO_BASE+i+'.mp3')
-    .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); })
-    .then(b=>{
-      const url=URL.createObjectURL(b);
-      blobCache.set(i,url);
-      loading.delete(i);
-      return url;
-    })
-    .catch(e=>{ loading.delete(i); throw e; });
-  loading.set(i,p);
-  return p;
-}
-// 全量预加载：149 句全部拉进内存（总计约 3.4MB），加载完再播，句间零间隙
-let loadTotal=0, loadDone=0, loadPromise=null, loadReady=false;
+/* ===== 单条连续音轨引擎（消除句间空隙与网络等待） ===== */
+const TRACK_URL=(location.protocol==='file:') ? 'https://11book.github.io/kids-showcase/zodiac-audio/full.mp3' : 'zodiac-audio/full.mp3';
+/* 每句在音轨中的 [开始, 结束] 秒（由源音频精确采样计算） */
+const TIMELINE=[[0.1,11.795],[11.895,15.946],[16.046,17.01],[17.11,17.598],[17.698,18.162],[18.262,19.304],[19.404,19.962],[20.062,20.719],[20.819,21.278],[21.378,22.325],[22.425,22.923],[23.023,23.548],[23.648,24.287],[24.387,25.47],[25.57,30.093],[30.193,33.312],[33.412,41.684],[41.784,44.493],[44.593,46.194],[46.294,48.084],[48.184,49.231],[49.331,51.924],[52.024,52.376],[52.476,55.672],[55.772,56.763],[56.863,58.747],[58.847,63.661],[63.761,70.467],[70.567,72.289],[72.389,73.034],[73.134,76.422],[76.522,76.942],[77.042,80.583],[80.683,85.007],[85.107,85.677],[85.777,91.061],[91.161,93.418],[93.518,95.868],[95.968,99.799],[99.899,103.134],[103.234,105.257],[105.357,107.245],[107.345,107.937],[108.037,112.691],[112.791,115.737],[115.837,123.207],[123.307,125.261],[125.361,129.526],[129.626,130.695],[130.795,135.429],[135.529,136.288],[136.388,141.863],[141.963,142.398],[142.498,144.058],[144.158,144.685],[144.785,146.269],[146.369,149.237],[149.337,150.299],[150.399,156.555],[156.655,158.122],[158.222,162.371],[162.471,162.987],[163.087,166.714],[166.814,170.718],[170.818,171.444],[171.544,174.424],[174.524,174.642],[174.742,176.819],[176.919,177.335],[177.435,183.812],[183.912,184.078],[184.178,189.685],[189.785,192.822],[192.922,199.728],[199.828,204.898],[204.998,207.951],[208.051,209.447],[209.547,210.991],[211.091,218.844],[218.944,226.431],[226.531,228.775],[228.875,232.628],[232.728,233.322],[233.422,244.53],[244.63,245.182],[245.282,246.972],[247.072,251.492],[251.592,251.739],[251.839,252.263],[252.363,255.988],[256.088,258.383],[258.483,263.995],[264.095,264.783],[264.883,268.302],[268.402,269.039],[269.139,271.839],[271.939,274.844],[274.944,275.606],[275.706,277.015],[277.115,280.058],[280.158,280.963],[281.063,293.04],[293.14,293.337],[293.437,306.744],[306.844,307.049],[307.149,312.608],[312.708,313.156],[313.256,317.624],[317.724,321.247],[321.347,326.111],[326.211,333.016],[333.116,334.278],[334.378,337.436],[337.536,341.618],[341.718,342.047],[342.147,345.632],[345.732,349.003],[349.103,356.518],[356.618,357.302],[357.402,359.455],[359.555,360.961],[361.061,365.727],[365.827,366.435],[366.535,367.672],[367.772,373.969],[374.069,380.591],[380.691,383.752],[383.852,388.906],[389.006,389.662],[389.762,396.921],[397.021,397.414],[397.514,405.958],[406.058,406.297],[406.397,413.33],[413.43,417.587],[417.687,418.931],[419.031,421.555],[421.655,423.653],[423.753,425.62],[425.72,428.179],[428.279,431.098],[431.198,432.404],[432.504,433.544],[433.644,435.233],[435.333,436.403],[436.503,439.152],[439.252,442.274],[442.374,445.084],[445.184,448.107]];
+let trackSrc=null, trackPromise=null, trackReady=false, loadReady=false, loadDone=0, loadTotal=1;
+
 function updateLoadUI(){
   const bar=document.querySelector('#loadbar');
   if(!bar) return;
   if(loadReady){ bar.classList.remove('on'); return; }
   bar.classList.add('on');
-  const pct=loadTotal? Math.round(loadDone/loadTotal*100):0;
+  const pct=Math.round(loadDone/loadTotal*100);
   document.querySelector('#loadfill').style.width=pct+'%';
-  document.querySelector('#loadtxt').textContent=`加载配音 ${loadDone}/${loadTotal}（${pct}%）`;
+  document.querySelector('#loadtxt').textContent=`加载配音 ${pct}%`;
 }
-function loadAll(){
-  if(loadPromise) return loadPromise;
-  loadTotal=DURATIONS.length; loadDone=0; loadReady=false;
-  updateLoadUI();
-  const CONC=8;
-  let next=0;
-  const worker=async()=>{
-    while(next<loadTotal){
-      const i=next++;
-      try{ await fetchBlob(i); }catch(e){}
-      loadDone++; updateLoadUI();
-    }
-  };
-  const workers=[]; for(let k=0;k<CONC;k++) workers.push(worker());
-  loadPromise=Promise.all(workers).then(()=>{ loadReady=true; updateLoadUI(); });
-  return loadPromise;
-}
-
-function preloadAhead(i){
-  const jobs=[];
-  // 长句播完后立刻预取其后 3 句（长句有充足网络时间）
-  const dur=DURATIONS[i]||0;
-  if(dur>3.0){
-    for(let k=1;k<=3;k++){
-      const n=i+k;
-      if(n>=DURATIONS.length) break;
-      if(!blobCache.has(n) && !loading.has(n)) jobs.push(fetchBlob(n).catch(()=>{}));
-    }
-  }
-  for(let k=1;k<=PRELOAD_AHEAD;k++){
-    const n=i+k;
-    if(n>=DURATIONS.length) break;
-    if(!blobCache.has(n) && !loading.has(n)) jobs.push(fetchBlob(n).catch(()=>{}));
-  }
-  if(jobs.length) Promise.all(jobs);
-}
-function releaseOld(i){
-  // 全量加载模式下不释放（总计仅 3.4MB），保证任意跳句都秒播
-  if(loadReady) return;
-  for(const [k,url] of blobCache){
-    if(k < i-2){ URL.revokeObjectURL(url); blobCache.delete(k); }
-  }
+function loadTrack(){
+  if(trackPromise) return trackPromise;
+  trackPromise=fetch(TRACK_URL,{cache:'force-cache'})
+    .then(r=>{
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const total=+(r.headers.get('content-length')||0);
+      if(!r.body||!total) return r.blob();
+      const reader=r.body.getReader(); const chunks=[]; let got=0;
+      return new Promise((res,rej)=>{
+        const step=d=>{
+          if(d.done){ res(new Blob(chunks,{type:'audio/mpeg'})); return; }
+          chunks.push(d.value); got+=d.value.length; loadDone=got; loadTotal=total; updateLoadUI();
+          reader.read().then(step).catch(rej);
+        };
+        reader.read().then(step).catch(rej);
+      });
+    })
+    .then(b=>{ trackSrc=URL.createObjectURL(b); if(player) player.src=trackSrc; trackReady=true; loadDone=1; loadReady=true; updateLoadUI(); return trackSrc; })
+    .catch(e=>{ trackSrc=TRACK_URL; if(player) player.src=trackSrc; trackReady=true; loadDone=1; loadReady=true; updateLoadUI(); return trackSrc; });
+  return trackPromise;
 }
 
 let player=null;
@@ -673,78 +640,69 @@ function getPlayer(){
     player=new Audio();
     player.preload='auto';
     player.setAttribute('playsinline','');
+    player.src=TRACK_URL;
     document.body.appendChild(player);
   }
   return player;
 }
-let curAudio=null, curIdx=-1;
-// 页面加载即开始全量预加载（3.4MB），加载完所有句子都可秒播
-loadAll();
-function stopSpeak(){
-  if(player){ try{ player.pause(); }catch(e){} }
-  Object.values(actors).forEach(a=>a.classList.remove('talking'));
-}
+let curIdx=-1, curCrowd=[], advancing=false, rafId=null;
+
 function actorsFor(r){
   if(r==='all') return Object.values(actors);
   const a=actors[r]; return a?[a]:[];
 }
-function speakLine(L0, index){
+function setTalking(on){
+  curCrowd.forEach(x=>x.classList.toggle('talking',on));
+}
+/* 时间轴驱动：按音轨播放位置判断当前句是否在说话，并在句末自动续下一句 */
+function tick(){
+  rafId=requestAnimationFrame(tick);
+  if(!player||!voiceOn) return;
+  const t=player.currentTime;
+  const seg=TIMELINE[curIdx];
+  if(!seg) return;
+  if(t>=seg[0]-0.02 && t<=seg[1]+0.03){
+    if(!curCrowd.length||!curCrowd[0].classList.contains('talking')) setTalking(true);
+    return;
+  }
+  setTalking(false);
+  // 句末 -> 续下一句
+  if(t>seg[1]+0.04 && !advancing && playing && !readMode){
+    advancing=true;
+    advance();
+    advancing=false;
+  }
+}
+function stopSpeak(){
+  if(player){ try{ player.pause(); }catch(e){} }
+  setTalking(false);
+}
+function speakLine(L0,index){
   if(!voiceOn) return false;
-  stopSpeak();
-  const crowd=actorsFor(L0.r);
+  curIdx=index;
+  curCrowd=actorsFor(L0.r);
   const a=getPlayer();
-  curAudio=a; curIdx=index;
-  const startPlay=()=>{
-    a.onplaying=()=>{ crowd.forEach(x=>x.classList.add('talking')); };
-    a.onended=()=>{
-      crowd.forEach(x=>x.classList.remove('talking'));
-      if(curAudio===a) curAudio=null;
-      if(voiceOn && playing) advance();
-    };
-    a.onerror=()=>{
-      crowd.forEach(x=>x.classList.remove('talking'));
-      if(curAudio===a) curAudio=null;
-      if(voiceOn && playing){ if(fallbackTTS(L0,index)) return; advance(); }
-    };
+  const seg=TIMELINE[index]||[0,1];
+  const go=()=>{
+    try{
+      const now=a.currentTime||0;
+      // 若检测稍晚（当前已播过该句开头），保持当前位置，避免重复念句首
+      const target=(now>seg[0]+0.20 && now-seg[0]<1.2) ? now : seg[0]+0.01;
+      a.currentTime=target;
+    }catch(e){}
     try{ a.playbackRate=speed; }catch(e){}
+    setTalking(true);
     let pr; try{ pr=a.play(); }catch(e){ pr=null; }
-    if(pr && pr.catch) pr.catch(()=>{
-      crowd.forEach(x=>x.classList.remove('talking'));
-      if(curAudio===a) curAudio=null;
+    if(pr&&pr.catch) pr.catch(()=>{
+      setTalking(false);
       if(fallbackTTS(L0,index)) return;
       toast('浏览器拦截了自动播放，请点一次「▶ 播放」按钮');
     });
   };
-  const url=blobCache.get(index);
-  if(url){ a.src=url; startPlay(); }
-  else{
-    // 尚未加载完：短等 120ms，拿到就用；拿不到则直接走 URL 边下边播
-    let done=false;
-    const race=Promise.race([
-      fetchBlob(index),
-      new Promise(r=>setTimeout(()=>r(null),120))
-    ]);
-    race.then(u=>{
-      if(done) return;
-      if(u){ done=true;
-        a.src=u; startPlay(); preloadAhead(index); releaseOld(index);
-        return;
-      }
-      // 还没下好：等全量加载完成再播，绝不先播空白
-      loadAll().then(()=>{
-        if(done) return; done=true;
-        const u2=blobCache.get(index);
-        if(u2){ a.src=u2; startPlay(); }
-        else { a.src=AUDIO_BASE+index+'.mp3'; startPlay(); }
-        preloadAhead(index);
-      });
-    }).catch(()=>{
-      if(done) return; done=true;
-      a.src=AUDIO_BASE+index+'.mp3'; startPlay();
-    });
-  }
+  if(trackReady){ go(); return true; }
+  loadTrack().then(()=>go());
+  return true;
 }
-
 // 兜底：音频文件加载失败时用浏览器内置语音合成
 function fallbackTTS(L0,index){
   if(!('speechSynthesis' in window)) return false;
@@ -818,7 +776,7 @@ function show(i,keepScroll){
   // 撒花
   if(L0.a===4 && r==='all') burstConfetti();
   // 配音
-  if(voiceOn){ clearTimeout(timer); speakLine(L0, idx); }
+  if(voiceOn){ clearTimeout(timer); if(suppressNextVoice){ suppressNextVoice=false; } else speakLine(L0, idx); }
   else { schedule(); }
 }
 
@@ -857,10 +815,10 @@ function schedule(){
   timer=setTimeout(advance, dur);
 }
 function togglePlay(){
-  // 配音模式：确保全部音频已加载完成再开始，避免句间等待
-  if(!voiceOn) {} else if(!loadReady){
-    loadAll().then(()=>{ togglePlay(); });
+  // 配音模式：等连续音轨加载完成再开始
+  if(voiceOn && !trackReady){
     toast('正在加载配音…',2000);
+    loadTrack().then(()=>{ if(!playing){ playing=true; $('#play').textContent='⏸ 暂停'; speakLine(LINES[idx], idx); }});
     return;
   }
   playing=!playing;
@@ -947,6 +905,9 @@ function loopC(){
 loopC();
 
 /* 初始化 */
+loadTrack();            // 预下载连续音轨（约3.6MB，一次请求）
+requestAnimationFrame(tick);  // 时间轴驱动嘴部动画与自动续句
+let suppressNextVoice=true;   // 首帧不自动发声（避免加载即被浏览器拦截提示）
 show(0);
 </script>
 </body>
