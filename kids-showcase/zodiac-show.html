@@ -607,6 +607,15 @@ function fetchBlob(i){
 }
 function preloadAhead(i){
   const jobs=[];
+  // 长句播完后立刻预取其后 3 句（长句有充足网络时间）
+  const dur=DURATIONS[i]||0;
+  if(dur>3.0){
+    for(let k=1;k<=3;k++){
+      const n=i+k;
+      if(n>=DURATIONS.length) break;
+      if(!blobCache.has(n) && !loading.has(n)) jobs.push(fetchBlob(n).catch(()=>{}));
+    }
+  }
   for(let k=1;k<=PRELOAD_AHEAD;k++){
     const n=i+k;
     if(n>=DURATIONS.length) break;
@@ -672,16 +681,25 @@ function speakLine(L0, index){
   const url=blobCache.get(index);
   if(url){ a.src=url; startPlay(); }
   else{
-    // 尚未加载完：等一下再播，绝不先播空白
-    fetchBlob(index).then(u=>{
-      if(!voiceOn) return;
-      a.src=u; startPlay();
-      preloadAhead(index); releaseOld(index);
+    // 尚未加载完：短等 120ms，拿到就用；拿不到则直接走 URL 边下边播
+    let done=false;
+    const race=Promise.race([
+      fetchBlob(index),
+      new Promise(r=>setTimeout(()=>r(null),120))
+    ]);
+    race.then(u=>{
+      if(done) return;
+      if(u){ done=true;
+        a.src=u; startPlay(); preloadAhead(index); releaseOld(index);
+        return;
+      }
+      // 兜底：直接用 URL 加载（浏览器边下边播）
+      a.src=AUDIO_BASE+index+'.mp3'; startPlay();
+      preloadAhead(index);
     }).catch(()=>{
-      // 网络失败：退回直接用 URL 加载
+      if(done) return; done=true;
       a.src=AUDIO_BASE+index+'.mp3'; startPlay();
     });
-    preloadAhead(index);
   }
 }
 
