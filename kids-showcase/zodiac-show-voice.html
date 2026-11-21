@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#120b2e">
+<title>十二生肖大拜年 · 2026羊年版本 · 配音朗读版</title>
+<style>
+:root{
+  --bg1:#1b1040; --bg2:#3a1c6b; --bg3:#0d0824;
+  --panel:rgba(255,255,255,.08); --panel-b:rgba(255,255,255,.20);
+  --txt:#ffffff; --txt2:rgba(255,255,255,.72);
+  --gold:#ffd45e; --pink:#ff7eb3; --cyan:#5ee7ff; --green:#6ef0a5;
+  --radius:26px; --sp:clamp(8px,1.4vw,18px);
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  font-family:var(--font);color:var(--txt);
+  background:
+    radial-gradient(1200px 700px at 50% -10%, #6a2ea8 0%, transparent 60%),
+    radial-gradient(900px 600px at 12% 105%, #d43f7a 0%, transparent 55%),
+    radial-gradient(900px 600px at 90% 100%, #1f6fb2 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg1),var(--bg3));
+  background-attachment:fixed;
+  overflow:hidden;
+}
+body::before{ /* 舞台追光 */
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(60% 45% at 50% 8%, rgba(255,255,255,.10), transparent 70%);
+}
+#app{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;gap:var(--sp);padding:var(--sp)}
+
+/* ---------- header ---------- */
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:clamp(15px,2vw,24px);letter-spacing:.5px}
+.brand .logo{font-size:1.35em;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.act{
+  padding:.42em .85em;border-radius:999px;font-size:clamp(11px,1.25vw,16px);font-weight:700;
+  background:var(--panel);border:1px solid var(--panel-b);color:var(--txt2);backdrop-filter:blur(8px);
+  transition:.3s;white-space:nowrap
+}
+.act.on{background:linear-gradient(135deg,var(--gold),#ff9d4d);color:#3a1c00;border-color:transparent;box-shadow:0 4px 16px rgba(255,180,60,.35)}
+.act.done{color:var(--green)}
+
+/* ---------- stage ---------- */
+#stage{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.18));border:1px solid var(--panel-b);
+  overflow:hidden;box-shadow:inset 0 0 60px rgba(0,0,0,.25)}
+#stage.glow{box-shadow:inset 0 0 60px rgba(0,0,0,.25),0 0 0 2px rgba(255,212,94,.45),0 0 50px rgba(255,190,80,.35)}
+/* 舞台背景：幕布 + 星光 + 地板 */
+#stage::before{content:"";position:absolute;inset:0 0 auto;height:34%;pointer-events:none;
+  background:
+    radial-gradient(2px 2px at 12% 30%,rgba(255,255,255,.85),transparent),
+    radial-gradient(2px 2px at 28% 12%,rgba(255,255,255,.6),transparent),
+    radial-gradient(2px 2px at 46% 26%,rgba(255,255,255,.75),transparent),
+    radial-gradient(2px 2px at 63% 10%,rgba(255,255,255,.55),transparent),
+    radial-gradient(2px 2px at 78% 22%,rgba(255,255,255,.8),transparent),
+    radial-gradient(2px 2px at 91% 14%,rgba(255,255,255,.6),transparent),
+    radial-gradient(2px 2px at 36% 38%,rgba(255,255,255,.4),transparent),
+    radial-gradient(2px 2px at 70% 36%,rgba(255,255,255,.45),transparent),
+    linear-gradient(180deg,rgba(120,30,110,.75),transparent);
+  animation:twinkle 4s ease-in-out infinite}
+#stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:26%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(255,190,90,.10) 55%,rgba(255,190,90,.16));
+  border-top:1px solid rgba(255,212,94,.18)}
+@keyframes twinkle{0%,100%{opacity:.75}50%{opacity:1}}
+.stage-floor{position:absolute;left:6%;right:6%;bottom:4px;height:26px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(255,212,94,.30),transparent 70%);pointer-events:none}
+#cast{display:flex;align-items:flex-end;justify-content:center;gap:clamp(2px,.7vw,12px);padding:10px 8px 8px;flex-wrap:nowrap;overflow:visible}
+.actor{position:relative;flex:1 1 0;min-width:0;max-width:clamp(46px,8vw,118px);transition:transform .55s cubic-bezier(.34,1.56,.64,1),filter .35s,opacity .35s;cursor:pointer;transform-origin:bottom center}
+.actor svg{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
+.actor .ring{position:absolute;left:50%;bottom:-4%;transform:translateX(-50%);width:88%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);opacity:0;transition:.4s;z-index:-1}
+.actor .tag{
+  position:absolute;left:50%;transform:translate(-50%,-4px) scale(.8);bottom:-4px;
+  background:linear-gradient(135deg,var(--gold),#ff9d4d);color:#3a1c00;font-weight:900;font-size:clamp(11px,1.5vw,19px);
+  padding:.1em .5em;border-radius:999px;opacity:0;transition:.35s;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.4)
+}
+.actor.speak{transform:translateY(-10%) scale(1.42);z-index:9}
+.actor.speak .ring{opacity:1;animation:pulse 1.6s ease-out infinite}
+.actor.speak .tag{opacity:1;transform:translate(-50%,0) scale(1)}
+.actor.dim{filter:brightness(.5) saturate(.55);opacity:.72}
+.actor.cheer{animation:cheer .55s ease-in-out}
+.actor.finale{transform:translateY(-4%) scale(1.12)}
+.actor.hop{animation:hop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes hop{0%{transform:translateY(30%) scale(.9)}55%{transform:translateY(-18%) scale(1.06)}100%{transform:translateY(0) scale(1)}}
+@keyframes pulse{0%{transform:translateX(-50%) scale(.8);opacity:.9}100%{transform:translateX(-50%) scale(1.5);opacity:0}}
+@keyframes cheer{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-14%) rotate(-6deg)}60%{transform:translateY(-6%) rotate(6deg)}}
+.talking .mouth{transform-box:fill-box;transform-origin:center;animation:talk .22s ease-in-out infinite alternate}
+@keyframes talk{from{transform:scaleY(.35)}to{transform:scaleY(1.25)}}
+.blink{animation:blink 4.5s infinite}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+
+/* 幕布大字 */
+#banner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;text-align:center;
+  font-size:clamp(26px,5vw,64px);font-weight:900;text-shadow:0 6px 24px rgba(0,0,0,.6);opacity:0;transition:.4s}
+#banner.on{opacity:1}
+#banner span{background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* MUSIC 覆盖层 */
+#music{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;
+  background:radial-gradient(60% 60% at 50% 50%,rgba(94,231,255,.22),rgba(0,0,0,.35));backdrop-filter:blur(3px)}
+#music.on{display:flex}
+#music .note{font-size:clamp(40px,8vw,90px);animation:float 1.6s ease-in-out infinite}
+#music .note:nth-child(2){animation-delay:.25s}#music .note:nth-child(3){animation-delay:.5s}
+#music .txt{font-size:clamp(20px,3.4vw,44px);font-weight:900;color:var(--cyan)}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-22px) rotate(8deg)}}
+
+/* 吉祥话卡片 */
+#cards{display:none;gap:8px;padding:0 4px 2px;overflow-x:auto;scrollbar-width:none;mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%)}
+#cards::-webkit-scrollbar{display:none}
+#cards.on{display:flex}
+.card{flex:0 0 auto;width:clamp(116px,13vw,186px);padding:8px 10px;border-radius:16px;text-align:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid var(--panel-b);
+  transform:rotateY(90deg);opacity:.35;transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s}
+.card.flip{transform:rotateY(0);opacity:1;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.card .z{font-size:clamp(20px,2.6vw,34px);font-weight:900;color:var(--gold)}
+.card .b{font-size:clamp(11px,1.35vw,17px);font-weight:700;margin-top:2px;line-height:1.3;height:3.9em;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+
+/* ---------- 台词区 ---------- */
+#dialog{background:var(--panel);border:1px solid var(--panel-b);border-radius:var(--radius);padding:clamp(10px,1.6vw,20px) clamp(14px,2.4vw,30px);
+  backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:6px;min-height:clamp(120px,22vh,240px)}
+#speaker{display:flex;align-items:center;gap:10px;font-size:clamp(16px,2.4vw,30px);font-weight:900;color:var(--gold)}
+#speaker .who{background:linear-gradient(135deg,var(--gold),#ff9d4d);color:#3a1c00;border-radius:999px;padding:.1em .7em}
+#speaker .tag2{font-size:clamp(11px,1.3vw,16px);font-weight:700;color:var(--cyan);border:1px solid rgba(94,231,255,.5);border-radius:999px;padding:.05em .6em}
+#line{font-size:clamp(24px,4.6vw,60px);font-weight:900;line-height:1.3;letter-spacing:.5px;min-height:1.35em;text-shadow:0 4px 14px rgba(0,0,0,.45)}
+#line .kw{color:var(--gold);text-shadow:0 0 22px rgba(255,212,94,.6)}
+#cue{font-size:clamp(12px,1.5vw,19px);color:var(--txt2);min-height:1.2em}
+#cue b{color:var(--pink)}
+
+/* ---------- 控制条 ---------- */
+#controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+.btn{padding:.55em 1.1em;border-radius:999px;border:1px solid var(--panel-b);background:var(--panel);color:var(--txt);
+  font-family:var(--font);font-size:clamp(13px,1.6vw,20px);font-weight:800;cursor:pointer;backdrop-filter:blur(8px);transition:.2s;white-space:nowrap}
+.btn:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:linear-gradient(135deg,var(--gold),#ff9d4d);color:#3a1c00;border-color:transparent}
+.btn.on{background:linear-gradient(135deg,var(--cyan),#3aa7ff);color:#05202b;border-color:transparent}
+.seg{display:flex;gap:4px;align-items:center;background:var(--panel);border:1px solid var(--panel-b);border-radius:999px;padding:3px}
+.seg .btn{border:none;background:transparent;padding:.35em .8em}
+.seg .btn.on{background:linear-gradient(135deg,var(--green),#2ecf8f);color:#04301d}
+#counter{font-size:clamp(11px,1.3vw,16px);color:var(--txt2);margin-left:auto;white-space:nowrap}
+
+/* ---------- 台词本 ---------- */
+#book{position:fixed;inset:0;z-index:40;display:none;background:rgba(8,4,20,.92);backdrop-filter:blur(8px);flex-direction:column}
+#book.on{display:flex}
+#book h2{margin:0;padding:14px 18px;font-size:clamp(16px,2.4vw,26px);display:flex;align-items:center;gap:12px}
+#book h2 button{margin-left:auto}
+#bookList{flex:1;overflow:auto;padding:0 14px 24px;font-size:clamp(14px,1.9vw,22px);line-height:1.6}
+.bl{padding:7px 10px;border-radius:12px;margin-bottom:6px;cursor:pointer;border-left:4px solid transparent}
+.bl:hover{background:rgba(255,255,255,.07)}
+.bl.cur{background:rgba(255,212,94,.16);border-left-color:var(--gold)}
+.bl .r{color:var(--gold);font-weight:900;margin-right:8px}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
+.hidden{display:none!important}
+#readNext{display:none}
+body.readmode #readNext{display:inline-block;background:linear-gradient(135deg,var(--green),#2ecf8f);color:#04301d;border-color:transparent;font-size:clamp(15px,2.2vw,26px);padding:.6em 1.4em}
+body.readmode #line{font-size:clamp(28px,6.2vw,78px)}
+body.readmode #cards{display:none!important}
+@media (max-width:760px){
+  #cast{flex-wrap:wrap;gap:2px;padding:6px 4px 4px}
+  .actor{flex:0 0 calc(16.66% - 4px);max-width:none}
+  .actor.speak{transform:translateY(-8%) scale(1.5)}
+  #counter{margin-left:0;width:100%;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.12s!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app">
+  <header>
+    <div class="brand"><span class="logo">🐑</span><span>十二生肖大拜年 · 2026羊年版本 · 配音朗读版</span></div>
+    <div class="acts" id="acts"></div>
+  </header>
+
+  <div id="stage">
+    <div id="cast"></div>
+    <div class="stage-floor"></div>
+    <div id="banner"><span id="bannerTxt"></span></div>
+    <div id="music"><div class="note">🎵</div><div class="txt">配乐播放</div><div class="note">🎶</div></div>
+  </div>
+
+  <div id="cards"></div>
+
+  <div id="dialog">
+    <div id="speaker"><span class="who" id="who">准备</span><span class="tag2" id="mood"></span></div>
+    <div id="line"></div>
+    <div id="cue"></div>
+  </div>
+
+  <div id="controls">
+    <button class="btn" id="prev">⏮ 上一句</button>
+    <button class="btn pri" id="play">▶ 播放</button>
+    <button class="btn" id="next">下一句 ⏭</button>
+    <button class="btn" id="loop">🔁 循环本幕</button>
+    <button class="btn" id="voice">🔊 配音朗读</button>
+    <button class="btn" id="read">🎤 跟读模式</button>
+    <button class="btn pri" id="readNext">我读完啦 →</button>
+    <button class="btn" id="bookBtn">📜 台词本</button>
+    <div class="seg">
+      <button class="btn" data-sp="0.5">0.5x</button>
+      <button class="btn on" data-sp="1">1x</button>
+      <button class="btn" data-sp="1.5">1.5x</button>
+    </div>
+    <span id="counter">—</span>
+  </div>
+</div>
+
+<div id="book">
+  <h2>📜 全部台词 <button class="btn" id="bookClose">关闭 ✕</button></h2>
+  <div id="bookList"></div>
+</div>
+
+<script>
+/* ============ 角色定义 ============ */
+const Z = {
+shu:{cn:'鼠',body:`
+<path d="M112 152 C142 148 152 118 136 100" fill="none" stroke="#8a94a6" stroke-width="8" stroke-linecap="round"/>
+<ellipse cx="76" cy="132" rx="34" ry="30" fill="#9aa5b8"/>
+<ellipse cx="76" cy="138" rx="20" ry="17" fill="#c3ccdb"/>
+<circle cx="50" cy="52" r="19" fill="#9aa5b8"/><circle cx="50" cy="52" r="11" fill="#f2a9bd"/>
+<circle cx="102" cy="52" r="19" fill="#9aa5b8"/><circle cx="102" cy="52" r="11" fill="#f2a9bd"/>
+<circle cx="76" cy="82" r="31" fill="#9aa5b8"/>
+<ellipse cx="76" cy="97" rx="19" ry="14" fill="#dde4ee"/>
+<circle cx="76" cy="95" r="5" fill="#f28ba4"/>
+<g class="blink"><circle cx="64" cy="76" r="5.5" fill="#2b2b2b"/><circle cx="88" cy="76" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="66" cy="74" r="2" fill="#fff"/><circle cx="90" cy="74" r="2" fill="#fff"/>
+<path class="mouth" d="M68 103 q8 7 16 0" stroke="#5b6472" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M58 92 L38 86 M58 99 L40 101 M94 92 L114 86 M94 99 L112 101" stroke="#cfd7e3" stroke-width="2.5" stroke-linecap="round"/>`},
+niu:{cn:'牛',body:`
+<ellipse cx="80" cy="142" rx="40" ry="32" fill="#eec27c"/>
+<ellipse cx="80" cy="148" rx="24" ry="18" fill="#f9e3bd"/>
+<path d="M50 54 C36 46 24 28 30 12 C44 18 52 34 54 52 Z" fill="#f7ddb0"/>
+<path d="M110 54 C124 46 136 28 130 12 C116 18 108 34 106 52 Z" fill="#f7ddb0"/>
+<ellipse cx="44" cy="76" rx="13" ry="9" fill="#dfa95f"/>
+<ellipse cx="116" cy="76" rx="13" ry="9" fill="#dfa95f"/>
+<ellipse cx="80" cy="76" rx="38" ry="33" fill="#eec27c"/>
+<ellipse cx="80" cy="95" rx="30" ry="21" fill="#f9e3bd"/>
+<ellipse cx="68" cy="95" rx="4.5" ry="6" fill="#b8813f"/>
+<ellipse cx="92" cy="95" rx="4.5" ry="6" fill="#b8813f"/>
+<g class="blink"><circle cx="64" cy="63" r="5.5" fill="#2b2b2b"/><circle cx="96" cy="63" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="66" cy="61" r="2" fill="#fff"/><circle cx="98" cy="61" r="2" fill="#fff"/>
+<path class="mouth" d="M73 109 q7 6 14 0" stroke="#b8813f" stroke-width="3" fill="none" stroke-linecap="round"/>
+<circle cx="80" cy="120" r="9" fill="#e04b4b"/><path d="M80 129 v7" stroke="#c9a24a" stroke-width="3"/>`},
+hu:{cn:'虎',body:`
+<path d="M116 150 C148 144 152 112 134 94" stroke="#f0932b" stroke-width="14" fill="none" stroke-linecap="round"/>
+<path d="M128 134 l10 7 M137 112 l10 8" stroke="#c96f18" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="78" cy="138" rx="38" ry="34" fill="#f7a83c"/>
+<path d="M48 124 l15 6 M46 144 l16 3 M94 122 l15 7 M96 148 l15 -5" stroke="#c96f18" stroke-width="7" stroke-linecap="round"/>
+<path d="M46 66 L54 42 L72 56 Z" fill="#f7a83c"/>
+<path d="M110 66 L102 42 L84 56 Z" fill="#f7a83c"/>
+<circle cx="78" cy="80" r="38" fill="#f7a83c"/>
+<text x="78" y="74" font-size="24" font-weight="900" text-anchor="middle" fill="#a2570f">王</text>
+<ellipse cx="78" cy="98" rx="24" ry="16" fill="#ffe0b8"/>
+<path d="M78 90 l-6 6 h12 z" fill="#8a4a12"/>
+<g class="blink"><circle cx="63" cy="74" r="5.5" fill="#2b2b2b"/><circle cx="93" cy="74" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="65" cy="72" r="2" fill="#fff"/><circle cx="95" cy="72" r="2" fill="#fff"/>
+<path class="mouth" d="M68 102 q10 9 20 0" stroke="#8a4a12" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+tu:{cn:'兔',body:`
+<ellipse cx="80" cy="148" rx="30" ry="30" fill="#f6f4f2"/>
+<ellipse cx="80" cy="152" rx="18" ry="16" fill="#ffffff"/>
+<ellipse cx="58" cy="26" rx="10" ry="30" fill="#f6f4f2" transform="rotate(-10 58 26)"/>
+<ellipse cx="58" cy="28" rx="5" ry="22" fill="#ffc2d4" transform="rotate(-10 58 28)"/>
+<ellipse cx="102" cy="26" rx="10" ry="30" fill="#f6f4f2" transform="rotate(10 102 26)"/>
+<ellipse cx="102" cy="28" rx="5" ry="22" fill="#ffc2d4" transform="rotate(10 102 28)"/>
+<circle cx="80" cy="100" r="30" fill="#f6f4f2"/>
+<g class="blink"><circle cx="69" cy="94" r="5.5" fill="#2b2b2b"/><circle cx="91" cy="94" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="71" cy="92" r="2" fill="#fff"/><circle cx="93" cy="92" r="2" fill="#fff"/>
+<path d="M80 101 l-4 4 h8 z" fill="#f28ba4"/>
+<path class="mouth" d="M72 108 h4 v9 h-4 z M84 108 h4 v9 h-4 z" fill="#ffffff" stroke="#d9d2cc" stroke-width="1"/>
+<circle cx="56" cy="142" r="12" fill="#ffffff"/>`},
+long:{cn:'龙',body:`
+<path d="M38 178 C96 178 130 148 118 116 C108 90 66 96 70 122" fill="none" stroke="#3f8fd8" stroke-width="26" stroke-linecap="round"/>
+<path d="M38 178 C96 178 130 148 118 116 C108 90 66 96 70 122" fill="none" stroke="#9fd0f5" stroke-width="11" stroke-linecap="round" opacity=".65"/>
+<path d="M52 160 l11 -12 l6 15 z" fill="#2f6fae"/>
+<path d="M98 152 l13 -10 l4 15 z" fill="#2f6fae"/>
+<path d="M120 126 l12 -8 l2 15 z" fill="#2f6fae"/>
+<path d="M56 44 C42 30 46 12 64 10 C58 26 62 40 66 50 z" fill="#6fb3ec"/>
+<path d="M100 44 C114 30 110 12 92 10 C98 26 94 40 90 50 z" fill="#6fb3ec"/>
+<path d="M50 40 l-10 -18 M54 36 l0 -20 M106 40 l10 -18 M102 36 l0 -20" stroke="#6fb3ec" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="72" cy="70" rx="34" ry="26" fill="#4a90d9"/>
+<path d="M38 76 C18 70 10 86 20 94 M106 76 C126 70 134 86 124 94" stroke="#ffd45e" stroke-width="4" fill="none" stroke-linecap="round"/>
+<g class="blink"><circle cx="59" cy="63" r="5.5" fill="#2b2b2b"/><circle cx="85" cy="63" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="61" cy="61" r="2" fill="#fff"/><circle cx="87" cy="61" r="2" fill="#fff"/>
+<ellipse cx="72" cy="82" rx="21" ry="13" fill="#cfe8ff"/>
+<circle cx="63" cy="80" r="3.2" fill="#2b3a55"/><circle cx="81" cy="80" r="3.2" fill="#2b3a55"/>
+<path class="mouth" d="M62 90 q10 7 20 0" stroke="#1f4f7d" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+she:{cn:'蛇',body:`
+<path d="M28 170 C80 170 134 158 132 122 C130 94 76 100 78 128 C80 146 108 148 112 132" fill="none" stroke="#5cb85f" stroke-width="24" stroke-linecap="round"/>
+<path d="M28 170 C80 170 134 158 132 122 C130 94 76 100 78 128 C80 146 108 148 112 132" fill="none" stroke="#b7e6a0" stroke-width="9" stroke-linecap="round" opacity=".6"/>
+<path d="M40 158 l11 -6 M66 162 l11 -6 M96 150 l10 -7 M122 132 l9 -9" stroke="#3f9c46" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="112" cy="106" rx="27" ry="21" fill="#5cb85f"/>
+<path d="M132 106 C148 104 150 116 140 118 M134 112 C150 112 152 124 142 126" stroke="#ff5f6d" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<g class="blink"><circle cx="102" cy="99" r="5" fill="#2b2b2b"/><circle cx="120" cy="99" r="5" fill="#2b2b2b"/></g>
+<circle cx="104" cy="97" r="2" fill="#fff"/><circle cx="122" cy="97" r="2" fill="#fff"/>
+<path class="mouth" d="M103 114 q9 6 17 0" stroke="#2f6b32" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+ma:{cn:'马',body:`
+<path d="M118 150 C148 146 154 116 140 100" stroke="#b9703c" stroke-width="16" fill="none" stroke-linecap="round"/>
+<ellipse cx="76" cy="138" rx="40" ry="32" fill="#d98c5f"/>
+<ellipse cx="76" cy="144" rx="24" ry="17" fill="#f2b98f"/>
+<path d="M50 48 L46 22 L68 40 z" fill="#d98c5f"/>
+<path d="M102 46 L112 22 L88 38 z" fill="#d98c5f"/>
+<path d="M62 42 C56 22 66 8 82 6 C76 22 76 34 78 46 z" fill="#7d4a26"/>
+<ellipse cx="86" cy="76" rx="30" ry="39" fill="#d98c5f" transform="rotate(-8 86 76)"/>
+<ellipse cx="95" cy="104" rx="20" ry="15" fill="#f2b98f" transform="rotate(-8 95 104)"/>
+<ellipse cx="86" cy="99" rx="4.5" ry="5.5" fill="#7d4a26" transform="rotate(-8 86 99)"/>
+<ellipse cx="98" cy="101" rx="4.5" ry="5.5" fill="#7d4a26" transform="rotate(-8 98 101)"/>
+<g class="blink"><circle cx="74" cy="62" r="5.5" fill="#2b2b2b"/><circle cx="94" cy="59" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="76" cy="60" r="2" fill="#fff"/><circle cx="96" cy="57" r="2" fill="#fff"/>
+<path class="mouth" d="M80 117 q9 5 15 0" stroke="#7d4a26" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+yang:{cn:'羊',body:`
+<circle cx="58" cy="134" r="27" fill="#f7f3e8"/>
+<circle cx="100" cy="132" r="27" fill="#f7f3e8"/>
+<circle cx="80" cy="148" r="27" fill="#f7f3e8"/>
+<circle cx="58" cy="134" r="14" fill="#fffdf6"/>
+<circle cx="100" cy="132" r="14" fill="#fffdf6"/>
+<path d="M52 78 C34 78 28 60 42 54 C52 60 54 70 56 80 z" fill="#cbb894"/>
+<path d="M108 78 C126 78 132 60 118 54 C108 60 106 70 104 80 z" fill="#cbb894"/>
+<ellipse cx="80" cy="90" rx="26" ry="24" fill="#efe3cb"/>
+<ellipse cx="80" cy="100" rx="16" ry="13" fill="#fdf7ea"/>
+<g class="blink"><circle cx="70" cy="84" r="5" fill="#2b2b2b"/><circle cx="90" cy="84" r="5" fill="#2b2b2b"/></g>
+<circle cx="72" cy="82" r="1.8" fill="#fff"/><circle cx="92" cy="82" r="1.8" fill="#fff"/>
+<path class="mouth" d="M74 104 q6 5 12 0" stroke="#b09a72" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M80 112 q9 18 -1 25 q-9 -12 1 -25z" fill="#f7f3e8"/>`},
+hou:{cn:'猴',body:`
+<path d="M112 154 C144 152 150 122 132 110" stroke="#b87b3f" stroke-width="9" fill="none" stroke-linecap="round"/>
+<ellipse cx="78" cy="140" rx="34" ry="30" fill="#c88a4b"/>
+<circle cx="44" cy="64" r="15" fill="#c88a4b"/><circle cx="116" cy="64" r="15" fill="#c88a4b"/>
+<circle cx="44" cy="64" r="8" fill="#f0c28a"/><circle cx="116" cy="64" r="8" fill="#f0c28a"/>
+<circle cx="80" cy="78" r="38" fill="#c88a4b"/>
+<path d="M80 58 C96 58 105 76 96 94 C92 102 68 102 64 94 C55 76 64 58 80 58z" fill="#f7d7ae"/>
+<g class="blink"><circle cx="65" cy="72" r="5.5" fill="#2b2b2b"/><circle cx="95" cy="72" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="67" cy="70" r="2" fill="#fff"/><circle cx="97" cy="70" r="2" fill="#fff"/>
+<ellipse cx="72" cy="88" rx="3.5" ry="2.5" fill="#8a5a2b"/><ellipse cx="88" cy="88" rx="3.5" ry="2.5" fill="#8a5a2b"/>
+<path class="mouth" d="M68 96 q12 9 24 0" stroke="#8a5a2b" stroke-width="3.5" fill="none" stroke-linecap="round"/>`},
+ji:{cn:'鸡',body:`
+<path d="M112 140 C144 134 154 104 138 84 C148 106 140 126 120 128z" fill="#e8b93c"/>
+<path d="M120 132 C148 122 154 96 142 80" stroke="#f0c64a" stroke-width="9" fill="none" stroke-linecap="round"/>
+<ellipse cx="74" cy="132" rx="34" ry="30" fill="#f7d774"/>
+<ellipse cx="74" cy="138" rx="20" ry="16" fill="#fff0b8"/>
+<path d="M56 64 C54 44 66 40 72 50 C74 34 88 32 92 46 C100 42 106 52 100 64z" fill="#e5453f"/>
+<circle cx="76" cy="78" r="26" fill="#ffe9a8"/>
+<path d="M100 76 L128 84 L100 92z" fill="#f5a623"/>
+<path d="M100 94 q-5 17 6 17 q9 0 5 -17z" fill="#e5453f"/>
+<g class="blink"><circle cx="69" cy="72" r="5" fill="#2b2b2b"/><circle cx="87" cy="72" r="5" fill="#2b2b2b"/></g>
+<circle cx="71" cy="70" r="1.8" fill="#fff"/><circle cx="89" cy="70" r="1.8" fill="#fff"/>
+<path d="M62 162 L62 178 M86 162 L86 178 M62 178 L51 184 M62 178 L73 184 M86 178 L75 184 M86 178 L97 184" stroke="#f5a623" stroke-width="5" stroke-linecap="round" fill="none"/>`},
+gou:{cn:'狗',body:`
+<path d="M116 148 C144 144 150 118 136 102" stroke="#a96b38" stroke-width="12" fill="none" stroke-linecap="round"/>
+<ellipse cx="76" cy="140" rx="36" ry="30" fill="#c88a5c"/>
+<ellipse cx="76" cy="144" rx="22" ry="16" fill="#e6bb8b"/>
+<ellipse cx="48" cy="78" rx="15" ry="31" fill="#a96b38" transform="rotate(-8 48 78)"/>
+<ellipse cx="112" cy="78" rx="15" ry="31" fill="#a96b38" transform="rotate(8 112 78)"/>
+<circle cx="80" cy="74" r="32" fill="#c88a5c"/>
+<ellipse cx="80" cy="98" rx="22" ry="16" fill="#f0d3ae"/>
+<ellipse cx="80" cy="88" rx="9" ry="7" fill="#3a2a1c"/>
+<g class="blink"><circle cx="68" cy="66" r="5.5" fill="#2b2b2b"/><circle cx="92" cy="66" r="5.5" fill="#2b2b2b"/></g>
+<circle cx="70" cy="64" r="2" fill="#fff"/><circle cx="94" cy="64" r="2" fill="#fff"/>
+<path d="M80 104 q0 12 -8 12" stroke="#3a2a1c" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path class="mouth" d="M72 114 q8 12 16 0 q-8 16 -16 0z" fill="#ff8fa6"/>`},
+zhu:{cn:'猪',body:`
+<path d="M118 154 C138 152 142 134 130 126 C124 122 120 128 126 134" stroke="#f4a3b6" stroke-width="7" fill="none" stroke-linecap="round"/>
+<ellipse cx="78" cy="138" rx="40" ry="34" fill="#f7b0c2"/>
+<ellipse cx="78" cy="144" rx="26" ry="20" fill="#ffd3de"/>
+<path d="M52 62 C42 44 50 34 64 42 C66 52 60 58 58 64z" fill="#f08fa6"/>
+<path d="M108 62 C118 44 110 34 96 42 C94 52 100 58 102 64z" fill="#f08fa6"/>
+<circle cx="80" cy="80" r="32" fill="#f7b0c2"/>
+<ellipse cx="80" cy="96" rx="24" ry="18" fill="#ff9fb8"/>
+<ellipse cx="70" cy="96" rx="5" ry="6.5" fill="#c4586e"/><ellipse cx="90" cy="96" rx="5" ry="6.5" fill="#c4586e"/>
+<g class="blink"><circle cx="67" cy="68" r="5" fill="#2b2b2b"/><circle cx="93" cy="68" r="5" fill="#2b2b2b"/></g>
+<circle cx="69" cy="66" r="1.8" fill="#fff"/><circle cx="95" cy="66" r="1.8" fill="#fff"/>
+<path class="mouth" d="M70 108 q10 7 20 0" stroke="#c4586e" stroke-width="3" fill="none" stroke-linecap="round"/>`}
+};
+
+const ORDER = ['shu','niu','hu','tu','long','she','ma','yang','hou','ji','gou','zhu'];
+const ROLENAME = {all:'全体（合）', aud:'观众', narr:'旁白', music:'配乐'};
+for(const k in Z) ROLENAME[k]=Z[k].cn;
+
+function svgFor(key){
+  const z=Z[key];
+  return `<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="80" cy="188" rx="44" ry="8" fill="rgba(0,0,0,.28)"/>
+  ${z.body}
+</svg>`;
+}
+
+/* ============ 剧本 ============ */
+const A = ['','第0幕 开场','第1幕 十二生肖亮相','第2幕 争当代表','第3幕 吉祥话接龙','第4幕 收尾'];
+const L = (a,r,t,mood,cue)=>({a,r,t,mood:mood||'',cue:cue||''});
+const LINES = [
+ L(0,'narr','子鼠丑牛寅虎卯兔，辰龙巳蛇午马未羊申猴酉鸡戌狗亥猪，这就是十二个生肖。','开场','跟着节奏一起念'),
+ L(0,'all','各位观众大家好！我们十二属相来给大家送祝福啦！','齐声','声音响亮，一起说'),
+
+ L(1,'shu','我是鼠！','亮相',''),
+ L(1,'niu','我是牛！','亮相',''),
+ L(1,'hu','我是虎！','亮相',''),
+ L(1,'tu','我是兔！','亮相',''),
+ L(1,'long','我是龙！','亮相',''),
+ L(1,'she','我是蛇！','亮相',''),
+ L(1,'ma','我是马！','亮相',''),
+ L(1,'yang','我是羊！','亮相',''),
+ L(1,'hou','我是猴！','亮相',''),
+ L(1,'ji','我是鸡！','亮相',''),
+ L(1,'gou','我是狗！','亮相',''),
+ L(1,'zhu','我是猪！','亮相','最后一个，用力喊'),
+
+ L(2,'yang','我代表十二属相给大家说几句吉祥话','自信','走上前，大大方方'),
+ L(2,'all','凭什么你代表大家说呀','起哄','大家一起问'),
+ L(2,'yang','今年是羊年啦，我要羊眉吐气，争做领头羊，祝大家羊气冲天。','得意','挺胸抬头'),
+ L(2,'all','啊？那叫牛气冲天','纠正','笑着纠正他'),
+ L(2,'gou','你可代表不了我们十二属相。','不服','一步上前'),
+ L(2,'yang','那你说谁能代表?','追问',''),
+ L(2,'gou','当然是我了!','骄傲','拍胸口'),
+ L(2,'yang','你们说说，他能代表吗？','拉帮结派','拉着大家一起说'),
+ L(2,'all','不能','齐声','一起摇头'),
+ L(2,'gou','要知道，这十二属相里只有我有身份。','得意',''),
+ L(2,'all','你有什么身份?','追问',''),
+ L(2,'gou','我们狗有户口，你有吗','骄傲','拍胸脯'),
+ L(2,'yang','啊？我们别说户口了，连暂住证都没有呢','吐槽',''),
+ L(2,'gou','我们狗跟人类的关系最好啊，你们到那小区去看一看，这人们都陪着我们一块儿散步。','滔滔不绝',''),
+ L(2,'yang','打住，您那叫','打断',''),
+ L(2,'all','溜狗!','大笑','一起喊'),
+ L(2,'gou','就算溜狗，那有溜老鼠的吗?有溜鸡的吗?','反问',''),
+ L(2,'all','害','嫌弃','一起笑'),
+ L(2,'gou','所以我们跟人类的关系最好!对人类的贡献最大！','总结','叉腰'),
+ L(2,'hou','你这可不是一回事，其实，我们猴才是大家的好朋友','凑上来',''),
+ L(2,'all','怎么见得?','好奇',''),
+ L(2,'hou','放眼望去，就猴跟咱们现场的观众长的最像亲戚啦','调侃','指观众'),
+ L(2,'hu','等等，你等会儿，谁跟你像啊','不高兴','大步上前'),
+ L(2,'hou','看看看看，多像多亲切呀!','卖萌',''),
+ L(2,'hu','得了吧，你再威风，能有我老虎威风吗?','骄傲','挺胸'),
+ L(2,'hou','哎呦，您可是兽中之王啊','恭维','拱手'),
+ L(2,'hu','那句夸我们老虎的话怎么说来着','得意',''),
+ L(2,'hou','那句话说的太精彩了','捧场',''),
+ L(2,'hu','告诉他们','催促',''),
+ L(2,'hou','那句话这么说的，山中无老虎，猴子是大王','大笑','叉腰'),
+ L(2,'all','猴子是大王，哈哈哈哈','大笑','一起笑'),
+ L(2,'hu','行了，哪句是夸你自个的，我可是百兽之王！你们呀，都得归我管！','不服',''),
+ L(2,'all','害，官瘾可真够大的','调侃',''),
+ L(2,'hu','我好歹也是个王，有句成语不都是拿我起头的吗','得意',''),
+ L(2,'all','虎头蛇尾','接梗','一起说'),
+ L(2,'she','哎，我们蛇招你们惹你们了?什么叫虎头蛇尾呀?','冤枉','冲出来'),
+ L(2,'all','都这么说。','调侃',''),
+ L(2,'she','我最不爱听的就这句，说了多少年了，打今儿起就得改改了。','立志','握拳向前'),
+ L(2,'all','怎么改','追问',''),
+ L(2,'she','我们不能总当蛇尾','坚定',''),
+ L(2,'all','那你要当什么','好奇',''),
+ L(2,'she','我们要争当蛇头。','铿锵','抬起头'),
+ L(2,'ji','快回去吧，你这舌头又要吐出来了','吐槽',''),
+ L(2,'all','哈哈哈哈哈','大笑','一起笑'),
+ L(2,'ji','要说这开头，我们鸡每天第一个起床叫醒大家!所以我有资格!','骄傲','拍翅膀'),
+ L(2,'all','闻鸡起舞?','接梗',''),
+ L(2,'ji','每个早上大家都要听我指挥!听我的号令起床!','神气',''),
+ L(2,'all','确实','点头',''),
+ L(2,'ji','现在全世界的人都在使用我们计算机呀','得意',''),
+ L(2,'shu','打住打住，你这鸡离了我就等于全完','拦住','摆手'),
+ L(2,'ji','你是谁呀','疑惑',''),
+ L(2,'shu','所有的计算机都离不开我们鼠-标','得意','举起鼠标'),
+ L(2,'all','害','嫌弃','一起笑'),
+ L(2,'shu','我们还是小朋友心中的明星','骄傲',''),
+ L(2,'all','怎么说','好奇',''),
+ L(2,'shu','你看看，米老鼠，猫和老鼠，哪个动画人物离得了我?','得意','比划'),
+ L(2,'all','呵','调侃',''),
+ L(2,'shu','别看我个头小，我可算是时代的风流人物啊','神气',''),
+ L(2,'she','哎，我说这风流人物可没有你啊','吐槽',''),
+ L(2,'shu','有诗为证，数~风流人数哇，所以我代表','念诗','摇头晃脑'),
+ L(2,'long','这怎么行?你们要学习学习我们龙，全心全意为人民服务。','稳重','走出来'),
+ L(2,'all','你这龙怎么为人民服务?','质疑','鸡蛇鼠一起问'),
+ L(2,'long','你没听过一条龙服务吗?','反问',''),
+ L(2,'all','嗯，有这句。','点头',''),
+ L(2,'long','我们服务的好，你称我们为龙头老大。有叫蛇头老大，鸡头老大鼠头老大的吗?','反问','环视四周'),
+ L(2,'tu','我同意龙为我们的代表，但我必须排在第二。','举手','举手'),
+ L(2,'all','龙排在第一，你也排不了第二。','反对',''),
+ L(2,'tu','我这个位置，全世界都知道。','神秘',''),
+ L(2,'all','什么位置?','好奇',''),
+ L(2,'tu','这都什么年月了，你们学学外语。one two three four。这two是第几呀?','洋气','掰手指'),
+ L(2,'all','二呀!','齐声',''),
+ L(2,'tu','这不第二位嘛。','得意',''),
+ L(2,'yang','唉，最讨厌学英语了，快回去吧你','嫌弃',''),
+ L(2,'ma','来','招手','举手示意'),
+ L(2,'yang','怎么啦','疑惑',''),
+ L(2,'ma','我都不爱跟他们争这些，你看看我争过吗','淡定','微微一笑'),
+ L(2,'yang','确实，看看人家','点头','一起点头'),
+ L(2,'ma','老马我忠心祝愿在场的各位家长朋友们，新的一年在工作中---','稳重','慢慢开口'),
+ L(2,'all','一马当先!','接梗','一起说'),
+ L(2,'ma','祝愿在场的所有小朋友们，在学习中---','接着说',''),
+ L(2,'all','一马当先!','喝彩','所有人鼓掌'),
+ L(2,'ma','哈哈哈!承让!承让!','得意','大笑'),
+ L(2,'yang','这都什么呀，你不是不争吗','打趣',''),
+ L(2,'niu','还是我来吧!','不服','大步上前'),
+ L(2,'yang','请问阁下是--','疑惑','上下打量'),
+ L(2,'niu','这一年，我老牛可做了不少贡献!','得意',''),
+ L(2,'all','你就吹吧。','起哄',''),
+ L(2,'niu','什么叫吹。你看今年第二十届亚运会，咱们中国代表团斩获169金，创历史最高。这说明咱中国人','铿锵有力','握拳'),
+ L(2,'all','牛!','喝彩','一起喊'),
+ L(2,'niu','再看看今年，长征十号运载火箭首飞成功，实现了航天领域世界级突破，就在前两天，神州二十四号发射成功，外国人都说咱中国人','铿锵有力','越说越带劲'),
+ L(2,'all','牛!','喝彩','鼓起来'),
+ L(2,'yang','说的好，但是这神州飞船上天，也有我们羊的贡献。','不服','走出来'),
+ L(2,'all','为什么呀?','好奇',''),
+ L(2,'yang','咱中国第一艘载人航天飞船的宇航员叫什么名字?','提问','看着大家问'),
+ L(2,'all','叫。。。嗯。利玮','挠头','想不起来'),
+ L(2,'yang','哎呀，你们想急死我啊，姓什么呀','着急','跺脚'),
+ L(2,'yang','亲爱的观众朋友们，你们大声说说，中国第一位航天英雄叫什么','招呼全场','请观众回答'),
+ L(2,'aud','杨利伟','互动','观众大声喊'),
+ L(2,'yang','看看看看!是我们羊的贡献吧!','得意','指着大家'),
+ L(2,'zhu','那这么说，人类更离不开我们猪!','不服','跳出来'),
+ L(2,'all','怎么讲?','好奇',''),
+ L(2,'zhu','中国传统文化就有我们一部分啊','得意',''),
+ L(2,'all','没错！唐诗 宋词 猪八戒  哈哈哈哈','大笑','一起数'),
+ L(2,'zhu','这都什么呀，我们猪最聪明，你们有什么算不过来的帐，还得用我。','得意','拍脑袋'),
+ L(2,'all','猪脑子?','调侃',''),
+ L(2,'zhu','不是，是珠心算!','纠正','强调'),
+ L(2,'all','啊?珠心算?','惊讶',''),
+ L(2,'zhu','酒席宴会上，大家端起酒杯就得提起我。','自豪',''),
+ L(2,'all','怎么说呀?','好奇',''),
+ L(2,'zhu','诸位诸位。','招呼','拱拱手'),
+ L(2,'all','什么呀这是。不行不行，我来我来(大家吵起来)我最有资格，我有资格！','热闹','一起闹起来'),
+ L(2,'yang','哎，别吵啦!别吵啦。我说诸位啊','镇场','举手压场'),
+ L(2,'zhu','到！这是叫我呢，嘿嘿~','调皮','敬礼'),
+ L(2,'yang','去去去。我说~这2027是什么年啊','严肃',''),
+ L(2,'all','羊年呗','齐声',''),
+ L(2,'yang','对喽！即将到来的2027年是羊年，你们都得听我指挥','神气','叉腰'),
+ L(2,'all','快说。','催促',''),
+ L(2,'yang','这样好不好!咱们谁也别争了，咱一人说一句吉祥话送给大家，把自己的属相加在里头行不行?','提议','张开双臂'),
+ L(2,'all','好。','齐声','拍手'),
+
+ L(3,'yang','我先说，我祝大家在即将到来的羊年里喜气洋洋，名羊四海。','祝福','第一个，抢先'),
+ L(3,'hou','生活猴美猴美，工作猴顺猴顺','祝福',''),
+ L(3,'gou','对待工作一丝不苟。','祝福',''),
+ L(3,'niu','无私奉献，甘作黄牛。','祝福',''),
+ L(3,'ma','骏马奔腾，马上有钱！','祝福',''),
+ L(3,'shu','迎接新一年的鼠光。','祝福',''),
+ L(3,'long','祝福伟大的人民活虎生龙。','祝福',''),
+ L(3,'hu','祝愿伟大的祖国虎虎生威。','祝福',''),
+ L(3,'she','金蛇盘虎。','祝福',''),
+ L(3,'zhu','诸事顺利。','祝福',''),
+ L(3,'tu','突飞猛进。','祝福',''),
+ L(3,'ji','闻鸡起舞。','祝福',''),
+
+ L(4,'yang','十二属相共同祝大家','号召','大家围拢过来'),
+ L(4,'all','身体健健康康，生活甜甜蜜蜜!!','齐声','一起喊出来'),
+ L(4,'hou','让我们一展歌喉，共同祝福','邀请','张开双臂'),
+ L(4,'all','祖国繁荣昌盛，大战普天大敌。','齐声','谢幕鞠躬')
+];
+
+
+
+/* ============ 状态 ============ */
+let idx=0, playing=false, speed=1, loopAct=false, readMode=false, timer=null, voiceOn=false, utter=null;
+const $=s=>document.querySelector(s);
+const castEl=$('#cast'), cardsEl=$('#cards'), lineEl=$('#line'), whoEl=$('#who'), moodEl=$('#mood'), cueEl=$('#cue');
+const actors={};
+const KW=/[！!？?。]/;
+
+/* 建立角色 */
+ORDER.forEach(k=>{
+  const d=document.createElement('div');
+  d.className='actor'; d.dataset.k=k;
+  d.innerHTML=`<div class="ring"></div>${svgFor(k)}<div class="tag">${Z[k].cn}</div>`;
+  d.onclick=()=>jumpToActor(k);
+  castEl.appendChild(d); actors[k]=d;
+});
+/* 吉祥话卡片 */
+ORDER.forEach(k=>{const c=document.createElement('div');c.className='card';c.dataset.k=k;
+  c.innerHTML=`<div class="z">${Z[k].cn}</div><div class="b"></div>`;cardsEl.appendChild(c);});
+
+/* 幕次按钮 */
+const ACTS=[0,1,2,3,4];
+ACTS.forEach(a=>{const b=document.createElement('button');b.className='act';b.textContent=A[a+1].replace('第','第');
+  b.onclick=()=>{const i=LINES.findIndex(l=>l.a===a);if(i>=0)show(i);};$('#acts').appendChild(b);});
+
+/* ============ 配音系统（Web Speech API） ============ */
+const VOICE={
+  shu :{p:1.75,r:1.15,v:'小老鼠'},
+  niu :{p:0.62,r:0.85,v:'老黄牛'},
+  hu  :{p:0.80,r:0.95,v:'大老虎'},
+  tu  :{p:1.85,r:1.20,v:'小兔子'},
+  long:{p:0.55,r:0.88,v:'老龙王'},
+  she :{p:1.05,r:0.92,v:'小蛇蛇'},
+  ma  :{p:1.00,r:1.12,v:'老马'},
+  yang:{p:1.50,r:1.00,v:'小羊羊'},
+  hou :{p:1.70,r:1.25,v:'小猴'},
+  ji  :{p:1.80,r:1.22,v:'大公鸡'},
+  gou :{p:1.05,r:1.06,v:'小狗'},
+  zhu :{p:0.78,r:0.82,v:'小猪'},
+  all :{p:1.05,r:1.00,v:'全体'},
+  aud :{p:1.25,r:1.10,v:'观众'},
+  narr:{p:0.88,r:0.95,v:'画外音'},
+  music:{p:1,r:1,v:'配乐'}
+};
+let zhVoice=null, zhVoices=[];
+// 角色 -> 中文音色索引（不同动物尽量用不同系统语音）
+const VOICE_PICK={shu:0,tu:1,hou:2,ji:3,yang:4,ma:5,gou:6,she:7,hu:8,long:9,niu:10,zhu:11};
+function pickZhVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  const vs=speechSynthesis.getVoices()||[];
+  zhVoices = vs.filter(v=>/^zh/i.test(v.lang));
+  if(!zhVoices.length) zhVoices = vs.filter(v=>/zh|cmn/i.test(v.lang));
+  zhVoice = zhVoices[0]||null;
+  return zhVoice;
+}
+if('speechSynthesis' in window){
+  pickZhVoice();
+  speechSynthesis.onvoiceschanged=pickZhVoice;
+}
+function stopSpeak(){
+  if(utter){ const u=utter; utter=null; try{u.onend=null;u.onerror=null;}catch(e){} speechSynthesis.cancel(); }
+  Object.values(actors).forEach(a=>a.classList.remove('talking'));
+}
+function speakLine(L0){
+  if(!voiceOn || !('speechSynthesis' in window)) return false;
+  stopSpeak();
+  if(L0.r==='music') return false;
+  const cfg=VOICE[L0.r]||{p:1,r:1};
+  const u=new SpeechSynthesisUtterance(L0.t);
+  if(!zhVoice) pickZhVoice();
+  const vi = (L0.r in VOICE_PICK) ? VOICE_PICK[L0.r] : 0;
+  const v = zhVoices.length ? zhVoices[vi % zhVoices.length] : zhVoice;
+  if(v) u.voice=v;
+  u.lang='zh-CN';
+  u.pitch=Math.max(0.1,Math.min(2,cfg.p));
+  u.rate=Math.max(0.5,Math.min(2,cfg.r*speed));
+  u.volume=1;
+  const actor=actors[L0.r];
+  const crowd = (L0.r==='all') ? Object.values(actors) : (actor?[actor]:[]);
+  utter=u;
+  u.onstart=()=>{ if(utter===u) crowd.forEach(a=>a.classList.add('talking')); };
+  u.onend=()=>{ crowd.forEach(a=>a.classList.remove('talking')); if(utter===u){utter=null; if(voiceOn&&playing) advance();} };
+  u.onerror=()=>{ crowd.forEach(a=>a.classList.remove('talking')); if(utter===u){utter=null; if(voiceOn&&playing) advance();} };
+  try{ speechSynthesis.speak(u); }catch(e){ return false; }
+  return true;
+}
+
+/* ============ 渲染 ============ */
+function currentAct(){return LINES[idx].a;}
+function show(i,keepScroll){
+  idx=(i+LINES.length)%LINES.length;
+  const L0=LINES[idx], r=L0.r;
+  // 幕次高亮
+  [...$('#acts').children].forEach((b,k)=>{
+    b.classList.toggle('on',ACTS[k]===L0.a);
+    b.classList.toggle('done',ACTS[k]<L0.a);
+  });
+  // 角色状态
+  Object.keys(actors).forEach(k=>{
+    const a=actors[k];
+    a.classList.remove('speak','dim','cheer','finale','hop');
+    if(r===k){a.classList.add('speak','hop');}
+    else if(r==='all'){a.classList.add('cheer');}
+    else if(r==='narr'||r==='music'||r==='aud'){ /* 保持全亮 */ }
+    else {a.classList.add('dim');}
+  });
+  if(r==='all'){Object.values(actors).forEach(a=>{a.classList.add('speak','cheer');});}
+  if(L0.a===4){Object.values(actors).forEach(a=>a.classList.add('finale'));}
+  // 台词
+  whoEl.textContent=ROLENAME[r]||'';
+  moodEl.textContent=L0.mood||'';
+  cueEl.innerHTML=L0.cue?('👉 '+L0.cue):'';
+  typeLine(L0.t);
+  // 幕布大字
+  const bn=$('#banner');
+  if(L0.a===0){bn.querySelector('span').textContent='《十二生肖大拜年》';bn.classList.add('on');}
+  else if(L0.a===1){bn.querySelector('span').textContent='十二生肖 · 依次亮相';bn.classList.add('on');}
+  else if(L0.a===3){bn.querySelector('span').textContent='一人一句吉祥话';bn.classList.add('on');}
+  else if(L0.a===4){bn.querySelector('span').textContent='祝大家新年快乐！';bn.classList.add('on');}
+  else bn.classList.remove('on');
+  // MUSIC
+  $('#music').classList.toggle('on', r==='music');
+  // 卡片
+  cardsEl.classList.toggle('on', L0.a>=3);
+  if(L0.a===3 && r!=='all' && r!=='narr' && r!=='aud' && r!=='music'){
+    const c=cardsEl.querySelector(`.card[data-k="${r}"]`);
+    if(c){c.classList.add('flip');c.querySelector('.b').textContent=L0.t;}
+  }
+  // 计数
+  $('#counter').textContent=`第 ${idx+1} / ${LINES.length} 句 · ${A[L0.a+1]}`;
+  // 台词本
+  [...$('#bookList').children].forEach((el,k)=>el.classList.toggle('cur',k===idx));
+  if(!keepScroll){const cur=$('#bookList').children[idx];if(cur)cur.scrollIntoView({block:'center'});}
+  // 撒花
+  if(L0.a===4 && r==='all') burstConfetti();
+  // 配音
+  const spoke = speakLine(L0);
+  if(spoke){ clearTimeout(timer); }
+  else { schedule(); }
+}
+
+let typeTimer=null;
+function typeLine(text){
+  clearInterval(typeTimer);
+  lineEl.textContent='';
+  let i=0;
+  const full=text;
+  typeTimer=setInterval(()=>{
+    i++;
+    lineEl.textContent=full.slice(0,i);
+    if(i%3===0 && full[i-1] && KW.test(full[i-1])) spark();
+    if(i>=full.length){clearInterval(typeTimer);}
+  }, Math.max(18, 62/speed));
+}
+
+/* 自动播放节奏 */
+function advance(){
+  if(loopAct){
+    const a=currentAct();
+    const idxs=LINES.map((l,k)=>l.a===a?k:-1).filter(k=>k>=0);
+    const pos=idxs.indexOf(idx);
+    show(idxs[(pos+1)%idxs.length]);
+  } else show(idx+1);
+}
+function schedule(){
+  clearTimeout(timer);
+  if(!playing||readMode) return;
+  if(voiceOn && ('speechSynthesis' in window)) return; // 配音模式下由语音结束驱动
+  const L0=LINES[idx];
+  let dur;
+  if(L0.r==='music') dur=4000;
+  else dur=Math.min(9000, Math.max(2200, 1400+L0.t.length*260))/speed;
+  timer=setTimeout(advance, dur);
+}
+function togglePlay(){
+  playing=!playing;
+  $('#play').textContent=playing?'⏸ 暂停':'▶ 播放';
+  if(!playing){ stopSpeak(); clearTimeout(timer); }
+  else if(voiceOn){ speakLine(LINES[idx]); }
+  else schedule();
+}
+function jumpToActor(k){
+  const i=LINES.findIndex(l=>l.r===k);
+  if(i>=0) show(i);
+}
+
+/* ============ 控制 ============ */
+$('#play').onclick=togglePlay;
+$('#next').onclick=()=>show(idx+1);
+$('#prev').onclick=()=>show(idx-1);
+$('#loop').onclick=e=>{loopAct=!loopAct;e.target.classList.toggle('on',loopAct);schedule();};
+$('#voice').onclick=e=>{
+  voiceOn=!voiceOn;
+  if(voiceOn && !('speechSynthesis' in window)){ alert('当前浏览器不支持语音合成，建议用 Chrome 或 Safari 打开'); }
+  e.target.classList.toggle('on',voiceOn);
+  e.target.textContent=voiceOn?'🔊 配音中':'🔊 配音朗读';
+  if(!voiceOn){ stopSpeak(); schedule(); }
+  else if(playing){ show(idx,true); }
+};
+$('#read').onclick=e=>{readMode=!readMode;e.target.classList.toggle('on',readMode);
+  if(readMode){playing=false;$('#play').textContent='▶ 播放';clearTimeout(timer);}
+  document.body.classList.toggle('readmode',readMode);};
+document.querySelectorAll('.seg .btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.seg .btn').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');speed=parseFloat(b.dataset.sp);schedule();});
+$('#bookBtn').onclick=()=>{$('#book').classList.add('on');buildBook();};
+$('#readNext').onclick=()=>show(idx+1);
+$('#bookClose').onclick=()=>$('#book').classList.remove('on');
+/* 键盘 */
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')show(idx+1);
+  if(e.key==='ArrowLeft')show(idx-1);
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+/* 点台词区翻页 */
+$('#dialog').addEventListener('click',()=>{ if(readMode) show(idx+1); });
+
+function buildBook(){
+  const box=$('#bookList');
+  if(box.children.length) return;
+  LINES.forEach(l=>{
+    const d=document.createElement('div');d.className='bl';
+    d.innerHTML=`<span class="r">${ROLENAME[l.r]}</span>${l.t}`;
+    d.onclick=()=>{show(LINES.indexOf(l));$('#book').classList.remove('on');};
+    box.appendChild(d);
+  });
+}
+
+/* ============ 特效 ============ */
+function spark(){
+  const st=$('#stage');
+  const s=document.createElement('div');
+  s.style.cssText='position:absolute;width:10px;height:10px;border-radius:50%;background:#ffd45e;pointer-events:none;left:'+(40+Math.random()*20)+'%;bottom:18%;box-shadow:0 0 18px #ffd45e;transition:transform .6s ease-out,opacity .6s';
+  st.appendChild(s);
+  requestAnimationFrame(()=>{s.style.transform='translateY(-90px) scale(2.4)';s.style.opacity='0';});
+  setTimeout(()=>s.remove(),700);
+}
+const cv=$('#confetti'),cx=cv.getContext('2d');
+function sizeCanvas(){cv.width=innerWidth;cv.height=innerHeight;}
+sizeCanvas();addEventListener('resize',sizeCanvas);
+let parts=[];
+function burstConfetti(){
+  const cols=['#ffd45e','#ff7eb3','#5ee7ff','#6ef0a5','#ffffff','#ff9d4d'];
+  for(let i=0;i<140;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.35+Math.random()*60,
+    vx:(Math.random()-.5)*9,vy:-6-Math.random()*9,w:6+Math.random()*8,h:8+Math.random()*10,c:cols[i%cols.length],r:Math.random()*6});
+}
+function loopC(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.28;p.r+=0.12;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();});
+  parts=parts.filter(p=>p.y<innerHeight+40);
+  requestAnimationFrame(loopC);
+}
+loopC();
+
+/* 初始化 */
+show(0);
+</script>
+</body>
+</html>
