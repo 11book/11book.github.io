@@ -203,7 +203,7 @@ body.readmode #cards{display:none!important}
     <button class="btn pri" id="play">▶ 播放</button>
     <button class="btn" id="next">下一句 ⏭</button>
     <button class="btn" id="loop">🔁 循环本幕</button>
-    <button class="btn" id="voice">🔊 配音朗读</button>
+    <button class="btn on" id="voice">🔊 配音中 (点此静音)</button>
     <button class="btn" id="read">🎤 跟读模式</button>
     <button class="btn pri" id="readNext">我读完啦 →</button>
     <button class="btn" id="bookBtn">📜 台词本</button>
@@ -556,7 +556,7 @@ const LINES = [
 
 
 /* ============ 状态 ============ */
-let idx=0, playing=false, speed=1, loopAct=false, readMode=false, timer=null, voiceOn=false, utter=null;
+let idx=0, playing=false, speed=1, loopAct=false, readMode=false, timer=null, voiceOn=true, utter=null;
 const $=s=>document.querySelector(s);
 const castEl=$('#cast'), cardsEl=$('#cards'), lineEl=$('#line'), whoEl=$('#who'), moodEl=$('#mood'), cueEl=$('#cue');
 const actors={};
@@ -597,6 +597,14 @@ function getPlayer(){
   return player;
 }
 let curAudio=null, curIdx=-1, pendingNext=null;
+const preloaded={};
+function preload(i){
+  if(preloaded[i]) return;
+  const a=new Audio();
+  a.preload='auto';
+  a.src=AUDIO_BASE+i+'.mp3';
+  preloaded[i]=a;
+}
 function stopSpeak(){
   pendingNext=null;
   if(player){ try{ player.pause(); }catch(e){} }
@@ -621,9 +629,10 @@ function speakLine(L0, index){
   a.onerror=()=>{
     crowd.forEach(x=>x.classList.remove('talking'));
     if(curAudio===a) curAudio=null;
-    if(voiceOn && playing) advance();
+    if(voiceOn && playing){ if(fallbackTTS(L0,index)) return; advance(); }
   };
   a.src=AUDIO_BASE+index+'.mp3';
+  preload(index+1);
   a.currentTime=0;
   let pr;
   try{ pr=a.play(); }catch(e){ pr=null; }
@@ -631,10 +640,27 @@ function speakLine(L0, index){
     // 自动播放被拦截：提示用户点一下播放
     crowd.forEach(x=>x.classList.remove('talking'));
     if(curAudio===a) curAudio=null;
+    if(fallbackTTS(L0,index)) return;
     toast('浏览器拦截了自动播放，请点一次「▶ 播放」按钮');
   });
   return true;
 }
+// 兜底：音频文件加载失败时用浏览器内置语音合成
+function fallbackTTS(L0,index){
+  if(!('speechSynthesis' in window)) return false;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(L0.t);
+    u.lang='zh-CN'; u.rate=1; u.pitch=1;
+    const vs=speechSynthesis.getVoices().filter(v=>/zh|cmn|Chinese/i.test((v.lang||'')+' '+(v.name||'')));
+    if(vs.length) u.voice=vs[index%vs.length];
+    u.onend=()=>{ if(voiceOn && playing) advance(); };
+    u.onerror=()=>{ if(voiceOn && playing) advance(); };
+    speechSynthesis.speak(u);
+    return true;
+  }catch(e){ return false; }
+}
+
 function toast(msg,ms=3000){
   let t=document.getElementById('toast');
   if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
@@ -749,7 +775,7 @@ $('#loop').onclick=e=>{loopAct=!loopAct;e.target.classList.toggle('on',loopAct);
 $('#voice').onclick=e=>{
   voiceOn=!voiceOn;
   e.target.classList.toggle('on',voiceOn);
-  e.target.textContent=voiceOn?'🔊 配音中 (再点关闭)':'🔊 配音朗读';
+  e.target.textContent=voiceOn?'🔊 配音中 (点此静音)':'🔇 已静音 (点此开声)';
   if(!voiceOn){ stopSpeak(); if(playing) schedule(); return; }
   // 开启后立即从头朗读
   idx=0; show(0);
