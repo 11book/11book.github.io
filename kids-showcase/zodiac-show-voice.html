@@ -580,20 +580,26 @@ ACTS.forEach(a=>{const b=document.createElement('button');b.className='act';b.te
   b.onclick=()=>{const i=LINES.findIndex(l=>l.a===a);if(i>=0)show(i);};$('#acts').appendChild(b);});
 
 /* ============ 配音系统（真实音频文件） ============ */
-const AUDIO_DIR='zodiac-audio/';
+const AUDIO_BASE=(location.protocol==='file:')
+  ? 'https://11book.github.io/kids-showcase/zodiac-audio/'
+  : 'zodiac-audio/';
 const DURATIONS=[3.812, 2.447, 0.474, 0.627, 0.566, 0.45, 0.604, 0.574, 0.491, 0.524, 0.458, 0.454, 0.502, 0.626, 1.771, 1.163, 2.971, 1.242, 1.273, 0.905, 0.637, 1.159, 0.435, 1.647, 0.747, 1.084, 1.92, 3.244, 0.833, 0.458, 1.92, 0.363, 2.157, 2.127, 0.534, 1.982, 1.527, 1.244, 1.939, 1.121, 1.486, 0.92, 0.655, 1.752, 1.325, 3.254, 1.131, 2.192, 0.607, 2.336, 0.607, 2.662, 0.488, 0.947, 0.739, 0.906, 1.459, 0.807, 2.623, 0.613, 2.035, 0.518, 1.561, 1.552, 0.539, 1.332, 0.363, 1.182, 0.513, 2.204, 0.375, 1.813, 1.645, 1.783, 2.998, 1.069, 1.271, 0.749, 3.799, 1.702, 1.527, 1.159, 0.559, 2.619, 0.461, 0.648, 1.751, 0.377, 0.439, 1.789, 1.041, 2.577, 0.63, 1.758, 0.63, 1.431, 1.269, 0.782, 0.716, 1.844, 0.628, 5.664, 0.401, 7.041, 0.401, 2.343, 0.559, 2.103, 1.183, 1.628, 2.793, 0.485, 1.615, 1.7, 0.512, 1.708, 1.856, 3.201, 0.521, 1.151, 0.903, 2.258, 0.576, 0.676, 3.544, 2.059, 1.641, 1.83, 0.582, 2.642, 0.513, 4.243, 0.374, 2.697, 1.403, 0.938, 1.395, 1.171, 0.855, 1.394, 1.317, 0.704, 0.691, 0.513, 0.535, 1.081, 1.697, 1.185, 1.604];
-const audCache={};
-function getAudio(i){
-  if(!audCache[i]){
-    const a=new Audio(AUDIO_DIR+i+'.mp3');
-    a.preload='auto';
-    audCache[i]=a;
+// 复用同一个 <audio> 元素：iOS/Safari 只允许已解锁的媒体元素续播，
+// 每句新建 Audio 会被判定为新播放而拦截，导致"没声音"
+let player=null;
+function getPlayer(){
+  if(!player){
+    player=new Audio();
+    player.preload='auto';
+    player.setAttribute('playsinline','');
+    document.body.appendChild(player);
   }
-  return audCache[i];
+  return player;
 }
-let curAudio=null, curIdx=-1;
+let curAudio=null, curIdx=-1, pendingNext=null;
 function stopSpeak(){
-  if(curAudio){ try{ curAudio.pause(); curAudio.currentTime=0; }catch(e){} curAudio=null; }
+  pendingNext=null;
+  if(player){ try{ player.pause(); }catch(e){} }
   Object.values(actors).forEach(a=>a.classList.remove('talking'));
 }
 function actorsFor(r){
@@ -604,12 +610,12 @@ function speakLine(L0, index){
   if(!voiceOn) return false;
   stopSpeak();
   const crowd=actorsFor(L0.r);
-  const a=getAudio(index);
+  const a=getPlayer();
   curAudio=a; curIdx=index;
   a.onplaying=()=>{ crowd.forEach(x=>x.classList.add('talking')); };
   a.onended=()=>{
     crowd.forEach(x=>x.classList.remove('talking'));
-    if(curAudio===a){ curAudio=null; }
+    if(curAudio===a) curAudio=null;
     if(voiceOn && playing) advance();
   };
   a.onerror=()=>{
@@ -617,12 +623,15 @@ function speakLine(L0, index){
     if(curAudio===a) curAudio=null;
     if(voiceOn && playing) advance();
   };
+  a.src=AUDIO_BASE+index+'.mp3';
   a.currentTime=0;
-  const pr=a.play();
+  let pr;
+  try{ pr=a.play(); }catch(e){ pr=null; }
   if(pr && pr.catch) pr.catch(()=>{
+    // 自动播放被拦截：提示用户点一下播放
     crowd.forEach(x=>x.classList.remove('talking'));
     if(curAudio===a) curAudio=null;
-    if(voiceOn && playing) advance();
+    toast('浏览器拦截了自动播放，请点一次「▶ 播放」按钮');
   });
   return true;
 }
