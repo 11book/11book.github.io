@@ -132,6 +132,12 @@ header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 #cue{font-size:clamp(12px,1.5vw,19px);color:var(--txt2);min-height:1.2em}
 #cue b{color:var(--pink)}
 
+/* 配音加载进度 */
+#loadbar{position:relative;height:0;overflow:hidden;background:rgba(255,255,255,.08);transition:height .25s;border-radius:0}
+#loadbar.on{height:26px}
+#loadfill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ffb703,#ff7b00);transition:width .2s}
+#loadtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);letter-spacing:.5px}
+
 /* 提示气泡 */
 #toast{position:fixed;left:50%;top:74px;transform:translate(-50%,-14px);background:rgba(20,16,38,.93);color:#fff;padding:11px 20px;border-radius:999px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.28s;z-index:99;max-width:88vw;text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
@@ -198,6 +204,7 @@ body.readmode #cards{display:none!important}
     <div id="cue"></div>
   </div>
 
+  <div id="loadbar"><div id="loadfill"></div><span id="loadtxt">加载配音…</span></div>
   <div id="controls">
     <button class="btn" id="prev">⏮ 上一句</button>
     <button class="btn pri" id="play">▶ 播放</button>
@@ -605,6 +612,35 @@ function fetchBlob(i){
   loading.set(i,p);
   return p;
 }
+// 全量预加载：149 句全部拉进内存（总计约 3.4MB），加载完再播，句间零间隙
+let loadTotal=0, loadDone=0, loadPromise=null, loadReady=false;
+function updateLoadUI(){
+  const bar=document.querySelector('#loadbar');
+  if(!bar) return;
+  if(loadReady){ bar.classList.remove('on'); return; }
+  bar.classList.add('on');
+  const pct=loadTotal? Math.round(loadDone/loadTotal*100):0;
+  document.querySelector('#loadfill').style.width=pct+'%';
+  document.querySelector('#loadtxt').textContent=`加载配音 ${loadDone}/${loadTotal}（${pct}%）`;
+}
+function loadAll(){
+  if(loadPromise) return loadPromise;
+  loadTotal=DURATIONS.length; loadDone=0; loadReady=false;
+  updateLoadUI();
+  const CONC=8;
+  let next=0;
+  const worker=async()=>{
+    while(next<loadTotal){
+      const i=next++;
+      try{ await fetchBlob(i); }catch(e){}
+      loadDone++; updateLoadUI();
+    }
+  };
+  const workers=[]; for(let k=0;k<CONC;k++) workers.push(worker());
+  loadPromise=Promise.all(workers).then(()=>{ loadReady=true; updateLoadUI(); });
+  return loadPromise;
+}
+
 function preloadAhead(i){
   const jobs=[];
   // 长句播完后立刻预取其后 3 句（长句有充足网络时间）
@@ -624,7 +660,8 @@ function preloadAhead(i){
   if(jobs.length) Promise.all(jobs);
 }
 function releaseOld(i){
-  // 保留窗口内，其余释放，避免内存无限增长
+  // 全量加载模式下不释放（总计仅 3.4MB），保证任意跳句都秒播
+  if(loadReady) return;
   for(const [k,url] of blobCache){
     if(k < i-2){ URL.revokeObjectURL(url); blobCache.delete(k); }
   }
@@ -641,8 +678,8 @@ function getPlayer(){
   return player;
 }
 let curAudio=null, curIdx=-1;
-// 页面加载即预热前几首，避免首句等待
-for(let k=0;k<10;k++) fetchBlob(k).catch(()=>{});
+// 页面加载即开始全量预加载（3.4MB），加载完所有句子都可秒播
+loadAll();
 function stopSpeak(){
   if(player){ try{ player.pause(); }catch(e){} }
   Object.values(actors).forEach(a=>a.classList.remove('talking'));
@@ -693,9 +730,14 @@ function speakLine(L0, index){
         a.src=u; startPlay(); preloadAhead(index); releaseOld(index);
         return;
       }
-      // 兜底：直接用 URL 加载（浏览器边下边播）
-      a.src=AUDIO_BASE+index+'.mp3'; startPlay();
-      preloadAhead(index);
+      // 还没下好：等全量加载完成再播，绝不先播空白
+      loadAll().then(()=>{
+        if(done) return; done=true;
+        const u2=blobCache.get(index);
+        if(u2){ a.src=u2; startPlay(); }
+        else { a.src=AUDIO_BASE+index+'.mp3'; startPlay(); }
+        preloadAhead(index);
+      });
     }).catch(()=>{
       if(done) return; done=true;
       a.src=AUDIO_BASE+index+'.mp3'; startPlay();
@@ -815,6 +857,12 @@ function schedule(){
   timer=setTimeout(advance, dur);
 }
 function togglePlay(){
+  // 配音模式：确保全部音频已加载完成再开始，避免句间等待
+  if(!voiceOn) {} else if(!loadReady){
+    loadAll().then(()=>{ togglePlay(); });
+    toast('正在加载配音…',2000);
+    return;
+  }
   playing=!playing;
   $('#play').textContent=playing?'⏸ 暂停':'▶ 播放';
   if(!playing){ stopSpeak(); clearTimeout(timer); }
