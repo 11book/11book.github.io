@@ -208,7 +208,7 @@ body.readmode #cards{display:none!important}
     <button class="btn pri" id="readNext">我读完啦 →</button>
     <button class="btn" id="bookBtn">📜 台词本</button>
     <div class="seg">
-      <button class="btn" data-sp="0.5">0.5x</button>
+      <button class="btn" data-sp="0.75">0.75x</button><button class="btn" data-sp="0.5">0.5x</button>
       <button class="btn on" data-sp="1">1x</button>
       <button class="btn" data-sp="1.5">1.5x</button>
     </div>
@@ -632,6 +632,7 @@ function speakLine(L0, index){
     if(voiceOn && playing){ if(fallbackTTS(L0,index)) return; advance(); }
   };
   a.src=AUDIO_BASE+index+'.mp3';
+  try{ a.playbackRate=speed; }catch(e){}
   preload(index+1);
   a.currentTime=0;
   let pr;
@@ -787,7 +788,9 @@ $('#read').onclick=e=>{readMode=!readMode;e.target.classList.toggle('on',readMod
   document.body.classList.toggle('readmode',readMode);};
 document.querySelectorAll('.seg .btn').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.seg .btn').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');speed=parseFloat(b.dataset.sp);schedule();});
+  b.classList.add('on');speed=parseFloat(b.dataset.sp);
+  if(player){ try{ player.playbackRate=speed; }catch(e){} }
+  schedule();});
 $('#bookBtn').onclick=()=>{$('#book').classList.add('on');buildBook();};
 $('#readNext').onclick=()=>show(idx+1);
 $('#bookClose').onclick=()=>$('#book').classList.remove('on');
