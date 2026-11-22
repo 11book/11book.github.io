@@ -599,7 +599,8 @@ const PRELOAD_AHEAD=8;
 
 /* ===== 单条连续音轨引擎（流式直连，边下边播，句间零等待） ===== */
 const ABS=(location.protocol==='file:') ? 'https://11book.github.io/kids-showcase/zodiac-audio/' : 'zodiac-audio/';
-const TRACK_M4A=ABS+'full.m4a', TRACK_MP3=ABS+'full.mp3';
+const AUDIO_V='22e3e6e';   // 音轨版本号：替换音轨文件时必须同步改这里，避免旧音轨与新时间轴混用
+const TRACK_M4A=ABS+'full.m4a?v='+AUDIO_V, TRACK_MP3=ABS+'full.mp3?v='+AUDIO_V;
 function pickTrack(){
   try{ const t=document.createElement('audio'); if(t.canPlayType('audio/mp4; codecs="mp4a.40.2"')) return TRACK_M4A; }catch(e){}
   return TRACK_MP3;
