@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>春夜喜雨 · 课文动画</title>
+<style>
+:root{
+  --ink:#eaf2ff; --dim:#9fb3cc; --gold:#ffd479;
+  --serif:"Songti SC","STSong","Noto Serif SC",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:#05080f;color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+  overflow:hidden;
+}
+#scene{position:fixed;inset:0;transition:opacity .9s ease;}
+.layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;}
+.layer.on{opacity:1}
+.sky{position:absolute;inset:0}
+#fx{position:fixed;inset:0;pointer-events:none}
+
+/* ---------- 诗句区 ---------- */
+#poem{
+  position:fixed;left:0;right:0;top:8.5vh;padding:0 6vw 20vh;
+  text-align:center;pointer-events:none;
+}
+.title{font-family:var(--serif);font-size:clamp(20px,2.6vw,32px);
+  letter-spacing:.35em;color:var(--gold);opacity:.9;margin-bottom:1.4rem;text-indent:.35em}
+.line{
+  font-family:var(--serif);
+  font-size:clamp(20px,3vw,34px);
+  line-height:1.5;letter-spacing:.18em;text-indent:.18em;
+  opacity:0;transform:translateY(10px);
+  transition:opacity .55s ease,transform .55s ease,color .55s ease;
+  text-shadow:0 2px 20px rgba(0,0,0,.75);
+  color:#cfe0f5;
+}
+.line.on{opacity:1;transform:none;color:#ffffff;font-size:clamp(26px,3.8vw,46px);
+  text-shadow:0 2px 26px rgba(0,0,0,.9),0 0 44px rgba(255,212,121,.28)}
+.line.on .t{color:#ffffff}
+.line.on::after{content:'';display:block;width:52px;height:2px;margin:.35rem auto 0;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.9}
+.line.past{opacity:.68;color:#c8d6ea}
+.line.future{opacity:.36;color:#adbfd6}
+.note{
+  display:block;margin-top:.5rem;
+  font-family:"PingFang SC",sans-serif;
+  font-size:clamp(12px,1.4vw,16px);letter-spacing:.06em;text-indent:0;
+  color:var(--dim);opacity:.9;
+}
+#quote{
+  position:fixed;left:0;right:0;bottom:15vh;text-align:center;
+  font-size:clamp(13px,1.5vw,18px);color:var(--gold);opacity:.9;
+  font-family:"PingFang SC",sans-serif;letter-spacing:.08em;padding:0 6vw;
+}
+
+/* ---------- 控制栏 ---------- */
+#bar{
+  position:fixed;left:50%;bottom:3.2vh;transform:translateX(-50%);
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;
+  background:rgba(10,16,28,.62);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.10);border-radius:999px;padding:8px 12px;
+  max-width:94vw;
+}
+.btn{
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);
+  color:var(--ink);border-radius:999px;padding:7px 13px;font-size:13px;cursor:pointer;
+  font-family:inherit;transition:.2s;white-space:nowrap;
+}
+.btn:hover{background:rgba(255,255,255,.16)}
+.btn.on{background:var(--gold);color:#20160a;border-color:var(--gold);font-weight:600}
+.seg{display:flex;gap:4px}
+#acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;
+  position:fixed;left:50%;top:2.4vh;transform:translateX(-50%);max-width:96vw}
+.act{
+  border:1px solid rgba(255,255,255,.14);background:rgba(8,14,24,.5);color:var(--dim);
+  border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:inherit
+}
+.act.on{background:rgba(255,212,121,.16);color:var(--gold);border-color:rgba(255,212,121,.5)}
+#counter{font-size:12px;color:var(--dim);padding:0 4px}
+#hint{position:fixed;right:18px;top:14px;font-size:13px;color:#c9d6e6;text-align:right;line-height:1.9;text-shadow:0 1px 10px rgba(0,0,0,.9)}
+#hint b{color:var(--gold)}
+@media (max-width:640px){
+  #poem{top:18vh}
+  .btn{padding:6px 10px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .line,.layer{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div id="scene"></div>
+<canvas id="fx"></canvas>
+
+<div id="poem">
+  <div class="title">春夜喜雨 · 杜甫</div>
+  <div id="lines"></div>
+</div>
+
+<div id="quote"></div>
+<div id="acts"></div>
+
+<div id="hint">
+  ← → 切句<br>空格 播放/暂停<br><b>Y</b> 朗读 · <b>N</b> 注释 · <b>R</b> 背诵
+</div>
+
+<div id="bar">
+  <button class="btn" id="prev">⏮</button>
+  <button class="btn pri" id="play">▶ 播放</button>
+  <button class="btn" id="next">⏭</button>
+  <button class="btn" id="read">🎤 跟读</button>
+  <button class="btn" id="recite">🧠 背诵</button>
+  <button class="btn" id="note">📖 注释</button>
+  <button class="btn" id="voice">🔊 朗读</button>
+  <div class="seg">
+    <button class="btn" data-sp="0.7">0.7x</button>
+    <button class="btn on" data-sp="1">1x</button>
+    <button class="btn" data-sp="1.4">1.4x</button>
+  </div>
+  <span id="counter">—</span>
+</div>
+
+<script>
+/* ============================================================
+   《春夜喜雨》课文动画 — 场景驱动型课件引擎 PoeticStage v0.1
+   思路：台词驱动(StageShow) → 场景驱动(PoeticStage)
+   数据与渲染分离：改诗只改 POEM，不碰引擎
+   ============================================================ */
+const POEM = {
+  title: '春夜喜雨', author: '唐 · 杜甫',
+  acts: [
+    {id:0, name:'一 · 春夜云生', scene:'night-cloud'},
+    {id:1, name:'二 · 随风潜入', scene:'rain'},
+    {id:2, name:'三 · 润物无声', scene:'sprout'},
+    {id:3, name:'四 · 江船火明', scene:'boat'},
+    {id:4, name:'五 · 晓看红湿', scene:'dawn'}
+  ],
+  lines: [
+    {act:0, text:'好雨知时节，',           note:'好雨：及时雨。知：懂得、知道。时节：适宜下雨的时节。'},
+    {act:0, text:'当春乃发生。',           note:'乃：就。发生：催发植物生长。'},
+    {act:1, text:'随风潜入夜，',           note:'潜：悄悄地、暗暗地。潜夜：趁着夜色。'},
+    {act:1, text:'润物细无声。',           note:'润物：滋润万物。细：细微、轻柔。'},
+    {act:2, text:'野径云俱黑，',           note:'野径：田野间的小路。俱：都。'},
+    {act:3, text:'江船火独明。',           note:'独：唯独、格外。'},
+    {act:4, text:'晓看红湿处，',           note:'晓：天刚亮时。湿：花木经雨后带水而显红色。'},
+    {act:4, text:'花重锦官城。',           note:'重：形容花因带雨水而沉重饱满。锦官城：成都的别称。'}
+  ],
+  quotes: {
+    0:'随风潜入夜，润物细无声 —— 写春雨“悄无声息”的品格',
+    1:'随风潜入夜，润物细无声 —— 写春雨“悄无声息”的品格',
+    2:'随风潜入夜，润物细无声 —— 写春雨“悄无声息”的品格',
+    3:'野径云俱黑，江船火独明 —— 黑白对比，一笔点出春夜',
+    4:'花重锦官城 —— 一字“重”，写尽成都花事之盛'
+  }
+};
+
+/* ---------------- 场景（纯 CSS/SVG 意境层） ---------------- */
+const SCENES = {
+  'night-cloud': `
+    <div class="sky" style="background:linear-gradient(180deg,#0a1428 0%,#101d38 45%,#16233f 100%)"></div>
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <defs>
+        <radialGradient id="moon" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#f3f7ff" stop-opacity=".9"/>
+          <stop offset="60%" stop-color="#cfe0ff" stop-opacity=".22"/>
+          <stop offset="100%" stop-color="#cfe0ff" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2c3d5e" stop-opacity=".85"/>
+          <stop offset="100%" stop-color="#16233f" stop-opacity=".9"/>
+        </linearGradient>
+      </defs>
+      <circle cx="880" cy="150" r="150" fill="url(#moon)" opacity=".35"/>
+      <circle cx="880" cy="150" r="40" fill="#eef4ff" opacity=".2"/>
+      <path d="M0 300 C180 250 320 340 480 300 C640 260 760 330 900 300 C1040 270 1140 320 1200 300 L1200 700 L0 700Z" fill="url(#cloud)"/>
+      <path d="M0 360 C220 320 340 400 520 365 C700 330 840 390 1000 365 C1110 348 1160 375 1200 365 L1200 700 L0 700Z" fill="#1b2a48" opacity=".9"/>
+      <path d="M0 430 C240 400 380 455 560 430 C740 405 900 450 1060 430 C1130 421 1170 435 1200 430 L1200 700 L0 700Z" fill="#22314f"/>
+      <path d="M0 470 L1200 470 L1200 700 L0 700Z" fill="#0e1626"/>
+    </svg>`,
+
+  'rain': `
+    <div class="sky" style="background:linear-gradient(180deg,#0b1120 0%,#101a2e 60%,#16233c 100%)"></div>
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <path d="M0 470 L1200 470 L1200 700 L0 700Z" fill="#0d1424"/>
+      <path d="M120 470 C130 380 150 320 160 300 C170 330 185 390 195 470Z" fill="#1c2a42"/>
+      <path d="M980 470 C990 400 1005 350 1015 330 C1025 355 1040 405 1050 470Z" fill="#1c2a42"/>
+      <g stroke="#6f8dbb" stroke-opacity=".18" stroke-width="1.4">
+        <path d="M0 120 L1200 60"/><path d="M0 200 L1200 140"/><path d="M0 280 L1200 220"/>
+      </g>
+    </svg>`,
+
+  'sprout': `
+    <div class="sky" style="background:linear-gradient(180deg,#0c1626 0%,#132238 55%,#1b2c40 100%)"></div>
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <path d="M0 470 L1200 470 L1200 700 L0 700Z" fill="#0f1a28"/>
+      <path d="M0 470 L1200 470 L1200 520 C900 505 300 535 0 515Z" fill="#14241f"/>
+      <g stroke="#3f8f5a" stroke-width="5" fill="none" stroke-linecap="round">
+        <path d="M300 500 C300 450 300 420 302 396"/>
+        <path d="M600 505 C600 450 600 415 598 385"/>
+        <path d="M900 498 C900 448 900 420 902 398"/>
+      </g>
+      <g fill="#4fa96c">
+        <path d="M302 400 C276 396 262 378 268 366 C292 366 304 380 302 400Z"/>
+        <path d="M302 400 C328 396 342 378 336 366 C312 366 300 380 302 400Z"/>
+        <path d="M598 388 C570 384 556 364 562 352 C588 352 600 368 598 388Z"/>
+        <path d="M598 388 C626 384 640 364 634 352 C608 352 596 368 598 388Z"/>
+        <path d="M902 400 C876 396 862 378 868 366 C892 366 904 380 902 400Z"/>
+        <path d="M902 400 C928 396 942 378 936 366 C912 366 900 380 902 400Z"/>
+      </g>
+      <ellipse cx="600" cy="520" rx="520" ry="42" fill="#16262a" opacity=".7"/>
+    </svg>`,
+
+  'boat': `
+    <div class="sky" style="background:linear-gradient(180deg,#060b16 0%,#0b1526 60%,#122036 100%)"></div>
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <rect x="0" y="430" width="1200" height="270" fill="#0a1526"/>
+      <g stroke="#5f7fae" stroke-opacity=".12" stroke-width="2">
+        <path d="M0 470 Q120 462 240 470 T480 470 T720 470 T960 470 T1200 470"/>
+        <path d="M0 520 Q120 512 240 520 T480 520 T720 520 T960 520 T1200 520"/>
+      </g>
+      <g>
+        <path d="M700 430 L840 430 L810 470 L726 470Z" fill="#131f33"/>
+        <path d="M760 430 L760 372 L770 372 L770 430Z" fill="#1a2941"/>
+        <circle cx="792" cy="404" r="13" fill="#ffcf7a" opacity=".95"/>
+        <circle cx="792" cy="404" r="34" fill="#ffb347" opacity=".28"/>
+        <circle cx="792" cy="404" r="62" fill="#ff9d2e" opacity=".12"/>
+      </g>
+      <path d="M0 430 L1200 430 L1200 442 L0 442Z" fill="#0d1a2c" opacity=".8"/>
+    </svg>`,
+
+  'dawn': `
+    <div class="sky" style="background:linear-gradient(180deg,#2a3550 0%,#6d5a6e 35%,#c98a76 62%,#e8b985 78%,#3a3a44 79%,#1c2230 100%)"></div>
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <circle cx="600" cy="520" r="70" fill="#ffe6b0" opacity=".55"/>
+      <circle cx="600" cy="520" r="130" fill="#ffd489" opacity=".18"/>
+      <path d="M0 545 L1200 545 L1200 700 L0 700Z" fill="#191d28"/>
+      <g>
+        <g fill="#b8444f" opacity=".92">
+          <circle cx="300" cy="540" r="13"/><circle cx="330" cy="534" r="16"/><circle cx="362" cy="540" r="12"/>
+          <circle cx="820" cy="536" r="14"/><circle cx="852" cy="530" r="17"/><circle cx="884" cy="537" r="12"/>
+        </g>
+        <g fill="#3f8f5a" opacity=".9">
+          <path d="M288 548 C300 512 318 500 330 500 C318 520 312 536 312 550Z"/>
+          <path d="M806 544 C820 508 840 498 852 498 C838 518 832 534 832 546Z"/>
+        </g>
+        <g fill="#c9563f" opacity=".8">
+          <circle cx="150" cy="556" r="9"/><circle cx="176" cy="552" r="11"/><circle cx="1020" cy="552" r="10"/>
+        </g>
+      </g>
+      <g fill="#ffd9a0" opacity=".5">
+        <circle cx="480" cy="500" r="5"/><circle cx="700" cy="492" r="6"/><circle cx="560" cy="480" r="4"/><circle cx="900" cy="505" r="5"/>
+      </g>
+    </svg>`
+};
+
+/* ---------------- 引擎 ---------------- */
+const PoeticStage = (function(){
+  let P=null, idx=0, playing=false, speed=1, timer=null, typeTimer=null;
+  let showNote=false, reciteMode=false, readMode=false, voiceOn=false;
+  const $=s=>document.querySelector(s);
+  const sceneBox=$('#scene'), linesBox=$('#lines'), fx=$('#fx');
+  const ctx=fx.getContext('2d');
+  let W=0,H=0,DPR=1;
+  let drops=[], splashes=[], motes=[];
+
+  function init(poem){
+    P=poem;
+    // 场景层
+    sceneBox.innerHTML = Object.keys(SCENES).map(k=>`<div class="layer" data-k="${k}">${SCENES[k]}</div>`).join('');
+    // 诗句
+    linesBox.innerHTML = P.lines.map((l,i)=>
+      `<div class="line" data-i="${i}"><span class="t">${l.text}</span><span class="note"></span></div>`).join('');
+    // 幕次按钮
+    $('#acts').innerHTML = P.acts.map(a=>`<button class="act" data-id="${a.id}">${a.name}</button>`).join('');
+    [...document.querySelectorAll('.act')].forEach(b=>b.onclick=()=>{
+      const i=P.lines.findIndex(l=>l.act==b.dataset.id); if(i>=0) show(i,true);
+    });
+    bind(); resize(); show(0,true); return PoeticStage;
+  }
+
+  function sceneOf(i){ return P.acts.find(a=>a.id===P.lines[i].act)?.scene; }
+
+  function setScene(k){
+    [...sceneBox.children].forEach(el=>el.classList.toggle('on', el.dataset.k===k));
+    // 粒子参数随场景切换
+    if(k==='rain'){ drops=Array.from({length:170},()=>mkDrop(true)); }
+    else if(k==='sprout'||k==='dawn'){ drops=Array.from({length:40},()=>mkDrop(true)); motes=Array.from({length:40},()=>mkMote()); }
+    else { drops=[]; motes=[]; }
+  }
+
+  function mkDrop(spread){
+    return {x:Math.random()*W, y:spread?Math.random()*H:-Math.random()*120,
+      l:8+Math.random()*16, s:4+Math.random()*7, o:.18+Math.random()*.35};
+  }
+  function mkMote(){ return {x:Math.random()*W,y:Math.random()*H,r:.7+Math.random()*2.2,
+    vy:-(.12+Math.random()*.35), vx:(Math.random()-.5)*.3,a:.2+Math.random()*.5}; }
+
+  function resize(){
+    DPR=Math.min(window.devicePixelRatio||1,2);
+    W=window.innerWidth; H=window.innerHeight;
+    fx.width=W*DPR; fx.height=H*DPR; fx.style.width=W+'px'; fx.style.height=H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    const k=sceneOf(idx);
+    if(drops.length){
+      ctx.lineCap='round';
+      drops.forEach(d=>{
+        ctx.strokeStyle=`rgba(190,215,255,${d.o})`;
+        ctx.lineWidth=1.1;
+        ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x+2.5,d.y+d.l); ctx.stroke();
+        d.y+=d.s; d.x+=d.s*0.22;
+        if(d.y>H){ d.y=-20; d.x=Math.random()*W; }
+        if(d.x>W+10) d.x=-10;
+      });
+    }
+    if(motes.length){
+      motes.forEach(m=>{
+        ctx.fillStyle=`rgba(255,225,170,${m.a})`;
+        ctx.beginPath(); ctx.arc(m.x,m.y,m.r,0,Math.PI*2); ctx.fill();
+        m.y+=m.vy; m.x+=m.vx;
+        if(m.y<-10){m.y=H+10;m.x=Math.random()*W;}
+      });
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function show(i,stop){
+    if(stop){ playing=false; $('#play').textContent='▶ 播放'; clearTimeout(timer); }
+    idx=(i+P.lines.length)%P.lines.length;
+    const L=P.lines[idx];
+    // 场景
+    const sc=sceneOf(idx);
+    if(sceneBox.dataset.cur!==sc){ sceneBox.dataset.cur=sc; setScene(sc); }
+    // 诗句状态
+    [...linesBox.children].forEach((el,k)=>{
+      el.classList.toggle('on',k===idx);
+      el.classList.toggle('past',k<idx);
+      el.classList.toggle('future',k>idx);
+    });
+    // 注释
+    const noteEl=linesBox.children[idx].querySelector('.note');
+    noteEl.textContent = showNote ? (L.note||'') : '';
+    // 背诵模式：当前句挖空
+    linesBox.children[idx].querySelector('.t').textContent =
+      (reciteMode && k===idx) ? maskText(L.text) : L.text;
+    // 名句
+    $('#quote').textContent = P.quotes[L.act]||'';
+    // 幕按钮
+    [...document.querySelectorAll('.act')].forEach(b=>{
+      b.classList.toggle('on', b.dataset.id==String(L.act));
+    });
+    $('#counter').textContent = `第 ${idx+1} / ${P.lines.length} 句`;
+    typeCurrent();
+    schedule();
+  }
+
+  function maskText(t){ return t.replace(/[^\s，。？！、]/g,'＿'); }
+
+  function typeCurrent(){
+    clearInterval(typeTimer);
+    const el=linesBox.children[idx].querySelector('.t');
+    if(reciteMode){ el.textContent=maskText(P.lines[idx].text); return; }
+    const text=P.lines[idx].text; let i=0;
+    el.textContent='';
+    typeTimer=setInterval(()=>{ i++; el.textContent=text.slice(0,i);
+      if(i>=text.length) clearInterval(typeTimer); }, 55/speed);
+  }
+
+  function schedule(){
+    clearTimeout(timer);
+    if(!playing||readMode) return;
+    const L=P.lines[idx];
+    const dur = Math.min(11000, Math.max(4200, 3200 + L.text.length*380)) / speed;
+    timer=setTimeout(()=>show(idx+1), dur);
+  }
+
+  function speak(){
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(P.lines[idx].text);
+    u.lang='zh-CN'; u.rate=.85*speed; u.pitch=1;
+    speechSynthesis.speak(u);
+  }
+
+  function bind(){
+    $('#play').onclick=()=>{ playing=!playing; $('#play').textContent=playing?'⏸ 暂停':'▶ 播放';
+      if(playing)schedule(); else clearTimeout(timer); };
+    $('#next').onclick=()=>show(idx+1);
+    $('#prev').onclick=()=>show(idx-1);
+    $('#read').onclick=e=>{ readMode=!readMode; e.target.classList.toggle('on',readMode);
+      if(readMode){playing=false;$('#play').textContent='▶ 播放';clearTimeout(timer);} };
+    $('#recite').onclick=e=>{ reciteMode=!reciteMode; e.target.classList.toggle('on',reciteMode);
+      show(idx,true); };
+    $('#note').onclick=e=>{ showNote=!showNote; e.target.classList.toggle('on',showNote);
+      const L=P.lines[idx]; linesBox.children[idx].querySelector('.note').textContent=showNote?(L.note||''):''; };
+    $('#voice').onclick=e=>{ voiceOn=!voiceOn; e.target.classList.toggle('on',voiceOn);
+      if(!voiceOn&&'speechSynthesis'in window) speechSynthesis.cancel(); else speak(); };
+    document.querySelectorAll('.seg .btn').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('.seg .btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); speed=parseFloat(b.dataset.sp); schedule();
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='ArrowRight') show(idx+1);
+      else if(e.key==='ArrowLeft') show(idx-1);
+      else if(e.key===' '){ e.preventDefault(); $('#play').click(); }
+      else if(e.key==='y'||e.key==='Y') $('#voice').click();
+      else if(e.key==='n'||e.key==='N') $('#note').click();
+      else if(e.key==='r'||e.key==='R') $('#recite').click();
+    });
+    window.addEventListener('resize',()=>{resize();});
+    $('#poem').onclick=()=>show(idx+1);
+  }
+
+  return { init, show, start:loop, get idx(){return idx;} };
+})();
+
+PoeticStage.init(POEM);
+PoeticStage.start();
+</script>
+</body>
+</html>
