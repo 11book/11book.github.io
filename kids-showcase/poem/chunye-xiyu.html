@@ -379,13 +379,13 @@ function figure(o){
   face+=`<path d="M0 -140 C-9 -146 -13 -153 -12 -158 C-6 -154 -2 -150 0 -146 C2 -150 6 -154 12 -158 C13 -153 9 -146 0 -140Z" fill="${INK}" opacity=".9"/>`;
   // 斗笠/蓑帽
   if(hat==='bamboo'){
-    face+=`<path d="M-32 -138 C-22 -158 22 -158 32 -138 C22 -132 -22 -132 -32 -138Z" fill="#6b5638" opacity=".95"/>`;
-    face+=`<path d="M-34 -137 C-20 -130 20 -130 34 -137" stroke="#8a6f47" stroke-width="2.4" fill="none" opacity=".9"/>`;
-    face+=`<path d="M-24 -143 q24 -8 48 0" stroke="#8a6f47" stroke-width="1.2" fill="none" opacity=".6"/>`;
-    face+=`<path d="M-15 -148 q15 -5 30 0" stroke="#8a6f47" stroke-width="1" fill="none" opacity=".45"/>`;
+    face+=`<path d="M-32 -138 C-22 -158 22 -158 32 -138 C22 -132 -22 -132 -32 -138Z" fill="#a5885a" opacity=".97"/>`;
+    face+=`<path d="M-34 -137 C-20 -130 20 -130 34 -137" stroke="#d8bd8c" stroke-width="2.6" fill="none" opacity=".95"/>`;
+    face+=`<path d="M-24 -143 q24 -8 48 0" stroke="#c9ab77" stroke-width="1.3" fill="none" opacity=".7"/>`;
+    face+=`<path d="M-15 -148 q15 -5 30 0" stroke="#c9ab77" stroke-width="1" fill="none" opacity=".5"/>`;
   }
   if(hat==='straw'){
-    face+=`<path d="M-30 -136 C-20 -158 20 -158 30 -136 C18 -128 -18 -128 -30 -136Z" fill="#7a6242" opacity=".95"/>`;
+    face+=`<path d="M-30 -136 C-20 -158 20 -158 30 -136 C18 -128 -18 -128 -30 -136Z" fill="#a68a5c" opacity=".97"/>`;
     // 蓑衣毛边
     for(let i=-26;i<=26;i+=6){
       face+=`<path d="M${i} -132 l2 9" stroke="#6a5336" stroke-width="1.3" opacity=".6"/>`;
@@ -500,9 +500,9 @@ function poet(){
 }
 /* 农人（斗笠，肩扛锄/背篓） */
 function farmer(){
-  const f=figure({s:.78,robe:'#7d8070',robe2:'#54574c',trim:'#c4bf9f',hat:'bamboo',pose:'walk'});
+  const f=figure({s:.78,robe:'#9a9c88',robe2:'#6b6e5f',trim:'#d8d3b0',hat:'bamboo',pose:'walk'});
   return `<g class="pf" data-depth="34">
-   <g class="breathe">
+   <g class="breathe" transform="scale(1.85)">
     ${f.body}${f.face}
     <!-- 竹篓 -->
     <path d="M-34 -44 C-44 -40 -46 -24 -38 -14 L-18 -18 L-20 -44Z" fill="#7a6242" opacity=".9"/>
@@ -515,7 +515,7 @@ function farmer(){
 }
 /* 渔翁（蓑帽，坐船摇橹） */
 function fisher(){
-  const f=figure({s:.8,robe:'#807c63',robe2:'#54513f',trim:'#bdb49b',hat:'straw',pose:'sit'});
+  const f=figure({s:.8,robe:'#9c967a',robe2:'#6b6650',trim:'#cec5aa',hat:'straw',pose:'sit'});
   return `<g class="pf" data-depth="40">
    <g class="sway">
     ${f.body}${f.face}
@@ -556,6 +556,9 @@ function defs(){
     <stop offset=".72" stop-color="#7d9ac2" stop-opacity=".05"/>
     <stop offset="1" stop-color="#7d9ac2" stop-opacity="0"/>
   </linearGradient>
+  <radialGradient id="wetG"><stop offset="0" stop-color="#8fa8c4" stop-opacity=".18"/>
+    <stop offset=".6" stop-color="#6d88a8" stop-opacity=".06"/>
+    <stop offset="1" stop-color="#4a6a95" stop-opacity="0"/></radialGradient>
   <radialGradient id="moonG"><stop offset="0" stop-color="#dfeaf8" stop-opacity=".55"/>
     <stop offset=".55" stop-color="#9fc0e2" stop-opacity=".16"/>
     <stop offset="1" stop-color="#7fa5cf" stop-opacity="0"/></radialGradient>
@@ -681,9 +684,18 @@ function sceneRain(){
     <g filter="url(#glow)"><rect x="224" y="668" width="18" height="24" fill="#f0b45c" opacity=".55"/></g>
   </g>
   <!-- 农人（斗笠） -->
-  <g transform="translate(560,832)">${farmer()}</g>
+  <g transform="translate(470,852)">
+   <ellipse cx="0" cy="-60" rx="120" ry="150" fill="url(#moonG)" opacity=".6"/>
+   ${farmer()}
+   <ellipse cx="0" cy="6" rx="70" ry="10" fill="#060b13" opacity=".55"/>
+   <path d="M-44 4 q44 -8 88 0" stroke="#7f9bc4" stroke-width="1.8" fill="none" opacity=".34"/>
+   <g stroke="#cfe4fb" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round">
+     <path d="M-30 -80 C-36 -52 -32 -26 -26 0"/>
+     <path d="M30 -80 C36 -52 32 -26 26 0"/>
+   </g>
+  </g>
   <!-- 诗人 -->
-  <g transform="translate(1130,880)">${poet()}</g>
+  <g transform="translate(1268,868) scale(.52)" opacity=".72">${poet()}</g>
   <rect x="0" y="820" width="1600" height="130" fill="url(#mistG)" opacity=".65"/>`;
 }
 
@@ -697,6 +709,15 @@ function sceneSprout(){
   <path d="M0 700 C300 672 620 700 900 682 C1180 664 1400 692 1600 676 L1600 1000 L0 1000Z" fill="#241a13" opacity=".9"/>
   <g filter="url(#dry)" opacity=".45">${moss(60,700,1480,260,151,'#0d0906',.5,90)}</g>
   <g filter="url(#dry)" opacity=".3">${slant(0,720,1600,240,161,'#3a2a1c',.3,40,70)}</g>
+  <!-- 湿润土壤反光 -->
+  <g opacity=".5" fill="none" stroke-linecap="round">
+    <path d="M120 762 C240 748 340 766 452 756" stroke="#6d7f92" stroke-width="1.6" opacity=".28"/>
+    <path d="M700 806 C840 790 980 812 1120 798" stroke="#7e90a4" stroke-width="1.8" opacity=".24"/>
+    <path d="M1150 748 C1260 736 1380 752 1500 742" stroke="#6d7f92" stroke-width="1.5" opacity=".22"/>
+    <path d="M300 884 C460 866 600 890 780 874" stroke="#5f7186" stroke-width="1.7" opacity=".2"/>
+    <path d="M980 902 C1130 886 1290 908 1450 894" stroke="#7e90a4" stroke-width="1.6" opacity=".2"/>
+  </g>
+  <ellipse cx="800" cy="790" rx="620" ry="130" fill="url(#wetG)" opacity=".5"/>
   <!-- 幼苗（三株，高度随 state.sproutH） -->
   <g id="sprouts" transform="translate(0,0)" style="pointer-events:all"></g>
   <!-- 水洼涟漪 -->
@@ -724,20 +745,32 @@ function sceneBoat(){
   <!-- 岸雾 -->
   <rect x="0" y="600" width="1600" height="90" fill="url(#mistG)" opacity=".75"/>
   <!-- 船 -->
-  <g id="boat" transform="translate(780,760) scale(1.24)">
+  <g id="boat" transform="translate(760,770) scale(1.55)">
     <g class="breathe">
       <!-- 船身 -->
-      <path d="M-150 0 C-120 26 120 26 150 0 C110 -14 -110 -14 -150 0Z" fill="#232f40"/>
-      <path d="M-150 0 C-120 26 120 26 150 0" fill="none" stroke="#5d7characters" stroke-width="0"/>
-      <path d="M-152 0 C-124 24 124 24 152 0" fill="none" stroke="#6c8ab0" stroke-width="2" opacity=".55"/>
+      <path d="M-150 0 C-120 26 120 26 150 0 C110 -14 -110 -14 -150 0Z" fill="#16202e"/>
+      <path d="M-150 0 C-120 22 120 22 150 0 C110 -12 -110 -12 -150 0Z" fill="#1d2a3a"/>
+      <path d="M-152 0 C-124 24 124 24 152 0" fill="none" stroke="#7d9cc2" stroke-width="2" opacity=".6"/>
+      <path d="M-146 -6 C-116 -18 116 -18 146 -6" stroke="#5f7b9e" stroke-width="1.4" fill="none" opacity=".45"/>
       <!-- 乌篷 -->
-      <path d="M-62 -4 C-58 -44 -30 -66 0 -66 C30 -66 58 -44 62 -4 Z" fill="#27344a"/>
-      <path d="M-62 -4 C-58 -44 -30 -66 0 -66 C30 -66 58 -44 62 -4" fill="none" stroke="#7893b8" stroke-width="2" opacity=".5"/>
+      <path d="M-64 -4 C-60 -46 -30 -68 0 -68 C30 -68 60 -46 64 -4 Z" fill="#1a2434"/>
+      <path d="M-64 -4 C-60 -46 -30 -68 0 -68 C30 -68 60 -46 64 -4" fill="none" stroke="#8aa6ca" stroke-width="2.4" opacity=".62"/>
+      <path d="M-58 -8 C-54 -42 -26 -62 0 -62 C26 -62 54 -42 58 -8" fill="none" stroke="#4d6széles" stroke-width="1" opacity="0"/>
+      <!-- 篷受灯火暖光 -->
+      <path d="M-20 -62 C-4 -66 12 -64 22 -58 C8 -48 -8 -46 -20 -50Z" fill="#c08a4a" opacity=".2"/>
       <g stroke="#2a3a50" stroke-width="1.6" fill="none" opacity=".8">
         <path d="M-34 -22 C-20 -50 20 -50 34 -22"/><path d="M-16 -40 C-8 -58 8 -58 16 -40"/>
       </g>
+      <g stroke="#6d87ad" stroke-width="1.1" fill="none" opacity=".45">
+        <path d="M-48 -12 C-40 -40 -20 -58 0 -58 C20 -58 40 -40 48 -12"/>
+        <path d="M-40 -20 C-32 -42 -16 -54 0 -54 C16 -54 32 -42 40 -20"/>
+        <path d="M-58 -8 L58 -8"/>
+      </g>
+      <!-- 船舷 -->
+      <path d="M-118 -8 C-60 -18 60 -18 118 -8" stroke="#7d9cc2" stroke-width="1.8" fill="none" opacity=".5"/>
+      <path d="M-92 -12 L-92 6 M92 -12 L92 6" stroke="#5f7899" stroke-width="1.4" opacity=".4"/>
       <!-- 渔翁 -->
-      <g transform="translate(96,-4)">${fisher()}</g>
+      <g transform="translate(108,-8) scale(.92)" opacity=".94">${fisher()}</g>
       <!-- 橹 -->
       <path d="M84 -46 C110 -26 116 6 106 34" stroke="#6b5638" stroke-width="5" fill="none" stroke-linecap="round"/>
       <path d="M106 34 C118 40 122 52 116 60" stroke="#5b4a33" stroke-width="7" fill="none" stroke-linecap="round"/>
@@ -746,14 +779,17 @@ function sceneBoat(){
   <!-- 灯笼（可拖） -->
   <g id="lamp" class="drag" transform="translate(900,700)" style="pointer-events:all">
     <g class="breathe">
-      <path d="M0 -70 L0 -46" stroke="#4a3a28" stroke-width="2.4"/>
-      <ellipse cx="0" cy="-24" rx="20" ry="26" fill="#c8423f"/>
-      <ellipse cx="0" cy="-24" rx="20" ry="26" fill="#f0b45c" opacity=".38"/>
-      <path d="M-20 -34 C-8 -38 8 -38 20 -34" stroke="#8f2f2c" stroke-width="2" opacity=".7" fill="none"/>
+      <path d="M0 -78 L0 -50" stroke="#4a3a28" stroke-width="2.2"/>
+      <path d="M-14 -50 L14 -50" stroke="#4a3a28" stroke-width="2"/>
+      <ellipse cx="0" cy="-26" rx="15" ry="21" fill="#c8423f"/>
+      <ellipse cx="0" cy="-26" rx="15" ry="21" fill="#f0b45c" opacity=".34"/>
+      <path d="M-15 -34 C-6 -37 6 -37 15 -34" stroke="#8f2f2c" stroke-width="1.8" opacity=".65" fill="none"/>
+      <path d="M-15 -18 C-6 -15 6 -15 15 -18" stroke="#8f2f2c" stroke-width="1.8" opacity=".65" fill="none"/>
+      <path d="M0 -47 L0 -42 M-15 -26 L15 -26" stroke="#8f2f2c" stroke-width="1.1" opacity=".45"/>
       <path d="M-20 -14 C-8 -10 8 -10 20 -14" stroke="#8f2f2c" stroke-width="2" opacity=".7" fill="none"/>
       <rect x="-6" y="-52" width="12" height="7" fill="#3a2d1e"/>
       <rect x="-6" y="-2" width="12" height="7" fill="#3a2d1e"/>
-      <ellipse cx="0" cy="-24" rx="86" ry="86" fill="url(#lampG)" opacity=".85"/>
+      <ellipse cx="0" cy="-26" rx="58" ry="62" fill="url(#lampG)" opacity=".55"/>
       <g fill="#e8c46a"><path d="M-3 6 L3 6 L2 20 L-2 20Z"/></g>
     </g>
   </g>
@@ -762,8 +798,12 @@ function sceneBoat(){
 
 function sceneDawn(){
   return `<rect width="1600" height="1000" fill="url(#skyDawn)"/>
-  <ellipse cx="1180" cy="840" rx="820" ry="560" fill="url(#dawnG)" opacity=".95"/>
-  <ellipse cx="1240" cy="900" rx="520" ry="220" fill="#ffd9a8" opacity=".16"/>
+  <ellipse cx="1180" cy="840" rx="820" ry="560" fill="url(#dawnG)" opacity="1"/>
+  <ellipse cx="1240" cy="900" rx="520" ry="220" fill="#ffd9a8" opacity=".26"/>
+  <!-- 地平线金辉 -->
+  <ellipse cx="1080" cy="700" rx="720" ry="90" fill="#f7cf9e" opacity=".28"/>
+  <ellipse cx="1240" cy="676" rx="420" ry="46" fill="#ffe6bd" opacity=".34"/>
+  <path d="M0 640 L1600 640 L1600 700 C1200 682 700 690 0 668Z" fill="#e7c39c" opacity=".22"/>
   <!-- 晨光 -->
   <g filter="url(#soft)" opacity=".4">
     <path d="M1120 840 L1420 300 L1500 320 L1180 860Z" fill="#ffd9a8"/>
@@ -801,11 +841,13 @@ function buildPoem(){
   const s2=el('text',{id:'heroSub',x:800,y:206,'text-anchor':'middle'},hero);
   // 右侧诗卷索引（像展开的手卷）
   const idx=el('g',{id:'poemIndex'},g);
+  el('rect',{x:1284,y:250,width:276,height:262,rx:3,fill:'rgba(7,12,21,.42)',
+    stroke:'rgba(190,215,245,.1)','stroke-width':1},idx);
   LINES.forEach((L,i)=>{
     const y=286+i*62;
     const gg=el('g',{class:'pidx','data-i':i},idx);
-    el('rect',{x:1296,y:y-26,width:252,height:40,rx:2,fill:'rgba(9,16,27,.24)',
-      stroke:'rgba(190,215,245,.12)','stroke-width':1},gg);
+    el('rect',{x:1296,y:y-26,width:252,height:40,rx:2,fill:'rgba(8,14,24,.6)',
+      stroke:'rgba(190,215,245,.16)','stroke-width':1},gg);
     el('circle',{cx:1314,cy:y-6,r:3,fill:'#e0b06a',opacity:.45},gg);
     const tx=el('text',{x:1328,y:y,'font-size':17.5,fill:'#dbe6f2','letter-spacing':'1.5'},gg);
     tx.textContent=L.t;
@@ -901,11 +943,11 @@ function drawRain(dt){
     if(d.y>Hpx-40){d.y=60;d.x=40+Math.random()*(Wpx-80);}
     const p=.55+.45*Math.sin(d.ph);
     const g=fxc.createRadialGradient(d.x,d.y,0,d.x,d.y,d.r*2.4);
-    g.addColorStop(0,`rgba(255,242,208,${.8*p})`);
-    g.addColorStop(.35,`rgba(238,186,108,${.3*p})`);
+    g.addColorStop(0,`rgba(255,244,214,${.55*p})`);
+    g.addColorStop(.35,`rgba(238,190,116,${.18*p})`);
     g.addColorStop(1,'rgba(238,186,108,0)');
     fxc.fillStyle=g; fxc.beginPath(); fxc.arc(d.x,d.y,d.r*3,0,7); fxc.fill();
-    fxc.fillStyle=`rgba(255,248,224,${.9*p})`;
+    fxc.fillStyle=`rgba(255,250,230,${.72*p})`;
     fxc.beginPath(); fxc.arc(d.x,d.y,d.r*.55,0,7); fxc.fill();
   }
   // 涟漪
@@ -1131,44 +1173,92 @@ svg.addEventListener('pointerdown',e=>{
 });
 function buildSprouts(){
   const g=$('sprouts'); if(!g)return;
-  const spots=[[420,760,1],[760,706,1.25],[1120,748,.9],[1380,700,.8]];
+  const spots=[[420,760,1],[760,700,1.3],[1120,748,.92],[1380,700,.82],[240,830,.7],[980,812,.86]];
   g.innerHTML=spots.map(([x,y,s],i)=>{
-    const h=(60+50*s)*(0.55+state.sproutH*.45);
-    const bend=(i%2?1:-1)*(6+state.sproutH*10);
-    return `<g transform="translate(${x},${y})"><g class="breathe" style="animation-delay:${i*.5}s">
-      <path d="M0 0 C${bend*.4} ${-h*.5} ${bend} ${-h*.8} ${bend*1.2} ${-h}" stroke="#6b8f5e" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-      <path d="M${bend*1.2} ${-h} c-24 -8 -32 -26 -26 -42 c18 6 26 22 26 42Z" fill="#5f8a58" opacity=".9"/>
-      <path d="M${bend*1.2} ${-h} c22 -10 28 -28 22 -44 c-16 8 -22 24 -22 44Z" fill="#6f9c62" opacity=".9"/>
-      <path d="M${bend*1.2} ${-h} c-24 -8 -32 -26 -26 -42" stroke="#8db87f" stroke-width="1" fill="none" opacity=".7"/>
-      <circle cx="${bend*1.2}" cy="${-h-4}" r="22" fill="transparent" style="pointer-events:all"/>
-      <circle cx="${bend*1.2}" cy="${-h-4}" r="4.6" fill="#cfe4f5" opacity=".92"/>
-      <circle cx="${bend*1.2-1}" cy="${-h-6}" r="1.6" fill="#fff" opacity=".95"/>
-    </g></g>`;
+    const gr=state.sproutH;                       // 0..1 生长进度
+    const h=(66+56*s)*(0.18+gr*.82);              // 高度随进度长出
+    const bend=(i%2?1:-1)*(3+gr*12);
+    const lw=(2+gr*2.2);                          // 茎由细变粗
+    const lf=(0.25+gr*.75);                       // 叶片展开度
+    const tx=bend*1.2, ty=-h;
+    // 叶（展开度控制尺寸与角度）
+    const l1x=tx-26*lf, l1y=ty-42*lf;
+    const l2x=tx+24*lf, l2y=ty-44*lf;
+    return `<g transform="translate(${x},${y})">
+     <!-- 破土裂缝与隆起 -->
+     <ellipse cx="0" cy="2" rx="${(30+gr*18).toFixed(1)}" ry="${(6+gr*3).toFixed(1)}" fill="#0d0906" opacity=".55"/>
+     <path d="M${-24-gr*10} 3 q${12+gr*6} -${5+gr*4} ${24+gr*10} 0 q${12+gr*6} ${5+gr*4} ${24+gr*10} 0"
+       fill="none" stroke="#3a2a1c" stroke-width="${(1.6+gr*1.4).toFixed(1)}" opacity=".7"/>
+     <ellipse cx="${(10+gr*16).toFixed(1)}" cy="${(-4-gr*6).toFixed(1)}" rx="${(7+gr*5).toFixed(1)}" ry="${(3+gr*2).toFixed(1)}" fill="#2f2318" opacity=".6"/>
+     <g class="breathe" style="animation-delay:${(i*.5).toFixed(1)}s">
+      <!-- 茎 -->
+      <path d="M0 0 C${(bend*.4).toFixed(1)} ${(-h*.5).toFixed(1)} ${bend.toFixed(1)} ${(-h*.8).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}"
+        stroke="#6b8f5e" stroke-width="${lw.toFixed(1)}" fill="none" stroke-linecap="round"/>
+      <path d="M0 0 C${(bend*.4).toFixed(1)} ${(-h*.5).toFixed(1)} ${bend.toFixed(1)} ${(-h*.8).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}"
+        stroke="#9dc088" stroke-width="${(lw*.34).toFixed(1)}" fill="none" stroke-linecap="round" opacity=".5"/>
+      <!-- 左叶 -->
+      <path d="M${tx.toFixed(1)} ${ty.toFixed(1)} c${(-24*lf).toFixed(1)} ${(-8*lf).toFixed(1)} ${(-34*lf).toFixed(1)} ${(-26*lf).toFixed(1)} ${(-28*lf).toFixed(1)} ${(-44*lf).toFixed(1)} c${(18*lf).toFixed(1)} ${(6*lf).toFixed(1)} ${(28*lf).toFixed(1)} ${(24*lf).toFixed(1)} ${(28*lf).toFixed(1)} ${(44*lf).toFixed(1)}Z"
+        fill="#5f8a58" opacity=".92"/>
+      <path d="M${tx.toFixed(1)} ${ty.toFixed(1)} c${(-16*lf).toFixed(1)} ${(-12*lf).toFixed(1)} ${(-26*lf).toFixed(1)} ${(-22*lf).toFixed(1)} ${(-28*lf).toFixed(1)} ${(-44*lf).toFixed(1)}"
+        stroke="#a3c795" stroke-width="1.1" fill="none" opacity=".75"/>
+      <!-- 右叶 -->
+      <path d="M${tx.toFixed(1)} ${ty.toFixed(1)} c${(24*lf).toFixed(1)} ${(-10*lf).toFixed(1)} ${(30*lf).toFixed(1)} ${(-28*lf).toFixed(1)} ${(24*lf).toFixed(1)} ${(-46*lf).toFixed(1)} c${(-16*lf).toFixed(1)} ${(8*lf).toFixed(1)} ${(-24*lf).toFixed(1)} ${(26*lf).toFixed(1)} ${(-24*lf).toFixed(1)} ${(46*lf).toFixed(1)}Z"
+        fill="#6f9c62" opacity=".92"/>
+      <path d="M${tx.toFixed(1)} ${ty.toFixed(1)} c${(16*lf).toFixed(1)} ${(-14*lf).toFixed(1)} ${(24*lf).toFixed(1)} ${(-24*lf).toFixed(1)} ${(24*lf).toFixed(1)} ${(-46*lf).toFixed(1)}"
+        stroke="#b0d19c" stroke-width="1.1" fill="none" opacity=".75"/>
+      <!-- 芽尖 + 叶尖水珠 -->
+      <circle cx="${tx.toFixed(1)}" cy="${(ty-4).toFixed(1)}" r="22" fill="transparent" style="pointer-events:all"/>
+      <circle cx="${tx.toFixed(1)}" cy="${(ty-4).toFixed(1)}" r="${(3.4+gr*2).toFixed(1)}" fill="#cfe4f5" opacity=".95"/>
+      <circle cx="${(tx-1).toFixed(1)}" cy="${(ty-6).toFixed(1)}" r="1.7" fill="#fff" opacity=".98"/>
+      <circle cx="${l1x.toFixed(1)}" cy="${(l1y+6).toFixed(1)}" r="2.6" fill="#e8f4ff" opacity=".8"/>
+      <circle cx="${l2x.toFixed(1)}" cy="${(l2y+8).toFixed(1)}" r="2.2" fill="#e8f4ff" opacity=".7"/>
+     </g></g>`;
   }).join('');
 }
 function buildPuddles(){
   const g=$('puddles'); if(!g)return;
-  g.innerHTML=[[300,860],[660,820],[1080,880],[1400,840]].map(([x,y],i)=>
-    `<ellipse cx="${x}" cy="${y}" rx="120" ry="16" fill="#3d567a" opacity=".28"/>
-     <ellipse cx="${x}" cy="${y}" rx="60" ry="8" fill="#5b7ba6" opacity=".22"/>
-     <ellipse cx="${x-30}" cy="${y-2}" rx="22" ry="5" fill="#9dc0e2" opacity=".18"/>
-     <g class="ripple" style="animation-delay:${i*.6}s"><ellipse cx="${x+30}" cy="${y}" rx="14" ry="4" fill="none" stroke="#bcd8f0" stroke-width="1.4"/></g>`).join('');
+  g.innerHTML=[[300,860],[660,820],[1080,880],[1400,840]].map(([x,y],i)=>{
+    const rings=[0,1,2].map(k=>`<ellipse cx="${x}" cy="${y}" rx="${18+k*16}" ry="${3+k*2.4}"
+      fill="none" stroke="#bcd8f0" stroke-width="${1.3-k*.28}" opacity="${.42-k*.11}"
+      class="ripple" style="animation-delay:${(i*.5+k*.7).toFixed(2)}s"/>`).join('');
+    return `<ellipse cx="${x}" cy="${y}" rx="120" ry="16" fill="#3d567a" opacity=".3"/>
+     <ellipse cx="${x}" cy="${y}" rx="66" ry="9" fill="#5b7ba6" opacity=".24"/>
+     <ellipse cx="${x-34}" cy="${y-3}" rx="26" ry="5" fill="#a9cbe8" opacity=".22"/>
+     <ellipse cx="${x+18}" cy="${y+2}" rx="12" ry="2.4" fill="#d8ecff" opacity=".2"/>
+     ${rings}`;
+  }).join('');
 }
 function buildBranch(){
   const g=$('branch'); if(!g)return;
-  const flowers=[[520,300],[700,246],[880,286],[1060,232],[1240,282],[1420,240],[600,400],[980,392]];
+  const flowers=[[500,292],[660,238],[820,280],[960,224],[1110,268],[1270,232],[1430,244],[590,398],[760,352],[940,344],[1130,318],[1310,296],[1500,300],[700,430],[1180,400]];
   let s=`<path d="M40 640 C220 570 420 520 640 470 C860 420 1080 400 1300 352 C1400 330 1500 316 1580 306"
-      stroke="#4a3a2e" stroke-width="9" fill="none" stroke-linecap="round"/>
+      stroke="#6b5340" stroke-width="6" fill="none" stroke-linecap="round" opacity=".9"/>
+    <path d="M40 640 C220 570 420 520 640 470 C860 420 1080 400 1300 352 C1400 330 1500 316 1580 306"
+      stroke="#9c7f60" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".5"/>
     <path d="M300 566 C360 528 420 512 470 508 M700 462 C760 430 810 416 870 408
-             M1080 402 C1140 386 1200 372 1250 366" stroke="#4a3a2e" stroke-width="4.4" fill="none" stroke-linecap="round"/>`;
+             M1080 402 C1140 386 1200 372 1250 366" stroke="#6b5340" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".85"/>
+    <path d="M420 522 C460 540 500 546 540 540 M900 430 C940 452 990 458 1040 450
+             M1210 372 C1240 396 1280 404 1320 398" stroke="#5f4a38" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".7"/>
+    <!-- 枝上嫩叶 -->
+    <g fill="#6f8f6a" opacity=".55">
+      <ellipse cx="360" cy="540" rx="13" ry="6" transform="rotate(-28 360 540)"/>
+      <ellipse cx="520" cy="502" rx="11" ry="5" transform="rotate(18 520 502)"/>
+      <ellipse cx="800" cy="426" rx="12" ry="5.5" transform="rotate(-16 800 426)"/>
+      <ellipse cx="1120" cy="380" rx="12" ry="5.5" transform="rotate(22 1120 380)"/>
+      <ellipse cx="1340" cy="338" rx="11" ry="5" transform="rotate(-12 1340 338)"/>
+    </g>`;
   flowers.forEach(([x,y],i)=>{
-    const r=17+i%3*3.4;
+    const r=26+i%3*4.5;
     s+=`<g class="hot" data-hi="${100+i}" data-n="红花" data-q="雨后的花最红，因为花瓣含着水，红得沉甸甸的——这就是「红湿」。">
-      <circle class="dot" cx="${x}" cy="${y}" r="4"/>
-      <circle class="ring" cx="${x}" cy="${y}" r="16"/>
+      <circle cx="${x}" cy="${y}" r="${r*2.1}" fill="transparent" style="pointer-events:all"/>
+      <ellipse cx="${x}" cy="${y}" rx="${r*1.7}" ry="${r*1.5}" fill="#e8556a" opacity=".22"/>
       ${petals(x,y,r)}
-      <circle cx="${x}" cy="${y}" r="3.4" fill="#f7dd90"/>
-      <circle cx="${x-2}" cy="${y-2}" r="1.5" fill="#fff2c8" opacity=".9"/>
+      <circle cx="${x}" cy="${y}" r="${(r*.28).toFixed(1)}" fill="#f7d477"/>
+      <circle cx="${x-1}" cy="${y-1}" r="${(r*.12).toFixed(1)}" fill="#fff2c8" opacity=".95"/>
+      <!-- 叶尖水珠 -->
+      <circle cx="${(x-r*.72).toFixed(1)}" cy="${(y-r*.55).toFixed(1)}" r="3.4" fill="#eaf6ff" opacity=".8"/>
+      <circle cx="${(x-r*.72).toFixed(1)}" cy="${(y-r*.55).toFixed(1)}" r="1.3" fill="#ffffff" opacity=".95"/>
+      <circle cx="${(x+r*.55).toFixed(1)}" cy="${(y+r*.6).toFixed(1)}" r="2.6" fill="#eaf6ff" opacity=".7"/>
     </g>`;
   });
   g.innerHTML=s;
@@ -1176,7 +1266,10 @@ function buildBranch(){
     let o='';
     for(let k=0;k<5;k++){
       const a=k*72*Math.PI/180;
-      o+=`<ellipse cx="${(x+Math.cos(a)*r*.72).toFixed(1)}" cy="${(y+Math.sin(a)*r*.72).toFixed(1)}" rx="${(r*.66).toFixed(1)}" ry="${(r*.5).toFixed(1)}" fill="#d9646f" opacity=".95" transform="rotate(${(k*72).toFixed(0)} ${x} ${y})"/>`;
+      const px=(x+Math.cos(a)*r*.72).toFixed(1), py=(y+Math.sin(a)*r*.72).toFixed(1);
+      o+=`<ellipse cx="${px}" cy="${py}" rx="${(r*.66).toFixed(1)}" ry="${(r*.52).toFixed(1)}" fill="#d6455c" opacity=".96" transform="rotate(${(k*72).toFixed(0)} ${x} ${y})"/>`;
+      o+=`<ellipse cx="${px}" cy="${(parseFloat(py)-r*.13).toFixed(1)}" rx="${(r*.4).toFixed(1)}" ry="${(r*.26).toFixed(1)}" fill="#f2707c" opacity=".7" transform="rotate(${(k*72).toFixed(0)} ${x} ${y})"/>`;
+      o+=`<ellipse cx="${(parseFloat(px)-r*.1).toFixed(1)}" cy="${(parseFloat(py)+r*.16).toFixed(1)}" rx="${(r*.34).toFixed(1)}" ry="${(r*.22).toFixed(1)}" fill="#a82f47" opacity=".55" transform="rotate(${(k*72).toFixed(0)} ${x} ${y})"/>`;
     }
     return o;
   }
@@ -1237,10 +1330,24 @@ function loop(ts){
       const tx=900+state.lantern.x, ty=700+state.lantern.y;
       lamp.setAttribute('transform',`translate(${tx},${ty})`);
       if(rf){
-        rf.innerHTML=`<g opacity=".55" transform="translate(${tx},812)">
-          <path d="M0 -8 L0 90" stroke="#f0b45c" stroke-width="4" opacity=".55"/>
-          ${[10,26,44,64,86].map((o,k)=>`<path d="M${-26+o*.4} ${o} q${14} ${3} ${28} 0" stroke="#e8b45e" stroke-width="${3-k*.4}" fill="none" opacity="${.5-k*.08}"/>`).join('')}
-          <ellipse cx="0" cy="0" rx="40" ry="120" fill="url(#lampG)" opacity=".2"/>
+        // 破碎倒影：按波纹错位的短笔触，不用直光柱
+        const w=Math.sin(Date.now()/560)*2.6;
+        const frags=[];
+        for(let k=0;k<11;k++){
+          const o=4+k*10;                       // 距光源纵向距离
+          const spread=6+o*.42;                // 越远越散
+          const j=(k%2?1:-1)*(1.5+k*.9)+w*(1+k*.12);
+          const lw=Math.max(1,3.6-k*.26);
+          const alpha=(.72-k*.055);
+          const warm=k<4;
+          const col=warm?'#f4c274':(k<7?'#d8a464':'#9fb0c4');
+          frags.push(`<path d="M${(-spread*.5+j).toFixed(1)} ${o} q${(spread*.5).toFixed(1)} ${(j>0?2.4:-2).toFixed(1)} ${spread.toFixed(1)} 0"
+            stroke="${col}" stroke-width="${lw.toFixed(2)}" fill="none" opacity="${alpha.toFixed(2)}" stroke-linecap="round"/>`);
+        }
+        rf.innerHTML=`<g transform="translate(${tx},798)">
+          <ellipse cx="0" cy="10" rx="26" ry="46" fill="url(#lampG)" opacity=".26"/>
+          ${frags.join('')}
+          <ellipse cx="0" cy="6" rx="11" ry="4" fill="#ffe6b4" opacity=".5"/>
         </g>`;
       }
     }
